@@ -17,6 +17,25 @@
           <element id="library" level="project" name="Maven: org.postgresql:postgresql:42.2.14" />
           <element id="library" level="project" name="Maven: io.github.cdimascio:dotenv-java:2.2.4" />
           <element id="library" level="project" name="Maven: com.google.code.gson:gson:2.9.0" />
+          <element id="library" level="project" name="Maven: com.heroku:webapp-runner-parent:9.0.41.0" />
+          <element id="library" level="project" name="Maven: org.apache.tomcat.embed:tomcat-embed-core:9.0.41" />
+          <element id="library" level="project" name="Maven: org.apache.tomcat:tomcat-annotations-api:9.0.41" />
+          <element id="library" level="project" name="Maven: org.apache.tomcat.embed:tomcat-embed-logging-juli:9.0.0.M6" />
+          <element id="library" level="project" name="Maven: org.apache.tomcat.embed:tomcat-embed-jasper:9.0.41" />
+          <element id="library" level="project" name="Maven: org.apache.tomcat.embed:tomcat-embed-el:9.0.41" />
+          <element id="library" level="project" name="Maven: org.eclipse.jdt:ecj:3.18.0" />
+          <element id="library" level="project" name="Maven: org.apache.tomcat:tomcat-jasper:9.0.41" />
+          <element id="library" level="project" name="Maven: org.apache.tomcat:tomcat-servlet-api:9.0.41" />
+          <element id="library" level="project" name="Maven: org.apache.tomcat:tomcat-juli:9.0.41" />
+          <element id="library" level="project" name="Maven: org.apache.tomcat:tomcat-el-api:9.0.41" />
+          <element id="library" level="project" name="Maven: org.apache.tomcat:tomcat-api:9.0.41" />
+          <element id="library" level="project" name="Maven: org.apache.tomcat:tomcat-util-scan:9.0.41" />
+          <element id="library" level="project" name="Maven: org.apache.tomcat:tomcat-util:9.0.41" />
+          <element id="library" level="project" name="Maven: org.apache.tomcat:tomcat-jasper-el:9.0.41" />
+          <element id="library" level="project" name="Maven: org.apache.tomcat:tomcat-jsp-api:9.0.41" />
+          <element id="library" level="project" name="Maven: org.apache.tomcat.embed:tomcat-embed-websocket:9.0.41" />
+          <element id="library" level="project" name="Maven: com.beust:jcommander:1.72" />
+          <element id="library" level="project" name="Maven: commons-io:commons-io:2.6" />
         </element>
       </element>
       <element id="directory" name="META-INF">

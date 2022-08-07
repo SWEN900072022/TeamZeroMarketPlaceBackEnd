@@ -1,5 +1,6 @@
 import com.google.gson.Gson;
 import io.github.cdimascio.dotenv.Dotenv;
+import io.github.cdimascio.dotenv.DotenvException;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -9,8 +10,8 @@ import java.io.PrintWriter;
 import java.sql.*;
 import java.util.ArrayList;
 
-@WebServlet(name = "test", value = "/test")
-public class test extends HttpServlet {
+@WebServlet(name = "testAPI", value = "/testAPI")
+public class testAPI extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ArrayList<String> results = Query();
@@ -30,9 +31,9 @@ public class test extends HttpServlet {
 
     }
 
-    private final String url = "jdbc:postgresql://localhost:5432/marketPlaceDB";
-    private final String user = Dotenv.configure().load().get("POSTGRES_USER");
-    private final String password = Dotenv.configure().load().get("POSTGRES_PASSWORD");
+    private final String url = getEnvValue("DATABASE_URL");
+    private final String user = getEnvValue("DATABASE_USER");
+    private final String password = getEnvValue("DATABASE_PASSWORD");
     public Connection Connection() {
         Connection conn = null;
         try {
@@ -71,5 +72,16 @@ public class test extends HttpServlet {
             System.out.println(e);
         }
         return list;
+    }
+
+    public String getEnvValue(String s) {
+        try {
+            return Dotenv.configure().load().get(s);
+        } catch (DotenvException e) {
+            return System.getenv().get(s);
+        } catch (Exception e) {
+            System.out.println("Cannot get environment value");
+        }
+        return "";
     }
 }
