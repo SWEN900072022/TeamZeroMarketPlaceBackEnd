@@ -38,7 +38,7 @@ public class testAPI extends HttpServlet {
         Connection conn = null;
         try {
             DriverManager.registerDriver(new org.postgresql.Driver());
-            conn = DriverManager.getConnection(url, user, password);
+            conn = DriverManager.getConnection(url);
         } catch(SQLException e) {
             System.out.println(e);
         }
