@@ -31,9 +31,9 @@ public class testAPI extends HttpServlet {
 
     }
 
-    private final String url = getEnvValue("DATABASE_URL");
-    private final String user = getEnvValue("DATABASE_USER");
-    private final String password = getEnvValue("DATABASE_PASSWORD");
+    private final String url = getEnvValue("POSTGRES_URL");
+    private final String user = getEnvValue("POSTGRES_USER");
+    private final String password = getEnvValue("POSTGRES_PASSWORD");
     public Connection Connection() {
         Connection conn = null;
         try {
