@@ -1,0 +1,59 @@
+@startuml
+
+RoleType "1"--> "*" User : enrolled as
+User "1..*"--> "1" SellerGroup : part of
+SellerGroup "1"--> "1..*"Listing : create
+User "1"--> "1..*" Listing : view
+User "*"--> "1..*" PurchaseHistory : view
+User "1"--> "*" Listing : modify
+User "1"--> "*"User : view
+ListingType "1"--> "*"Listing : create as
+Listing "1" --> "1"CheckoutDetails
+Order "1..*" --> "1"PurchaseHistory : update
+PurchaseHistory "1"--> "1..*"SitewidePurchaseHistory : part of
+User "1"--> "*" SitewidePurchaseHistory : query
+User "1"--> "*" Listing : view
+User "1"--> "*" Order : modify
+CheckoutDetails "1"--> "1"Order : details given
+OrderStatus "1"--> "*"Order : create as
+Listing <|-- Auction
+
+RoleType : ADMIN
+RoleType : SELLER
+RoleType : CUSTOMER
+User : id
+User : name
+User : email
+SellerGroup : id
+SellerGroup : name
+SellerGroup : email
+Listing : id
+Listing : name
+Listing : quantity
+Listing : category
+ListingType : FIXED_PRICE
+ListingType : AUCTION
+CheckoutDetails : id
+CheckoutDetails : name
+CheckoutDetails : email
+CheckoutDetails : address
+Order : id
+Order : name
+Order : quantity
+Order : price
+PurchaseHistory : id
+PurchaseHistory : name
+PurchaseHistory : quantity
+PurchaseHistory : date
+SitewidePurchaseHistory : id
+SitewidePurchaseHistory : name
+SitewidePurchaseHistory : quantity
+SitewidePurchaseHistory : date
+OrderStatus : ACTIVE
+OrderStatus : CLOSED
+Auction : id
+Auction : name
+Auction : starttime
+Auction : endtime
+
+@enduml
