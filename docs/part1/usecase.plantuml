@@ -34,8 +34,8 @@ rectangle sellerActions {
     (Logs into seller account) --> (Sends invites to authenticated sellers)
     (Logs into seller account) -> (Receives invite to seller group)
     (Logs into seller account) -> (Views a list of active orders)
-    (Views a list of active orders) -.> (Modify quantity of selected order):extend
-    (Views a list of active orders) -.> (Cancel Order):extend
+    (Views a list of active orders) <.- (Modify quantity of selected order):extend
+    (Views a list of active orders) <.- (Cancel Order):extend
 }
 
 rectangle customerActions{
@@ -74,10 +74,10 @@ rectangle administratorActions {
     (Logs into administrator account) --> (View all listings)
     (Logs into administrator account) --> (View all users)
     (Logs into administrator account) --> (View all active orders)
-    (View all active orders) -.> (Close an active order):extend
-    (View all users) -.> (View customer order history):extend
-    (View all listings) -.> (Remove listing):extend
-    (View all listings) -.> (Modify listing information):extend
+    (View all active orders) <.- (Close an active order):extend
+    (View all users) <.- (View customer order history):extend
+    (View all listings) <.- (Remove listing):extend
+    (View all listings) <.- (Modify listing information):extend
 }
 
 @enduml
