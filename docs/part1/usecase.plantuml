@@ -2,9 +2,11 @@
 skinparam packageStyle rectangle
 left to right direction
 actor Seller
+actor Administrator
 rectangle accountManagement {
 Seller --> (Logs into seller account)
 Seller -> (Creates a seller account)
+Administrator --> (Logs into administrator account)
 (Creates a seller account) -> (Logs into seller account)
 }
 
@@ -31,6 +33,16 @@ note "must be in at least one seller group" as N1
 
 
 
+}
+
+rectangle administratorActions {
+    (Logs into administrator account) --> (View all listings)
+    (Logs into administrator account) --> (View all users)
+    (Logs into administrator account) --> (View all active orders)
+    (View all active orders) -.> (Close an active order):extend
+    (View all users) -.> (View customer order history):extend
+    (View all listings) -.> (Remove listing):extend
+    (View all listings) -.> (Modify listing information):extend
 }
 
 @enduml
