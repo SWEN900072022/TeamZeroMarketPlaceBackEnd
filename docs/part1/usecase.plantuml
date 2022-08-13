@@ -6,78 +6,79 @@ actor Customer
 actor Seller
 actor Administrator
 
-rectangle accountManagement {
-    Seller --> (Logs into seller account)
-    Seller -> (Creates a seller account)
-    Administrator --> (Logs into administrator account)
-    (Creates a seller account) -> (Logs into seller account)
-    Customer --> (Creates a customer account)
-    Customer --> (Logs into customer account)
+rectangle onlineMarketPlace {
+    rectangle accountManagement {
+        Seller --> (Logs into seller account)
+        Seller -> (Creates a seller account)
+        Administrator --> (Logs into administrator account)
+        (Creates a seller account) -> (Logs into seller account)
+        Customer --> (Creates a customer account)
+        Customer --> (Logs into customer account)
 
+    }
+
+    rectangle sellerActions {
+        note "must be in at least one seller group" as N1
+
+        (Logs into seller account) -->(Create Fixed Price Listing)
+        (Create Fixed Price Listing) -.> (Create Fixed Price Listing for Individual):include
+        (Create Fixed Price Listing) -.> (Create Fixed Price Listing for Seller Group):include
+        (Create Fixed Price Listing for Seller Group) .. (N1)
+
+        (Logs into seller account) --> (Create Auction Listing)
+        (Create Auction Listing) -.> (Create Auction Listing for Individual):include
+
+        (Create Auction Listing) -.> (Create Auction Listing for Seller Group): include
+        (Create Auction Listing for Seller Group) .. (N1)
+
+        (Logs into seller account) --> (Creates a seller group)
+        (Logs into seller account) --> (Sends invites to authenticated sellers)
+        (Logs into seller account) -> (Receives invite to seller group)
+        (Logs into seller account) -> (Views a list of active orders)
+        (Views a list of active orders) <.- (Modify quantity of selected order):extend
+        (Views a list of active orders) <.- (Cancel Order):extend
+    }
+
+    rectangle customerActions{
+        (View all active orders) as vCustomer
+
+        (Logs into customer account) --> (Search for item)
+        (Search for item) -.> (Using item name) :include
+        (Search for item) -.> (Using seller name):include
+        (Search for item) <.- (View Listing):extend
+
+        (View Listing) <.- (Add item to cart):extend
+        (View Listing) <.- (Bid on item):extend
+
+        (Bid on item) <.- (Add item to cart):extend
+
+        (Logs into customer account) --> (vCustomer)
+        (vCustomer)<.- (View an active order):extend
+        (View an active order) <.-(Modify active order):extend
+        (View an active order) <.-(Cancel active order):extend
+
+        (Logs into customer account) --> (View shopping cart)
+
+        (View shopping cart) <.- (Remove item from cart):extend
+        (View shopping cart) <.- (Modify quantity of an item):extend
+        (View shopping cart) <.- (Check out shopping cart):extend
+
+        (Modify quantity of an item)-.> (Update shopping cart total):include
+        (Remove item from cart) -.> (Update shopping cart total):include
+
+        (Check out shopping cart) -.> (Enter payment information):include
+        (Check out shopping cart) -.> (Enter user information):include
+    }
+
+    rectangle administratorActions {
+
+        (Logs into administrator account) --> (View all listings)
+        (Logs into administrator account) --> (View all users)
+        (Logs into administrator account) --> (View all active orders)
+        (View all active orders) <.- (Close an active order):extend
+        (View all users) <.- (View customer order history):extend
+        (View all listings) <.- (Remove listing):extend
+        (View all listings) <.- (Modify listing information):extend
+    }
 }
-
-rectangle sellerActions {
-    note "must be in at least one seller group" as N1
-
-    (Logs into seller account) -->(Create Fixed Price Listing)
-    (Create Fixed Price Listing) -.> (Create Fixed Price Listing for Individual):include
-    (Create Fixed Price Listing) -.> (Create Fixed Price Listing for Seller Group):include
-    (Create Fixed Price Listing for Seller Group) .. (N1)
-
-    (Logs into seller account) --> (Create Auction Listing)
-    (Create Auction Listing) -.> (Create Auction Listing for Individual):include
-
-    (Create Auction Listing) -.> (Create Auction Listing for Seller Group): include
-    (Create Auction Listing for Seller Group) .. (N1)
-
-    (Logs into seller account) --> (Creates a seller group)
-    (Logs into seller account) --> (Sends invites to authenticated sellers)
-    (Logs into seller account) -> (Receives invite to seller group)
-    (Logs into seller account) -> (Views a list of active orders)
-    (Views a list of active orders) <.- (Modify quantity of selected order):extend
-    (Views a list of active orders) <.- (Cancel Order):extend
-}
-
-rectangle customerActions{
-    (View all active orders) as vCustomer
-
-    (Logs into customer account) --> (Search for item)
-    (Search for item) -.> (Using item name) :include
-    (Search for item) -.> (Using seller name):include
-    (Search for item) <.- (View Listing):extend
-
-    (View Listing) <.- (Add item to cart):extend
-    (View Listing) <.- (Bid on item):extend
-
-    (Bid on item) <.- (Add item to cart):extend
-
-    (Logs into customer account) --> (vCustomer)
-    (vCustomer)<.- (View an active order):extend
-    (View an active order) <.-(Modify active order):extend
-    (View an active order) <.-(Cancel active order):extend
-
-    (Logs into customer account) --> (View shopping cart)
-
-    (View shopping cart) <.- (Remove item from cart):extend
-    (View shopping cart) <.- (Modify quantity of an item):extend
-    (View shopping cart) <.- (Check out shopping cart):extend
-
-    (Modify quantity of an item)-.> (Update shopping cart total):include
-    (Remove item from cart) -.> (Update shopping cart total):include
-    
-    (Check out shopping cart) -.> (Enter payment information):include
-    (Check out shopping cart) -.> (Enter user information):include
-}
-
-rectangle administratorActions {
-
-    (Logs into administrator account) --> (View all listings)
-    (Logs into administrator account) --> (View all users)
-    (Logs into administrator account) --> (View all active orders)
-    (View all active orders) <.- (Close an active order):extend
-    (View all users) <.- (View customer order history):extend
-    (View all listings) <.- (Remove listing):extend
-    (View all listings) <.- (Modify listing information):extend
-}
-
 @enduml

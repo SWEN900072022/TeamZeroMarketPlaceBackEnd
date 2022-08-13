@@ -1,17 +1,17 @@
 @startuml
 
 RoleType "1"--> "*" User : enrolled as
-User "1..*"--> "1" SellerGroup : part of
+User "1..*"--> "1..*" SellerGroup : part of
 SellerGroup "1"--> "1..*"Listing : create
-User "1"--> "1..*" Listing : view
+User "1"--> "1..*" Listing : view / search
 User "*"--> "1..*" PurchaseHistory : view
 User "1"--> "*" Listing : modify
 User "1"--> "*"User : view
 ListingType "1"--> "*"Listing : create as
-Listing "1" --> "1"CheckoutDetails
+Listing "1" --> "1"CheckoutDetails : purchase
 Order "1..*" --> "1"PurchaseHistory : update
-PurchaseHistory "1"--> "1..*"SitewidePurchaseHistory : part of
-User "1"--> "*" SitewidePurchaseHistory : query
+PurchaseHistory "1..*"--> "1"SitewidePurchaseHistory : part of
+User "1"--> "1" SitewidePurchaseHistory : query
 User "1"--> "*" Listing : view
 User "1"--> "*" Order : modify
 CheckoutDetails "1"--> "1"Order : details given
@@ -31,6 +31,7 @@ Listing : id
 Listing : name
 Listing : quantity
 Listing : category
+Listing : price
 ListingType : FIXED_PRICE
 ListingType : AUCTION
 CheckoutDetails : id
@@ -55,5 +56,6 @@ Auction : id
 Auction : name
 Auction : starttime
 Auction : endtime
+Auction : reserve_price
 
 @enduml
