@@ -37,10 +37,16 @@ public class testAPI extends HttpServlet {
     public Connection Connection() {
         Connection conn = null;
         try {
+            // This is for production
             DriverManager.registerDriver(new org.postgresql.Driver());
             conn = DriverManager.getConnection(url);
         } catch(SQLException e) {
-            System.out.println(e);
+            try {
+                // This is for dev
+                conn = DriverManager.getConnection(url, user, password);
+            } catch (SQLException ex) {
+                System.out.println(ex);
+            }
         }
         return conn;
     }
