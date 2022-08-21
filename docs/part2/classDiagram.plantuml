@@ -1,0 +1,143 @@
+@startuml
+class registerUserServlet<? extends HttpServlet> {
+    {method} doPost(request, response)
+}
+
+class loginUserServlet<? extends HttpServlet> {
+    {method} doGet(request, response)
+}
+
+class removeListing<? extends HttpServlet> {
+    {method} doGet(request, response)
+}
+
+class modifyListing<? extends HttpServlet> {
+    {method} doGet(request, response)
+}
+
+class createListing<? extends HttpServlet> {
+    {method} doGet(request, response)
+}
+
+class searchListing<? extends HttpServlet> {
+    {method} doGet(request, response)
+}
+
+class inviteSellerGroup<? extends HttpServlet> {
+    {method} doGet(request, response)
+}
+
+class createSellerGroup<? extends HttpServlet> {
+    {method} doGet(request, response)
+}
+
+class viewUserList<? extends HttpServlet> {
+    {method} doGet(request, response)
+}
+
+class viewListingList<? extends HttpServlet> {
+    {method} doGet(request, response)
+}
+
+class viewOrderList<? extends HttpServlet> {
+    {method} doGet(request, response)
+}
+
+class closeOrder<? extends HttpServlet> {
+    {method} doGet(request, response)
+}
+
+class userModel {
+    {method} register(username, password)
+    {method} login(username, password)
+    {method} getUserList(numUsers)
+}
+
+class listingModel {
+    {method} removeListing(listingId)
+    {method} modifyListing(listingId, listingObj)
+    {method} createListing(listingObj)
+    {method} searchListingByPrice(price)
+    {method} searchListingByBidPrice(bidPrice)
+    {method} searchListingByTitle(title)
+    {method} searchListingByType(type)
+    {method} viewListingList(numList)
+}
+
+class orderModel {
+    {method} viewOrderList(numOrders)
+    {method} closeOrder(orderName)
+}
+
+class sellerGroupModel {
+    {method} createSellerGroup(userName)
+    {method} inviteSellerGroup(userNameList)
+}
+
+class Orders {
+    {field} + user : string
+    {field} + quantity : int
+    {field} + title : string
+    {field} + price : int
+    {field} + address : string
+}
+
+class SellerGroup {
+    {field} + Name : string
+    {field} + Members : ArrayList
+    {field} + pendingInvites : ArrayList
+}
+
+interface Listing {
+    {field} + description : string
+    {field} + title : string
+    {field} + listingId : int
+    {field} + type : int
+}
+
+class AuctionListing<? implements Listing>  {
+    {field} + bidPrice : int
+    {field} + highestBids : ArrayList
+}
+
+class FixedPriceListing<? implements Listing> {
+    {field} + price : int
+    {field} + quantity : int
+}
+
+class Users {
+    {field} sessions : int
+    {field} name : string
+    {field} role : int
+}
+
+package Database <<Database>> {
+}
+
+Listing <|-- AuctionListing
+Listing <|-- FixedPriceListing
+
+registerUserServlet -- userModel
+loginUserServlet -- userModel
+viewUserList -- userModel
+userModel -[dotted]> Users
+userModel -[dotted]--> Database
+
+removeListing -- listingModel
+modifyListing -- listingModel
+createListing -- listingModel
+searchListing -- listingModel
+viewListingList -- listingModel
+listingModel -[dotted]> Listing
+listingModel -[dotted]--> Database
+
+inviteSellerGroup -- sellerGroupModel
+createSellerGroup -- sellerGroupModel
+sellerGroupModel -[dotted]> SellerGroup
+sellerGroupModel -[dotted]-> Database
+
+viewOrderList -- orderModel
+closeOrder -- orderModel
+orderModel -[dotted]> Orders
+orderModel -[dotted]-> Database
+@enduml
