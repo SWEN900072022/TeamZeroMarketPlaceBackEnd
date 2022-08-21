@@ -1,0 +1,18 @@
+@startuml
+entity orders {
+    *orderId : number <<genrated>>
+    --
+    *userId : number <<FK>>
+    *quantity : number
+    *listingTitle : varchar(100)
+    *price : number
+    *address : text
+}
+
+entity notifications {
+    *notificationId : number <<genrated>>
+    --
+    *recipientId : number <<FK>>
+    *message : text
+}
+@enduml
