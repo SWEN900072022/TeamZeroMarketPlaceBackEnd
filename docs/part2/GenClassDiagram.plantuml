@@ -1,0 +1,53 @@
+@startuml
+class Main {
+
+}
+
+class Components {
+    {field} + componentController : Controller
+    {method} + setController()
+    {method} + OnChange()
+}
+
+class Controller {
+    {method} + UpdateView()
+    {method} + UpdateModel()
+}
+
+class Servlets {
+    {method} + doGet(request, response)
+    {method} + doPost(request, response)
+}
+
+Interface ModelInterface <<interface>>{
+    {method} + GetData()
+    {method} + ModifyData()
+    {method} + DeleteData()
+}
+
+class Model <implements ModelInterface> {
+    {method} + GetData()
+    {method} + ModifyData()
+    {method} + DeleteData()
+    {method} - Insert()
+    {method} - Delete()
+    {method} - Modify()
+}
+
+note top of EntityObj : Depends on \n values in \nthe ER diagram
+class EntityObj {
+
+}
+
+
+package Database <<Database>> {
+}
+
+Main --> Components
+Components --> Controller : On View Changes
+Controller ..> Servlets : JSON via HTTPS
+Servlets --> ModelInterface
+ModelInterface --> Model
+Model .right.> EntityObj
+Model ..> Database
+@enduml
