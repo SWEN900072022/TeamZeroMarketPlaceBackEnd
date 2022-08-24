@@ -3,10 +3,15 @@ entity orders {
     *orderId : number <<genrated>>
     --
     *userId : number <<FK>>
-    *quantity : number
-    *listingTitle : varchar(100)
-    *price : number
     *address : text
+}
+
+entity orderItem{
+    orderID: serial <<FK>>
+    listingID: serial <<FK>>
+    --
+    quantity: int
+    unitPrice : float
 }
 
 entity notifications {
@@ -15,4 +20,44 @@ entity notifications {
     *recipientId : number <<FK>>
     *message : text
 }
-@enduml
+
+
+entity users{
+    user_id : serial
+    --
+    password : varchar(100)
+    roles : string
+
+}
+
+entity listings{
+    listingID : serial
+    --
+    title: string 
+    description : varchar(100)
+
+
+}
+
+entity sellerGroups{
+    groupID : serial
+    --
+    groupName: string
+
+}
+
+entity groupMembership{
+    groupID : serial <<FK>>
+    customerID : serial <<FK>>
+    --
+    
+}
+users ||--o{ orders
+users ||--o{ groupMembership
+
+orders ||--|{orderItem
+orderItem }o--||listings
+groupMembership }o--|| sellerGroups
+users ||--o{notifications
+
+@enduml 
