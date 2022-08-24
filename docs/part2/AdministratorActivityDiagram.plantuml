@@ -1,0 +1,16 @@
+@startuml
+start
+if(Admin is registered) then (no)
+    end
+endif
+:Admin logs into their account;
+repeat
+    if(Admin wants to view all users in the system) then(yes)
+    elseif(Admin wants to view all listings in the system) then (yes)
+    elseif(Admin wants to view all orders in the system) then(yes)
+    end
+    endif
+repeat while(isLoggedIn) is(yes)
+-> no;
+end
+@enduml

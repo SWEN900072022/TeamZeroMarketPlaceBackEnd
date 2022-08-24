@@ -1,0 +1,36 @@
+@startuml
+start
+
+if(user is registered) then (no)
+    :User registers their account;
+endif
+:User logs into their account;
+repeat
+    if(user searchers for a listing) then (yes)
+        :User enters a query;
+        :A filtered list is displayed;
+    elseif(user clicks on a listing) then(yes)
+        :The home page is updated with listing information;
+        if(user checks out the listing) then (yes)
+            :The checkout trolley has one new listing;
+        endif
+        :User clicks out and returns to the home page;
+    elseif(user checks out the trolley) then(yes)
+        :The user is directed to a checkout page;
+        :The user receives a confirmation page;
+        :User clicks out and returns to the home page;
+    elseif(user looks at the orders page) then(yes)
+        :User sees a list of active orders;
+        if(modify) then
+            :User modifies order;
+        else if(cancel) then
+            :User cancels the order;
+        endif
+        :User clicks out and returns to the home page;
+    elseif(user logs out) then(yes)
+        end
+    endif
+repeat while (isLoggedIn) is (yes)
+-> no;
+end
+@enduml

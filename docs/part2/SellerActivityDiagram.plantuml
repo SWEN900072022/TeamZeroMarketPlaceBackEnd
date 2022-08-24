@@ -1,0 +1,18 @@
+@startuml
+start
+if(seller is registered) then (no)
+    :Seller registers their account;
+endif
+:Seller logs into their account;
+repeat
+    if(Seller goes into the listing creation page) then(yes)
+
+    elseif(Seller goes to the seller group management page) then (yes)
+    elseif(Seller goes to the order management page) then(yes)
+    elseif(Seller logs out) then(yes)
+    end
+    endif
+repeat while(isLoggedIn) is(yes)
+-> no;
+end
+@enduml
