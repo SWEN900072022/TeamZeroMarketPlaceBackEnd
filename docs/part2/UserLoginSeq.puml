@@ -1,0 +1,62 @@
+@startuml
+' skinparam sequenceArrowThickness 2
+' skinparam roundcorner 20
+' skinparam maxmessagesize 60
+' skinparam sequenceParticipant underline
+
+actor User
+participant "React App" as A
+participant "Login Component" as B
+participant "Homepage" as F
+participant "Frontend controller" as C
+participant "loginUserServlet" as D
+participant "userMapper" as G
+participant "Database" as E
+
+
+User -> A: Accesss marketplace login URL
+activate A
+
+A -> B: fetch loginPage()
+activate B
+A ->B: render()
+
+User -> B: login(username, pasword)
+
+B -> C: handleSubmit()
+activate C
+
+
+C -> D: postCredentials()
+activate D
+
+
+
+D -> E: checkCredentials()
+activate E
+E -> E:  Process request
+E --> D: Status
+
+
+alt successful login
+    D -> G: notify()
+    activate G
+    G -> E: mapUser(creds)
+    E-->G
+    deactivate E
+    D --> C
+    C --> A
+    D -> D: generateToken()
+    D --> A: sessionToken 
+    A -> F: render()
+    ' deactivate B
+    activate F
+
+else login failed
+    D --> C
+    C --> A: invalid credentials
+
+end
+A --> User: Done
+deactivate A
+@enduml

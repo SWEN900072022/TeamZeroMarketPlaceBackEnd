@@ -1,0 +1,59 @@
+@startuml
+' skinparam sequenceArrowThickness 2
+' skinparam roundcorner 20
+' skinparam maxmessagesize 60
+' skinparam sequenceParticipant underline
+
+actor Seller
+participant "React App" as A
+participant "myListings()" as B
+
+participant "Frontend controller" as C
+participant "viewListingListServlet" as D
+participant "listingListMapper" as G
+participant "<<List>>AllMyListings" as F
+participant "Database" as E
+
+
+Seller -> A: View all my active listings
+activate A
+
+A ->B: render()
+activate B
+
+
+B -> C: handleRequest(all listings)
+activate C
+
+
+C -> D: getAllMyListings()
+activate D
+
+
+
+D -> E: Listing WHERE sellerID == currUserID or sellerGroupID== currSellerGroupID
+activate E
+
+
+
+G -> E: mapListings(res)
+activate G
+E-->F
+deactivate E
+activate F
+F --> G
+deactivate F
+G --> D
+deactivate G
+D --> C
+deactivate D
+C --> B
+deactivate C
+B --> A
+deactivate B
+
+
+
+A --> Seller: Done
+deactivate A
+@enduml
