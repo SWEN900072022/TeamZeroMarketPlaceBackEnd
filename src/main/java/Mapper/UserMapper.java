@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class UserMapper implements MapperInterface<User> {
+public class UserMapper extends Mapper<User> {
     private Connection conn = null;
 
     public UserMapper() {
@@ -38,11 +38,11 @@ public class UserMapper implements MapperInterface<User> {
     }
 
     public boolean delete(User u) {
-        return true;
+        return false;
     }
 
     public boolean modify(User u) {
-        return true;
+        return false;
     }
 
     public List<User> find(Map<String, String> map) {
@@ -55,8 +55,7 @@ public class UserMapper implements MapperInterface<User> {
 
         if(itr.hasNext()) {
             sb.append(" WHERE ");
-        }
-        else {
+        } else {
             sb.append(";");
         }
 
@@ -78,14 +77,12 @@ public class UserMapper implements MapperInterface<User> {
             statement.execute();
 
             rs = statement.getResultSet();
-            int i = 1;
             while(rs.next()) {
                 User user = new User();
                 user.setEmail(rs.getString("email"));
                 user.setUsername(rs.getString("username"));
                 user.setRoles(rs.getString("roles"));
                 user.setPassword(rs.getString("password"));
-                System.out.println(user);
                 list.add(user);
             }
         } catch (SQLException e) {

@@ -9,6 +9,9 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 @WebServlet(name = "RegisterUserServlet", value = "/register")
 public class RegisterUserServlet extends HttpServlet {
@@ -22,6 +25,14 @@ public class RegisterUserServlet extends HttpServlet {
 
         User user = new User(email, username, password, role);
         UserModel uModel = new UserModel();
-        uModel.register(user);
+        boolean hasRegistered = uModel.register(user);
+
+        Map<String, Boolean>result = new HashMap<>();
+        result.put("result", hasRegistered);
+        Gson gson = new Gson();
+        String json = gson.toJson(result);
+
+        PrintWriter out = response.getWriter();
+        out.println(json);
     }
 }
