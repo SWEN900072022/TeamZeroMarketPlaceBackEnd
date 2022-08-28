@@ -8,4 +8,5 @@ public interface MapperInterface<T> {
     boolean delete(T TEntity);
     boolean modify(T TEntity);
     List<T> find(Map<String, String> map);
+    List<T> find(Map<String, String> map, int mode);
 }

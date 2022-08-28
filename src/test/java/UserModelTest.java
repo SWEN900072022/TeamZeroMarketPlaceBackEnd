@@ -64,6 +64,10 @@ public class UserModelTest {
         }
 
         public List<User> find(Map<String, String> map) {
+            return find(map, 0);
+        }
+
+        public List<User> find(Map<String, String> map, int mode) {
             return this.result;
         }
     }

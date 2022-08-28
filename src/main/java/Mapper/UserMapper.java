@@ -1,6 +1,7 @@
 package Mapper;
 
 import Entity.User;
+import Util.Util;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -46,6 +47,10 @@ public class UserMapper extends Mapper<User> {
     }
 
     public List<User> find(Map<String, String> map) {
+        return find(map, 0);
+    }
+
+    public List<User> find(Map<String, String> map, int mode) {
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT * FROM users");
         PreparedStatement statement;
@@ -63,7 +68,11 @@ public class UserMapper extends Mapper<User> {
             Map.Entry<String, String> entry = itr.next();
             sb.append(String.format("%s='%s'", entry.getKey(), entry.getValue()));
             if(itr.hasNext()) {
-                sb.append(" AND ");
+                if(mode == 0) {
+                    sb.append(" AND ");
+                } else {
+                    sb.append(" OR ");
+                }
             } else {
                 sb.append(";");
             }
