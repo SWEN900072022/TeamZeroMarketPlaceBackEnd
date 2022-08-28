@@ -3,10 +3,7 @@ package Mapper;
 import Entity.User;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class UserMapper extends Mapper<User> {
     private Connection conn = null;
@@ -14,20 +11,31 @@ public class UserMapper extends Mapper<User> {
     public UserMapper() {
     }
 
-    public boolean insert(User user) {
-        String sql = String.format(
-                "INSERT INTO users (username, password, email, roles) VALUES ('%s','%s','%s', '%s');",
-                user.getUsername(),
-                user.getPassword(),
-                user.getEmail(),
-                user.getRoles());
+    public boolean insert(List<User> userList) {
+        StringBuilder sb = new StringBuilder();
         PreparedStatement statement;
+        ListIterator<User> userListIterator = userList.listIterator();
+        sb.append("INSERT INTO users (username, password, email, roles) VALUES");
+
+        while(userListIterator.hasNext()) {
+            User user = userListIterator.next();
+            sb.append(String.format("('%s','%s','%s', '%s')",
+                            user.getUsername(),
+                            user.getPassword(),
+                            user.getEmail(),
+                            user.getRoles()));
+            if(!userListIterator.hasNext()) {
+                sb.append(";");
+            } else {
+                sb.append(",");
+            }
+        }
 
         try {
             if(conn == null) {
                 conn = Util.getConnection();
             }
-            statement = conn.prepareStatement(sql);
+            statement = conn.prepareStatement(sb.toString());
             statement.execute();
         } catch (SQLException e) {
             // Print out the exceptions for now
@@ -37,11 +45,11 @@ public class UserMapper extends Mapper<User> {
         return true;
     }
 
-    public boolean delete(User u) {
+    public boolean delete(List<User> userList) {
         return false;
     }
 
-    public boolean modify(User u) {
+    public boolean modify(List<User> userList) {
         return false;
     }
 
