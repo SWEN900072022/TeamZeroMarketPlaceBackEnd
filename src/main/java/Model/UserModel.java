@@ -21,6 +21,7 @@ public class UserModel {
 
     public UserModel(Mapper<User> mapper) {
         this.uMapper = mapper;
+        repo = new UserRepository();
     }
 
     public boolean register(User user) {

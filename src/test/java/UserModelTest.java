@@ -51,15 +51,15 @@ public class UserModelTest {
             }
         }
 
-        public boolean insert(User user) {
+        public boolean insert(List<User> userList) {
             return this.canInsert;
         }
 
-        public boolean delete(User u) {
+        public boolean delete(List<User> userList) {
             return false;
         }
 
-        public boolean modify(User u) {
+        public boolean modify(List<User> userList) {
             return false;
         }
 
