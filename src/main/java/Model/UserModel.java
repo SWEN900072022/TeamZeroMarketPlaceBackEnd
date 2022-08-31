@@ -3,6 +3,7 @@ package Model;
 import Entity.User;
 import Mapper.Mapper;
 import Mapper.UserMapper;
+import UnitofWork.UserRepository;
 import Util.JWTUtil;
 
 import java.util.HashMap;
@@ -10,15 +11,18 @@ import java.util.List;
 import java.util.Map;
 
 public class UserModel {
-    private Mapper<User> uMapper;
+    private final Mapper<User> uMapper;
+    private UserRepository repo;
 
     public UserModel() {
         // Create a mapper for the model to write data to
         uMapper = new UserMapper();
+        repo = new UserRepository();
     }
 
     public UserModel(Mapper<User> mapper) {
         this.uMapper = mapper;
+        repo = new UserRepository();
     }
 
     public boolean register(User user) {
@@ -31,7 +35,8 @@ public class UserModel {
         List<User> list = uMapper.find(queryMap, 1);
 
         if(list.isEmpty()) {
-            return uMapper.insert(user);
+            repo.registerNew(user);
+            return true;
         }
         return false;
     }
