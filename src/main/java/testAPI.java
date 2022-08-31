@@ -16,7 +16,6 @@ public class testAPI extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ArrayList<String> results = Query();
 
-        System.out.println("reached");
         Gson gson = new Gson();
         String json = gson.toJson(results);
         System.out.println(json);
