@@ -10,8 +10,8 @@ public class FixedPriceListing extends Listing {
         this.quantity = 0;
     }
 
-    public FixedPriceListing(String description, String title, int price, int quantity) {
-        super(description, title, 0);
+    public FixedPriceListing(String description, String title,int createdById, int price, int quantity) {
+        super(description, title, 0, createdById);
         this.price = price;
         this.quantity = quantity;
     }

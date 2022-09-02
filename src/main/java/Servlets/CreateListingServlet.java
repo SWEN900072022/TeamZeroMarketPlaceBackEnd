@@ -31,10 +31,13 @@ public class CreateListingServlet extends HttpServlet {
         if(type == 0) {
             int price = Integer.parseInt(request.getParameter("price"));
             int quantity = Integer.parseInt(request.getParameter("quantity"));
+            int createdById = Integer.parseInt(JWTUtil.getSubject(jwt));
 
-            Listing listing = new FixedPriceListing(description, title, price, quantity);
+            Listing listing = new FixedPriceListing(description, title,createdById, price, quantity);
             ListingModel listingModel = new ListingModel();
             listingModel.createListing(listing);
+        } else {
+            // Unimplemented
         }
     }
 }

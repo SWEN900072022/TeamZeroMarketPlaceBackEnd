@@ -1,25 +1,33 @@
 package UnitofWork;
 
+import Entity.FixedPriceListing;
 import Entity.Listing;
 import Entity.User;
 import Enums.UnitActions;
+import Mapper.FixedPriceListingMapper;
 import Mapper.ListingMapper;
 
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 public class ListingRepository implements IUnitofWork<Listing>{
     private final Map<String, List<Listing>> fixedPriceContext;
     private final Map<String, List<Listing>> auctionPriceContext;
     private final ListingMapper lMapper;
+    private final FixedPriceListingMapper fplMapper;
 
     public ListingRepository() {
         fixedPriceContext = new HashMap<>();
         auctionPriceContext = new HashMap<>();
         lMapper = new ListingMapper();
+        fplMapper = new FixedPriceListingMapper();
     }
     @Override
     public void registerNew(Listing listing) {
@@ -77,17 +85,31 @@ public class ListingRepository implements IUnitofWork<Listing>{
     }
 
     private void commitNew(Map<String, List<Listing>> context) {
-        List<Listing> userList = context.get(UnitActions.INSERT.toString());
-        lMapper.insert(userList);
+        List<Listing> listingList = context.get(UnitActions.INSERT.toString());
+        listingList = lMapper.insertWithResultSet(listingList);
+
+        // Add them into the respective databases, fixed vs auction
+        // Check the type of the first element to see the type of context
+        // then, we write to the database
+        int type = listingList.get(0).getType();
+        if(type == 0) {
+            // Write to the fixed price database
+            List<FixedPriceListing> fpListingList = listingList.stream()
+                                                                .filter(FixedPriceListing.class::isInstance)
+                                                                .map(FixedPriceListing.class::cast)
+                                                                .collect(toList());
+            fplMapper.insert(fpListingList);
+        } else {
+            // Write to the auction price database
+            // Not implemented yet
+        }
     }
 
     private void commitModify(Map<String, List<Listing>> context) {
-        List<Listing> userList = context.get(UnitActions.MODIFY.toString());
-        lMapper.modify(userList);
+        // Unimplemented
     }
 
     private void commitDel(Map<String, List<Listing>> context) {
-        List<Listing> userList = context.get(UnitActions.DELETE.toString());
-        lMapper.modify(userList);
+        // Unimplemented
     }
 }

@@ -21,5 +21,6 @@ public class ListingModel {
 
     public void createListing(Listing listing) {
         repo.registerNew(listing);
+        repo.commit();
     }
 }
