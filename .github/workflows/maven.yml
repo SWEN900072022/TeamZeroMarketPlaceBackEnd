@@ -27,7 +27,6 @@ jobs:
         mkdir src/main/resources
         touch src/main/resources/.env
         echo JWT_SECRET=${{ secrets.JWT_SECRET }} > src/main/resources/.env
-        cat .env
     - name: Build with Maven
       run: mvn --batch-mode -DskipTests package
     - name: Test with Maven
