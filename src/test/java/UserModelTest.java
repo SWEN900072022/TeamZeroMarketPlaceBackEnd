@@ -40,7 +40,9 @@ public class UserModelTest {
     @Test
     public void successfulLogin() {
         mapper.setEmptyResult(false);
-        String jwt = userModel.login(new User());
+        User user = new User();
+        user.setEmail("a");
+        String jwt = userModel.login(user);
         assertNotNull(jwt);
 
         // Make sure that the jwt token is valid
