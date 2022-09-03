@@ -12,6 +12,7 @@ import javax.servlet.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.Map;
 
 @WebServlet(name = "CreateListingServlet", value = "/createListing")
 public class CreateListingServlet extends HttpServlet {
@@ -24,8 +25,13 @@ public class CreateListingServlet extends HttpServlet {
 
         // Check if the jwt token is valid, if not, return an empty response
         if(!JWTUtil.validateToken(jwt)) {
+            Map<String, Boolean> result = new HashMap<>();
+            result.put("result", false);
+            Gson gson = new Gson();
+            String json = gson.toJson(result);
+
             PrintWriter out = response.getWriter();
-            out.println(new Gson().toJson(new HashMap<>())); //  empty set
+            out.println(json);
         }
 
         if(type == 0) {
@@ -35,7 +41,15 @@ public class CreateListingServlet extends HttpServlet {
 
             Listing listing = new FixedPriceListing(description, title,createdById, price, quantity);
             ListingModel listingModel = new ListingModel();
-            listingModel.createListing(listing);
+            boolean isSuccessful = listingModel.createListing(listing);
+
+            Map<String, Boolean> result = new HashMap<>();
+            result.put("result", isSuccessful);
+            Gson gson = new Gson();
+            String json = gson.toJson(result);
+
+            PrintWriter out = response.getWriter();
+            out.println(json);
         } else {
             // Unimplemented
         }

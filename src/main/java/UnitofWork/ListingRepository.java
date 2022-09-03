@@ -63,10 +63,12 @@ public class ListingRepository implements IUnitofWork<Listing>{
     }
 
     @Override
-    public void commit() {
+    public void commit() throws Exception {
+        commit(fixedPriceContext);
+        commit(auctionPriceContext);
     }
 
-    public void commit(Map<String, List<Listing>> context) {
+    public void commit(Map<String, List<Listing>> context) throws Exception {
         if(context.size() == 0) {
             return;
         }
@@ -84,9 +86,14 @@ public class ListingRepository implements IUnitofWork<Listing>{
         }
     }
 
-    private void commitNew(Map<String, List<Listing>> context) {
+    private void commitNew(Map<String, List<Listing>> context) throws Exception {
         List<Listing> listingList = context.get(UnitActions.INSERT.toString());
         listingList = lMapper.insertWithResultSet(listingList);
+
+        if(listingList.isEmpty()) {
+            // Something went wrong here
+            throw new Exception();
+        }
 
         // Add them into the respective databases, fixed vs auction
         // Check the type of the first element to see the type of context
@@ -98,7 +105,11 @@ public class ListingRepository implements IUnitofWork<Listing>{
                                                                 .filter(FixedPriceListing.class::isInstance)
                                                                 .map(FixedPriceListing.class::cast)
                                                                 .collect(toList());
-            fplMapper.insert(fpListingList);
+            boolean canInsert = fplMapper.insert(fpListingList);
+            if(!canInsert) {
+                // Something went wrong
+                throw new Exception();
+            }
         } else {
             // Write to the auction price database
             // Not implemented yet

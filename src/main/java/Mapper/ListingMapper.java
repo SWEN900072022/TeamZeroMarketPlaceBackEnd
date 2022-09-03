@@ -64,7 +64,7 @@ public class ListingMapper extends Mapper<Listing>{
         listingListIterator = listingList.listIterator();
         while(generatedKeys.next() && listingListIterator.hasNext()) {
             Listing listing = listingListIterator.next();
-            listing.setId(generatedKeys.getInt(1));
+            listing.setId(generatedKeys.getInt("id"));
         }
         return listingList;
     }

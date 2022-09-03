@@ -19,8 +19,13 @@ public class ListingModel {
         repo = new ListingRepository();
     }
 
-    public void createListing(Listing listing) {
+    public boolean createListing(Listing listing) {
         repo.registerNew(listing);
-        repo.commit();
+        try{
+            repo.commit();
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 }
