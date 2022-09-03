@@ -29,6 +29,14 @@ public class ListingRepository implements IUnitofWork<Listing>{
         lMapper = new ListingMapper();
         fplMapper = new FixedPriceListingMapper();
     }
+
+    public ListingRepository(ListingMapper lMapper, FixedPriceListingMapper fplMapper) {
+        this.lMapper = lMapper;
+        this.fplMapper = fplMapper;
+        fixedPriceContext = new HashMap<>();
+        auctionPriceContext = new HashMap<>();
+    }
+
     @Override
     public void registerNew(Listing listing) {
         register(listing, UnitActions.INSERT.toString());

@@ -23,17 +23,6 @@ public class CreateListingServlet extends HttpServlet {
         int type = Integer.parseInt(request.getParameter("type"));
         String jwt = request.getHeader("jwt");
 
-        // Check if the jwt token is valid, if not, return an empty response
-        if(!JWTUtil.validateToken(jwt)) {
-            Map<String, Boolean> result = new HashMap<>();
-            result.put("result", false);
-            Gson gson = new Gson();
-            String json = gson.toJson(result);
-
-            PrintWriter out = response.getWriter();
-            out.println(json);
-        }
-
         if(type == 0) {
             int price = Integer.parseInt(request.getParameter("price"));
             int quantity = Integer.parseInt(request.getParameter("quantity"));
@@ -41,7 +30,7 @@ public class CreateListingServlet extends HttpServlet {
 
             Listing listing = new FixedPriceListing(description, title,createdById, price, quantity);
             ListingModel listingModel = new ListingModel();
-            boolean isSuccessful = listingModel.createListing(listing);
+            boolean isSuccessful = listingModel.createListing(listing, jwt);
 
             Map<String, Boolean> result = new HashMap<>();
             result.put("result", isSuccessful);
