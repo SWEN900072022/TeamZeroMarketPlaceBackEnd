@@ -26,11 +26,16 @@ public class CreateListingServlet extends HttpServlet {
         if(type == 0) {
             int price = Integer.parseInt(request.getParameter("price"));
             int quantity = Integer.parseInt(request.getParameter("quantity"));
-            int createdById = Integer.parseInt(JWTUtil.getSubject(jwt));
+            boolean isSuccessful = false;
 
-            Listing listing = new FixedPriceListing(description, title,createdById, price, quantity);
-            ListingModel listingModel = new ListingModel();
-            boolean isSuccessful = listingModel.createListing(listing, jwt);
+            try {
+                int createdById = Integer.parseInt(JWTUtil.getSubject(jwt));
+                Listing listing = new FixedPriceListing(description, title,createdById, price, quantity);
+                ListingModel listingModel = new ListingModel();
+                isSuccessful = listingModel.createListing(listing, jwt);
+            } catch (NumberFormatException e) {
+                isSuccessful = false;
+            }
 
             Map<String, Boolean> result = new HashMap<>();
             result.put("result", isSuccessful);
