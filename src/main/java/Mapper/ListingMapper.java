@@ -41,7 +41,7 @@ public class ListingMapper extends Mapper<Listing>{
             sb.append(String.format("('%s','%s','%s', '%s')",
                             listing.getDescription(),
                             listing.getTitle(),
-                            listing.getType(),
+                            listing.getTypeString(),
                             listing.getCreatedById()));
             if(!listingListIterator.hasNext()) {
                 sb.append(";");

@@ -1,16 +1,18 @@
 package Entity;
 
+import Enums.ListingTypes;
+
 public abstract class Listing {
     private String description;
     private String title;
-    private int type;
+    private ListingTypes type;
     private int id;
     private int createdById;
 
     public Listing() {
         this.description = null;
         this.title = null;
-        this.type = 0; // 0 for fixed, 1 for auctions
+        this.type = ListingTypes.FIXED_PRICE; // 0 for fixed, 1 for auctions
         this.id = 0;
         this.createdById = 0;
     }
@@ -34,7 +36,7 @@ public abstract class Listing {
     public Listing(String description, String title, int type, int createdById) {
         this.description = description;
         this.title = title;
-        this.type = type;
+        this.type = setType(type);
         this.id = 0;
         this.createdById = createdById;
     }
@@ -55,11 +57,23 @@ public abstract class Listing {
         this.title = title;
     }
 
-    public int getType() {
+    public ListingTypes getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public String getTypeString() {
+        return type.toString();
+    }
+
+    public void setType(ListingTypes type) {
         this.type = type;
+    }
+
+    public ListingTypes setType(int type) {
+        if(type == 0) {
+            return ListingTypes.FIXED_PRICE;
+        } else {
+            return ListingTypes.AUCTION;
+        }
     }
 }

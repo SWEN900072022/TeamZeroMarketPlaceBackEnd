@@ -3,6 +3,7 @@ package UnitofWork;
 import Entity.FixedPriceListing;
 import Entity.Listing;
 import Entity.User;
+import Enums.ListingTypes;
 import Enums.UnitActions;
 import Mapper.FixedPriceListingMapper;
 import Mapper.ListingMapper;
@@ -53,8 +54,8 @@ public class ListingRepository implements IUnitofWork<Listing>{
     }
 
     private void register(Listing listing, String operation) {
-        int type = listing.getType();
-        if (type == 0) {
+        ListingTypes type = listing.getType();
+        if (type == ListingTypes.FIXED_PRICE) {
             register(listing, operation, fixedPriceContext);
         } else {
             register(listing, operation, auctionPriceContext);
@@ -106,8 +107,8 @@ public class ListingRepository implements IUnitofWork<Listing>{
         // Add them into the respective databases, fixed vs auction
         // Check the type of the first element to see the type of context
         // then, we write to the database
-        int type = listingList.get(0).getType();
-        if(type == 0) {
+        ListingTypes type = listingList.get(0).getType();
+        if(type == ListingTypes.FIXED_PRICE) {
             // Write to the fixed price database
             List<FixedPriceListing> fpListingList = listingList.stream()
                                                                 .filter(FixedPriceListing.class::isInstance)
