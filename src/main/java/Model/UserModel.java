@@ -39,4 +39,9 @@ public class UserModel {
         }
         return false;
     }
+
+    public List<User> getAllUsers() {
+        List<User> list = uMapper.getAll();
+        return list;
+    }
 }

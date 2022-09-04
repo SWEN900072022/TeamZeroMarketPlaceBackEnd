@@ -1,5 +1,7 @@
 package Mapper;
 
+import Entity.User;
+
 import java.util.List;
 import java.util.Map;
 
@@ -8,4 +10,5 @@ public interface MapperInterface<T> {
     boolean delete(List<T> TEntity);
     boolean modify(List<T> TEntity);
     List<T> find(Map<String, String> map);
+    List<T> getAll();
 }

@@ -66,5 +66,10 @@ public class UserModelTest {
         public List<User> find(Map<String, String> map) {
             return this.result;
         }
+
+        @Override
+        public List<User> getAll() {
+            return this.result;
+        }
     }
 }

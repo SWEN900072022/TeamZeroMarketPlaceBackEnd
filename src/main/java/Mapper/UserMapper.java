@@ -98,4 +98,28 @@ public class UserMapper extends Mapper<User> {
         }
         return list;
     }
+
+    public List<User> getAll(){
+        List <User> allUsers= new ArrayList<User>();
+        PreparedStatement statement;
+        ResultSet rs;
+        try{
+            if(conn==null){
+                conn = Util.getConnection();
+            }
+            statement = conn.prepareStatement("SELECT * FROM users");
+            rs = statement.executeQuery();
+            while(rs.next()){
+                User user = new User();
+                user.setEmail(rs.getString("email"));
+                user.setUsername(rs.getString("username"));
+                user.setRoles(rs.getString("roles"));
+                user.setPassword(rs.getString("password"));
+                allUsers.add(user);
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return allUsers;
+    }
 }
