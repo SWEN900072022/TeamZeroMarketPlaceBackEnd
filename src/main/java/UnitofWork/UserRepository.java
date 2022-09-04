@@ -20,6 +20,11 @@ public class UserRepository implements IUnitofWork<User>{
     }
 
     @Override
+    public void read(User[] entity) {
+
+    }
+
+    @Override
     public void registerNew(User user) {
         register(user, UnitActions.INSERT.toString());
     }

@@ -23,10 +23,12 @@ public class ListingRepository implements IUnitofWork<Listing>{
     private final Map<String, List<Listing>> auctionPriceContext;
     private final ListingMapper lMapper;
     private final FixedPriceListingMapper fplMapper;
+    private Map<Integer, Listing> listingIdentityMap;
 
     public ListingRepository() {
         fixedPriceContext = new HashMap<>();
         auctionPriceContext = new HashMap<>();
+        listingIdentityMap = new HashMap<>();
         lMapper = new ListingMapper();
         fplMapper = new FixedPriceListingMapper();
     }
@@ -34,8 +36,16 @@ public class ListingRepository implements IUnitofWork<Listing>{
     public ListingRepository(ListingMapper lMapper, FixedPriceListingMapper fplMapper) {
         this.lMapper = lMapper;
         this.fplMapper = fplMapper;
+        this.listingIdentityMap = new HashMap<>();
         fixedPriceContext = new HashMap<>();
         auctionPriceContext = new HashMap<>();
+    }
+
+    @Override
+    public void read(Integer[] id) {
+        // Given the listing id, we want to retrieve lisitng records from the database
+        // We check to see if the records is available in the identity mapping
+
     }
 
     @Override

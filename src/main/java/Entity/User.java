@@ -2,8 +2,6 @@ package Entity;
 
 import Enums.UserRoles;
 
-import java.io.Serializable;
-
 public class User{
     private String email;
     private String username;

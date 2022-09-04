@@ -66,6 +66,11 @@ public class ListingModelTest {
         }
 
         @Override
+        public void read(Listing[] entity) {
+
+        }
+
+        @Override
         public void registerNew(Listing entity) {
 
         }
