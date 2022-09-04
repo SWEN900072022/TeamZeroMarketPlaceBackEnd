@@ -2,14 +2,13 @@ import Entity.User;
 import Mapper.Mapper;
 import Model.UserModel;
 import Util.JWTUtil;
-import io.jsonwebtoken.JwtException;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static Util.JWTUtil.validateToken;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserModelTest {
@@ -61,7 +60,7 @@ public class UserModelTest {
 
     class mockUserMapper extends Mapper<User> {
         private boolean isEmptyResult = false;
-        public List<User> result = new ArrayList<>();
+        public Map<Integer, User> result = new HashMap<>();
 
         public mockUserMapper() {
 
@@ -70,9 +69,9 @@ public class UserModelTest {
         public void setEmptyResult(boolean emptyResult) {
             this.isEmptyResult = emptyResult;
             if(emptyResult) {
-                result = new ArrayList<>();
+                result = new HashMap<>();
             } else {
-                result.add(new User());
+                result.put(0, new User());
             }
         }
 
@@ -88,11 +87,11 @@ public class UserModelTest {
             return false;
         }
 
-        public List<User> find(Map<String, String> map) {
+        public Map<Integer, User> find(Map<String, String> map) {
             return find(map, 0);
         }
 
-        public List<User> find(Map<String, String> map, int mode) {
+        public Map<Integer, User> find(Map<String, String> map, int mode) {
             return this.result;
         }
     }

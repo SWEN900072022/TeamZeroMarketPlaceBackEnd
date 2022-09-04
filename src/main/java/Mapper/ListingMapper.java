@@ -1,6 +1,8 @@
 package Mapper;
 
+import Entity.FixedPriceListingImpl;
 import Entity.Listing;
+import Enums.ListingTypes;
 import Util.Util;
 
 import java.sql.*;
@@ -77,11 +79,58 @@ public class ListingMapper extends Mapper<Listing>{
         return true;
     }
 
-    public List<Listing> find(Map<String, String> map) {
+    public Map<Integer, Listing> find(Map<String, String> map) {
         return find(map, 0);
     }
 
-    public List<Listing> find(Map<String, String>map, int mode) {
-        return new ArrayList<>();
+    public Map<Integer, Listing> find(Map<String, String>map, int mode) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT * FROM listing");
+        PreparedStatement statement;
+        Iterator<Map.Entry<String, String>> itr = map.entrySet().iterator();
+        Map<Integer, Listing> list = new HashMap<>();
+        ResultSet rs;
+
+        if(itr.hasNext()) {
+            sb.append(" WHERE ");
+        } else {
+            sb.append(";");
+        }
+
+        while(itr.hasNext()) {
+            Map.Entry<String, String> entry = itr.next();
+            sb.append(String.format("%s='%s'", entry.getKey(), entry.getValue()));
+            if(itr.hasNext()) {
+                if(mode == 0) { // 0 for and, 1 for or
+                    sb.append(" AND ");
+                } else {
+                    sb.append(" OR ");
+                }
+            } else {
+                sb.append(";");
+            }
+        }
+
+        try {
+            if(conn == null) {
+                conn = Util.getConnection();
+            }
+            statement = conn.prepareStatement(sb.toString());
+            statement.execute();
+
+            rs = statement.getResultSet();
+            while(rs.next()) {
+                Listing listing = new FixedPriceListingImpl(); // We default to a fixed price listing
+                listing.setDescription(rs.getString("description"));
+                listing.setTitle(rs.getString("title"));
+                listing.setType(ListingTypes.fromString(rs.getString("type")));
+                listing.setId(rs.getInt("id"));
+                listing.setCreatedById(rs.getInt("created_by_id"));
+                list.put(listing.getId(), listing);
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return list;
     }
 }

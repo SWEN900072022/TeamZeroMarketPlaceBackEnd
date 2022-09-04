@@ -2,11 +2,12 @@ package UnitofWork;
 
 import Entity.Order;
 
+import java.util.Map;
+
 public class OrderRepository implements IUnitofWork<Order> {
-
     @Override
-    public void read(Order[] entity) {
-
+    public Map<Integer, Order> read(Integer[] id) {
+        return null;
     }
 
     @Override

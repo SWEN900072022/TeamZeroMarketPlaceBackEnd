@@ -1,7 +1,9 @@
 package UnitofWork;
 
+import java.util.Map;
+
 public interface IUnitofWork<T>{
-    void read(Integer[] id);
+    Map<Integer, T> read(Integer[] id);
     void registerNew(T entity);
     void registerModified(T entity);
     void registerDeleted(T entity);

@@ -1,20 +1,17 @@
 package UnitofWork;
 
 import Entity.FixedPriceListing;
+import Entity.FixedPriceListingImpl;
 import Entity.Listing;
-import Entity.User;
 import Enums.ListingTypes;
 import Enums.UnitActions;
 import Mapper.FixedPriceListingMapper;
 import Mapper.ListingMapper;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -42,10 +39,26 @@ public class ListingRepository implements IUnitofWork<Listing>{
     }
 
     @Override
-    public void read(Integer[] id) {
-        // Given the listing id, we want to retrieve lisitng records from the database
+    public Map<Integer, Listing> read(Integer[] idList) {
+        // Given the listing id, we want to retrieve listing records from the database
         // We check to see if the records is available in the identity mapping
+        Map<String, String> toQuery = new HashMap<>();
+        Map<Integer, Listing> result = new HashMap<>();
+        for(Integer id : idList) {
+            // See if the record is available
+            if(listingIdentityMap.containsKey(id)) {
+                result.put(id, listingIdentityMap.get(id));
+            } else {
+                toQuery.put("id", id.toString());
+            }
+        }
 
+        // With the list of integer that needs to be queried, we pass it to the mapper
+        Map<Integer, Listing> dbResult = lMapper.find(toQuery);
+
+        // Combine the two lists together
+        result.putAll(dbResult);
+        return result;
     }
 
     @Override
@@ -121,8 +134,8 @@ public class ListingRepository implements IUnitofWork<Listing>{
         if(type == ListingTypes.FIXED_PRICE) {
             // Write to the fixed price database
             List<FixedPriceListing> fpListingList = listingList.stream()
-                                                                .filter(FixedPriceListing.class::isInstance)
-                                                                .map(FixedPriceListing.class::cast)
+                                                                .filter(FixedPriceListingImpl.class::isInstance)
+                                                                .map(FixedPriceListingImpl.class::cast)
                                                                 .collect(toList());
             boolean canInsert = fplMapper.insert(fpListingList);
             if(!canInsert) {

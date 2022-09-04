@@ -20,8 +20,8 @@ public class UserRepository implements IUnitofWork<User>{
     }
 
     @Override
-    public void read(User[] entity) {
-
+    public Map<Integer, User> read(Integer[] id) {
+        return null;
     }
 
     @Override

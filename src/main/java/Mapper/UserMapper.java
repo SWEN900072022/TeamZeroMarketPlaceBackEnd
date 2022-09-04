@@ -54,16 +54,16 @@ public class UserMapper extends Mapper<User> {
         return false;
     }
 
-    public List<User> find(Map<String, String> map) {
+    public Map<Integer, User> find(Map<String, String> map) {
         return find(map, 0);
     }
 
-    public List<User> find(Map<String, String> map, int mode) {
+    public Map<Integer, User> find(Map<String, String> map, int mode) {
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT * FROM users");
         PreparedStatement statement;
         Iterator<Map.Entry<String, String>> itr = map.entrySet().iterator();
-        List<User> list = new ArrayList<>();
+        Map<Integer, User> list = new HashMap<>();
         ResultSet rs;
 
         if(itr.hasNext()) {
@@ -76,7 +76,7 @@ public class UserMapper extends Mapper<User> {
             Map.Entry<String, String> entry = itr.next();
             sb.append(String.format("%s='%s'", entry.getKey(), entry.getValue()));
             if(itr.hasNext()) {
-                if(mode == 0) {
+                if(mode == 0) { // 0 for and, 1 for or
                     sb.append(" AND ");
                 } else {
                     sb.append(" OR ");
@@ -101,7 +101,7 @@ public class UserMapper extends Mapper<User> {
                 user.setRoles(rs.getString("roles"));
                 user.setPassword(rs.getString("password"));
                 user.setId(rs.getInt("id"));
-                list.add(user);
+                list.put(user.getId(), user);
             }
         } catch (SQLException e) {
             System.out.println(e);

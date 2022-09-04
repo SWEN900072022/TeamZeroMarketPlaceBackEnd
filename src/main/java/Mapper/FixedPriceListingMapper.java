@@ -1,14 +1,13 @@
 package Mapper;
 
 import Entity.FixedPriceListing;
+import Entity.FixedPriceListingImpl;
 import Entity.Listing;
+import Enums.ListingTypes;
 import Util.Util;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
+import java.util.*;
 
 public class FixedPriceListingMapper extends Mapper<FixedPriceListing> {
     private Connection conn = null;
@@ -72,12 +71,56 @@ public class FixedPriceListingMapper extends Mapper<FixedPriceListing> {
     }
 
     @Override
-    public List<FixedPriceListing> find(Map<String, String> map) {
-        return null;
+    public Map<Integer, FixedPriceListing> find(Map<String, String> map) {
+        return find(map, 0);
     }
 
     @Override
-    public List<FixedPriceListing> find(Map<String, String> map, int mode) {
-        return null;
+    public Map<Integer, FixedPriceListing> find(Map<String, String> map, int mode) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT * FROM fixed_price_listing");
+        PreparedStatement statement;
+        Iterator<Map.Entry<String, String>> itr = map.entrySet().iterator();
+        Map<Integer, FixedPriceListing> list = new HashMap<>();
+        ResultSet rs;
+
+        if(itr.hasNext()) {
+            sb.append(" WHERE ");
+        } else {
+            sb.append(";");
+        }
+
+        while(itr.hasNext()) {
+            Map.Entry<String, String> entry = itr.next();
+            sb.append(String.format("%s='%s'", entry.getKey(), entry.getValue()));
+            if(itr.hasNext()) {
+                if(mode == 0) { // 0 for and, 1 for or
+                    sb.append(" AND ");
+                } else {
+                    sb.append(" OR ");
+                }
+            } else {
+                sb.append(";");
+            }
+        }
+
+        try {
+            if(conn == null) {
+                conn = Util.getConnection();
+            }
+            statement = conn.prepareStatement(sb.toString());
+            statement.execute();
+
+            rs = statement.getResultSet();
+            while(rs.next()) {
+                FixedPriceListing listing = new FixedPriceListingImpl(); // We default to a fixed price listing
+                listing.setPrice(rs.getInt("price"));
+                listing.setQuantity(rs.getInt("quantity"));
+                listing.setFplId(rs.getInt("id"));
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return list;
     }
 }

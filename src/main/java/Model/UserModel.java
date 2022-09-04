@@ -32,9 +32,9 @@ public class UserModel {
         queryMap.put("username", user.getUsername());
         queryMap.put("email", user.getEmail());
 
-        List<User> list = uMapper.find(queryMap, 1);
+        Map<Integer, User> map = uMapper.find(queryMap, 1);
 
-        if(list.isEmpty()) {
+        if(map.isEmpty()) {
             repo.registerNew(user);
             return true;
         }
@@ -47,14 +47,14 @@ public class UserModel {
         queryMap.put("email", user.getEmail());
         queryMap.put("password", user.getPassword());
 
-        List<User> list = uMapper.find(queryMap);
+        Map<Integer, User> map = uMapper.find(queryMap);
 
-        if(list.isEmpty()) {
+        if(map.isEmpty()) {
             // User does not exist
             return null;
         }
 
-        user = list.get(0); // Update the user object
+        user = (User)map.values().toArray()[0]; // Update the user object
         // User exists here
         // Generate jwt token for upcoming sessions
         return JWTUtil.generateToken(String.valueOf(user.getId()), queryMap);
