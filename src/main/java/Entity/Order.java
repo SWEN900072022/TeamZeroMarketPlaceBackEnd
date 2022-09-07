@@ -5,6 +5,12 @@ public class Order {
     private int listingId;
     private int quantity;
 
+    public Order() {
+        this.id = 0;
+        this.listingId = 0;
+        this.quantity = 0;
+    }
+
     public Order(int listingId, int quantity) {
         this.id = 0;
         this.listingId = listingId;

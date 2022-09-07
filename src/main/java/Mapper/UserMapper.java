@@ -86,6 +86,8 @@ public class UserMapper extends Mapper<User> {
             }
         }
 
+        // Additional conditions, such as limit goes here
+
         try {
             if(conn == null) {
                 conn = Util.getConnection();

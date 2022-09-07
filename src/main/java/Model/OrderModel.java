@@ -8,6 +8,7 @@ import UnitofWork.IUnitofWork;
 import UnitofWork.ListingRepository;
 import UnitofWork.OrderRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public class OrderModel {
     public boolean createOrders(Integer[] listingId, Integer[] quantity) {
         // First we validate that the quantity is sufficient
         Map<Integer,Listing> listingMap  = listingRepo.read(listingId);
-
+        List<Listing> modifiedListing = new ArrayList<>(); // FixedPriceListing List
 
         // Iterate the listing and check if there are sufficient
         for(int i = 0; i < listingId.length; i++) {
@@ -43,18 +44,30 @@ public class OrderModel {
                 if(fpListing.getQuantity() < quantity[i]) {
                     // There isn't enough to support to order, abort transaction
                     return false;
+                } else {
+                    fpListing.setQuantity(fpListing.getQuantity() - quantity[i]);
                 }
+
+                listing = (Listing)fpListing;
             } else {
                 // Auction
                 // Not implemented
             }
+
+            // Register the modified objects and the new order
+            listingRepo.registerModified(listing);
+            Order order = new Order(listingId[i], quantity[i]);
+            orderRepo.registerNew(order);
         }
 
-        // At this point, we should have enough to satisfy the order.
-        // We subtract the quantity from the listing and create a new entry into the order
-        // database
-
         // Order written to database, transaction completed
-        return false;
+        try{
+            listingRepo.commit();
+            orderRepo.commit();
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
     }
 }

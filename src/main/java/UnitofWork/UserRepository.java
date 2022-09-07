@@ -79,6 +79,6 @@ public class UserRepository implements IUnitofWork<User>{
 
     private void commitDel() {
         List<User> userList = context.get(UnitActions.DELETE.toString());
-        uMapper.modify(userList);
+        uMapper.delete(userList);
     }
 }
