@@ -22,6 +22,11 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         cache: maven
+    - name: 'Create env file'
+      run: |
+        mkdir src/main/resources
+        touch src/main/resources/.env
+        echo JWT_SECRET=${{ secrets.JWT_SECRET }} > src/main/resources/.env
     - name: Build with Maven
       run: mvn --batch-mode -DskipTests package
     - name: Test with Maven

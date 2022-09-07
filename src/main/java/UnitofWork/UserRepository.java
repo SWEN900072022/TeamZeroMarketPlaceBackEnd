@@ -2,6 +2,7 @@ package UnitofWork;
 
 import Entity.User;
 import Enums.UnitActions;
+import Mapper.Mapper;
 import Mapper.UserMapper;
 
 import java.util.ArrayList;
@@ -12,11 +13,16 @@ import java.util.Map;
 public class UserRepository implements IUnitofWork<User>{
 
     private final Map<String, List<User>> context;
-    private final UserMapper uMapper;
+    private final Mapper<User> uMapper;
 
     public UserRepository() {
         context = new HashMap<>();
         uMapper = new UserMapper();
+    }
+
+    public UserRepository(Mapper<User> uMapper) {
+        context = new HashMap<>();
+        this.uMapper = uMapper;
     }
 
     @Override

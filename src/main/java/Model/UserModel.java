@@ -4,6 +4,7 @@ import Entity.User;
 import Mapper.Mapper;
 import Mapper.UserMapper;
 import UnitofWork.UserRepository;
+import Util.JWTUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +22,7 @@ public class UserModel {
 
     public UserModel(Mapper<User> mapper) {
         this.uMapper = mapper;
-        repo = new UserRepository();
+        repo = new UserRepository(mapper);
     }
 
     public boolean register(User user) {
@@ -31,17 +32,38 @@ public class UserModel {
         queryMap.put("username", user.getUsername());
         queryMap.put("email", user.getEmail());
 
-        List<User> list = uMapper.find(queryMap);
+        List<User> list = uMapper.find(queryMap, 1);
 
         if(list.isEmpty()) {
             repo.registerNew(user);
+            repo.commit();
             return true;
         }
         return false;
     }
 
+
     public List<User> getAllUsers() {
         List<User> list = uMapper.getAll();
         return list;
+    }
+
+    public String login(User user) {
+        // Validate to see whether the user is an actual user
+        Map<String, String> queryMap = new HashMap<>();
+        queryMap.put("email", user.getEmail());
+        queryMap.put("password", user.getPassword());
+
+        List<User> list = uMapper.find(queryMap);
+
+        if(list.isEmpty()) {
+            // User does not exist
+            return null;
+        }
+
+        // User exists here
+        // Generate jwt token for upcoming sessions
+        return JWTUtil.generateToken(user.getEmail(), queryMap);
+
     }
 }
