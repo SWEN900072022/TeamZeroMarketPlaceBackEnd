@@ -55,8 +55,9 @@ public class UserModel {
             return null;
         }
 
+        user = list.get(0); // Update the user object
         // User exists here
         // Generate jwt token for upcoming sessions
-        return JWTUtil.generateToken(user.getEmail(), queryMap);
+        return JWTUtil.generateToken(String.valueOf(user.getId()), queryMap);
     }
 }

@@ -55,4 +55,24 @@ public final class JWTUtil {
         return true;
     }
 
+    public static String getSubject(String jwt) {
+        String secret = getEnvValue("JWT_SECRET");
+        String sub;
+
+        try{
+            sub = Jwts.parserBuilder()
+                    .setSigningKey(
+                            Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8))
+                    )
+                    .build()
+                    .parseClaimsJws(jwt)
+                    .getBody()
+                    .getSubject();
+        } catch (JwtException ex) {
+            return "";
+            // Something has gone wrong
+        }
+
+        return sub;
+    }
 }

@@ -100,6 +100,7 @@ public class UserMapper extends Mapper<User> {
                 user.setUsername(rs.getString("username"));
                 user.setRoles(rs.getString("roles"));
                 user.setPassword(rs.getString("password"));
+                user.setId(rs.getInt("id"));
                 list.add(user);
             }
         } catch (SQLException e) {
