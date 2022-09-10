@@ -9,6 +9,7 @@ public class Order {
     private int quantity;
     private int orderedBy;
 
+
     public Order() {
         this.id = 0;
         this.listingId = 0;
@@ -16,10 +17,19 @@ public class Order {
         this.orderedBy = 0;
     }
 
-    public Order(int listingId, int quantity) {
+    public int getOrderedBy() {
+        return orderedBy;
+    }
+
+    public void setOrderedBy(int orderedBy) {
+        this.orderedBy = orderedBy;
+    }
+
+    public Order(int listingId, int quantity, int orderedBy) {
         this.id = 0;
         this.listingId = listingId;
         this.quantity = quantity;
+        this.orderedBy = orderedBy;
     }
 
     public int getId() {
@@ -51,6 +61,7 @@ public class Order {
         attr.add("id");
         attr.add("listing_id");
         attr.add("quantity");
+        attr.add("ordered_by");
         return attr;
     }
 }

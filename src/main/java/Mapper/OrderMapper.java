@@ -3,103 +3,64 @@ package Mapper;
 import Entity.Order;
 import Util.Util;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 
 public class OrderMapper extends Mapper<Order> {
     private Connection conn = null;
+
     public OrderMapper() {
 
     }
+
     @Override
-    public boolean insert(List<Order> orderList) {
-        StringBuilder sb = new StringBuilder();
-        PreparedStatement statement;
-        ListIterator<Order> orderListIterator = orderList.listIterator();
-        sb.append("INSERT INTO orders (listing_id, quantity) VALUES");
+    public boolean insert(Order order) {
+        try {
+            PreparedStatement statement;
 
-        while(orderListIterator.hasNext()) {
-            Order order = orderListIterator.next();
-            sb.append(String.format("('%s','%s')",
-                    order.getListingId(),
-                    order.getQuantity()));
-            if(!orderListIterator.hasNext()) {
-                sb.append(";");
-            } else {
-                sb.append(",");
-            }
-        }
-
-        try{
-            if(conn == null) {
+            if (conn == null) {
                 conn = Util.getConnection();
             }
-            statement = conn.prepareStatement(sb.toString());
+
+            statement = conn.prepareStatement(
+                    "INSERT INTO orders (listing_id, quantity, ordered_by) " +
+                            "VALUES (?, ?, ?);", Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, order.getListingId());
+            statement.setInt(2, order.getQuantity());
+            statement.setInt(3, order.getOrderedBy());
             statement.execute();
         } catch (SQLException e) {
-            System.out.println(e);
             return false;
         }
         return true;
     }
 
     @Override
-    public boolean delete(List<Order> TEntity) {
+    public boolean delete(Order TEntity) {
         return false;
     }
 
     @Override
-    public boolean modify(List<Order> orderList) {
-        List<String> fieldsToBeUpdated = Order.getOrderAttribute();
-        StringBuilder sb = new StringBuilder();
-        sb.append("UPDATE orders as o set ");
-        Iterator<String> fItr = fieldsToBeUpdated.listIterator();
-
-        while(fItr.hasNext()) {
-            String field = fItr.next();
-            sb.append(String.format("%s=o2.%s", field, field));
-            if(fItr.hasNext()) {
-                sb.append(",");
-            }
+    public boolean modify(Order order) {
+        if (conn == null) {
+            conn = Util.getConnection();
         }
-
-        sb.append(" from ( values ");
-        Iterator<Order> orderIterator = orderList.listIterator();
-        while(orderIterator.hasNext()) {
-            Order order = orderIterator.next();
-            sb.append(String.format("(%s, %s, %s)",
-                    order.getId(),
-                    order.getListingId(),
-                    order.getQuantity()));
-
-            if(fItr.hasNext()) {
-                sb.append(",");
-            }
-        }
-
-        sb.append(" ) as o2(");
-        fItr = fieldsToBeUpdated.listIterator();
-
-        while(fItr.hasNext()) {
-            String field = fItr.next();
-            sb.append(String.format("%s", field));
-            if(fItr.hasNext()) {
-                sb.append(",");
-            } else {
-                sb.append(")");
-            }
-        }
-
-        sb.append("where o.id=o2.id");
-
         try {
-            if(conn == null) {
-                conn = Util.getConnection();
-            }
-            PreparedStatement statement = conn.prepareStatement(sb.toString());
+            PreparedStatement statement = conn.prepareStatement(
+                    "UPDATE orders as o set " +
+                            "id=o2.id, " +
+                            "listing_id=o2.listing_id, " +
+                            "quantity=o2.quantity, " +
+                            "ordered_by=o2.ordered_by " +
+                            "from (values " +
+                            "(?, ?, ?, ?)" +
+                            ") as o2(id, listing_id, quantity, ordered_by) " +
+                            "where o.id=o2.id;"
+            );
+            statement.setInt(1, order.getId());
+            statement.setInt(2, order.getListingId());
+            statement.setInt(3, order.getQuantity());
+            statement.setInt(4, order.getOrderedBy());
             statement.execute();
         } catch (SQLException e) {
             return false;
@@ -107,62 +68,26 @@ public class OrderMapper extends Mapper<Order> {
         return true;
     }
 
-    @Override
-    public Map<Integer, Order> find(Map<String, String> map) {
-        return find(map, 0);
-    }
+    public Order findById(Integer id) {
+        Order order = new Order();
+        try {
+            PreparedStatement statement = conn.prepareStatement(
+                    "SELECT * FROM orders where id=?;"
+            );
+            statement.setInt(1, id);
+            statement.execute();
 
-    @Override
-    public Map<Integer, Order> find(Map<String, String> map, int mode) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("SELECT * FROM orders");
-        PreparedStatement statement;
-        Iterator<Map.Entry<String, String>> itr = map.entrySet().iterator();
-        Map<Integer, Order> list = new HashMap<>();
-        ResultSet rs;
-
-        if(itr.hasNext()) {
-            sb.append(" WHERE ");
-        } else {
-            sb.append(";");
-        }
-
-        while(itr.hasNext()) {
-            Map.Entry<String, String> entry = itr.next();
-            sb.append(String.format("%s='%s'", entry.getKey(), entry.getValue()));
-            if(itr.hasNext()) {
-                if(mode == 0) { // 0 for and, 1 for or
-                    sb.append(" AND ");
-                } else {
-                    sb.append(" OR ");
-                }
-            } else {
-                sb.append(";");
+            ResultSet rs = statement.getResultSet();
+            while (rs.next()) {
+                // Process the result set into an object
+                order.setListingId(rs.getInt("listing_id"));
+                order.setQuantity(rs.getInt("quantity"));
+                order.setId(rs.getInt("id"));
+                order.setOrderedBy(rs.getInt("ordered_by"));
             }
-        }
-
-        // Additional conditions, such as limit should go here
-
-        try{
-             if(conn == null) {
-                 conn = Util.getConnection();
-             }
-
-             statement = conn.prepareStatement(sb.toString());
-             statement.execute();
-
-             rs = statement.getResultSet();
-             while(rs.next()) {
-                 // Process the result set into an object
-                 Order order = new Order();
-                 order.setListingId(rs.getInt("listing_id"));
-                 order.setQuantity(rs.getInt("quantity"));
-                 order.setId(rs.getInt("id"));
-                 list.put(order.getId(), order);
-             }
         } catch (SQLException e) {
-            System.out.println(e);
+            return null;
         }
-        return list;
+        return order;
     }
 }

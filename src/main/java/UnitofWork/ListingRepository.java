@@ -42,34 +42,18 @@ public class ListingRepository implements IUnitofWork<Listing>{
     public Map<Integer, Listing> read(Integer[] idList) {
         // Given the listing id, we want to retrieve listing records from the database
         // We check to see if the records is available in the identity mapping
-        Map<String, String> toQuery = new HashMap<>();
         Map<Integer, Listing> result = new HashMap<>();
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("(");
-        for(int i = 0; i < idList.length; i++) {
+        for(Integer id : idList) {
             // See if the record is available
-            Integer id = idList[i];
             if(listingIdentityMap.containsKey(id)) {
                 result.put(id, listingIdentityMap.get(id));
             } else {
-                sb.append(id);
-            }
-
-            if(i == idList.length - 1) {
-                sb.append(")");
-            } else {
-                sb.append(",");
+                Listing listing = lMapper.findById(id);
+                result.put(id, listing);
             }
         }
 
-        toQuery.put("id", sb.toString());
-
-        // With the list of integer that needs to be queried, we pass it to the mapper
-        Map<Integer, Listing> dbResult = lMapper.find(toQuery);
-
-        // Combine the two lists together
-        result.putAll(dbResult);
         return result;
     }
 
@@ -132,9 +116,13 @@ public class ListingRepository implements IUnitofWork<Listing>{
 
     private void commitNew(Map<String, List<Listing>> context) throws Exception {
         List<Listing> listingList = context.get(UnitActions.INSERT.toString());
-        listingList = lMapper.insertWithResultSet(listingList);
+        List<Listing> result = new ArrayList<>();
 
-        if(listingList.isEmpty()) {
+        for(Listing listing : listingList) {
+            result.add(lMapper.insertWithResultSet(listing));
+        }
+
+        if(result.isEmpty()) {
             // Something went wrong here
             throw new Exception();
         }
@@ -142,17 +130,20 @@ public class ListingRepository implements IUnitofWork<Listing>{
         // Add them into the respective databases, fixed vs auction
         // Check the type of the first element to see the type of context
         // then, we write to the database
-        ListingTypes type = listingList.get(0).getType();
+        ListingTypes type = result.get(0).getType();
         if(type == ListingTypes.FIXED_PRICE) {
             // Write to the fixed price database
-            List<FixedPriceListing> fpListingList = listingList.stream()
+            List<FixedPriceListing> fpListingList = result.stream()
                                                                 .filter(FixedPriceListingImpl.class::isInstance)
                                                                 .map(FixedPriceListingImpl.class::cast)
                                                                 .collect(toList());
-            boolean canInsert = fplMapper.insert(fpListingList);
-            if(!canInsert) {
-                // Something went wrong
-                throw new Exception();
+
+            for(FixedPriceListing fpListing : fpListingList) {
+                boolean canInsert = fplMapper.insert(fpListing);
+                if(!canInsert) {
+                    // Something went wrong
+                    throw new Exception();
+                }
             }
         } else {
             // Write to the auction price database
@@ -162,7 +153,10 @@ public class ListingRepository implements IUnitofWork<Listing>{
 
     private void commitModify(Map<String, List<Listing>> context) throws Exception {
         List<Listing> listingList = context.get(UnitActions.MODIFY.toString());
-        lMapper.modify(listingList);
+
+        for(Listing listing : listingList) {
+            lMapper.modify(listing);
+        }
 
         // Modify the changes to the respective dbs, fixed price vs auction
         ListingTypes type = listingList.get(0).getType();
@@ -171,9 +165,12 @@ public class ListingRepository implements IUnitofWork<Listing>{
                                                                 .filter(FixedPriceListingImpl.class::isInstance)
                                                                 .map(FixedPriceListingImpl.class::cast)
                                                                 .collect(toList());
-            boolean canModify = fplMapper.modify(fpListingList);
-            if(!canModify) {
-                throw new Exception();
+
+            for(FixedPriceListing fpListing : fpListingList) {
+                boolean canModify = fplMapper.modify(fpListing);
+                if(!canModify) {
+                    throw new Exception();
+                }
             }
         } else {
             // Write to the auction database

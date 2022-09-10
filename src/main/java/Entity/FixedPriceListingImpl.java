@@ -53,16 +53,12 @@ public class FixedPriceListingImpl extends Listing implements FixedPriceListing 
         // Create a mapper and load the values into the object
         FixedPriceListingMapper mapper = new FixedPriceListingMapper();
 
-        Map<String, String> queryMap = new HashMap<>();
-        queryMap.put("general_listing_id", Integer.toString(getId()));
-
-        Map<Integer, FixedPriceListing>result =  mapper.find(queryMap);
+        FixedPriceListing result = mapper.findById(getFplId());
 
         // There should only be one item in the result set
-        FixedPriceListing resultListing = (FixedPriceListing) result.values().toArray()[0];
-        this.price = resultListing.getPrice();
-        this.quantity = resultListing.getQuantity();
-        this.fplId = resultListing.getFplId();
+        this.price = result.getPrice();
+        this.quantity = result.getQuantity();
+        this.fplId = result.getFplId();
     }
 
     public static List<String> getFPListAttributes() {

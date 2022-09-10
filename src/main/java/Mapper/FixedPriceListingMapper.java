@@ -12,108 +12,70 @@ import java.util.*;
 public class FixedPriceListingMapper extends Mapper<FixedPriceListing> {
     private Connection conn = null;
     @Override
-    public boolean insert(List<FixedPriceListing> listingList) {
+    public boolean insert(FixedPriceListing listing) {
         try {
-            insertOperation(listingList, false);
+            insertOperation(listing, false);
         } catch (SQLException e) {
             return false;
         }
         return true;
     }
 
-    private List<FixedPriceListing> insertOperation(List<FixedPriceListing>listingList, boolean shouldReturn) throws SQLException {
-        StringBuilder sb = new StringBuilder();
+    private FixedPriceListing insertOperation(FixedPriceListing listing, boolean shouldReturn) throws SQLException {
         PreparedStatement statement;
-        ListIterator<FixedPriceListing> listingListIterator = listingList.listIterator();
-        sb.append("INSERT INTO fixed_price_listing (general_listing_id, price, quantity) VALUES");
-
-        while(listingListIterator.hasNext()) {
-            FixedPriceListing listing = listingListIterator.next();
-            sb.append(String.format("('%s','%s','%s')",
-                            listing.getId(),
-                            listing.getPrice(),
-                            listing.getQuantity()));
-            if(!listingListIterator.hasNext()) {
-                sb.append(";");
-            } else {
-                sb.append(",");
-            }
-        }
 
         if(conn == null) {
             conn = Util.getConnection();
         }
-        statement = conn.prepareStatement(sb.toString(), Statement.RETURN_GENERATED_KEYS);
+        statement = conn.prepareStatement(
+                "INSERT INTO fixed_price_listing (general_listing_id, price, quantity) " +
+                        "VALUES (? ,?, ?);",
+                Statement.RETURN_GENERATED_KEYS);
+        statement.setInt(1, listing.getId());
+        statement.setInt(2, listing.getPrice());
+        statement.setInt(3, listing.getQuantity());
         statement.execute();
 
         if(!shouldReturn) {
-            return new ArrayList<>();
+            return null;
         }
 
         ResultSet generatedKeys = statement.getGeneratedKeys();
-        listingListIterator = listingList.listIterator();
-        while(generatedKeys.next() && listingListIterator.hasNext()) {
-            FixedPriceListing listing = listingListIterator.next();
+        while(generatedKeys.next()) {
             listing.setId(generatedKeys.getInt(1));
         }
 
-        return listingList;
+        return listing;
     }
 
     @Override
-    public boolean delete(List<FixedPriceListing> listingList) {
+    public boolean delete(FixedPriceListing listing) {
         return false;
     }
 
     @Override
-    public boolean modify(List<FixedPriceListing> listingList) {
-        List<String> fieldsToBeUpdated = FixedPriceListingImpl.getFPListAttributes();
-        StringBuilder sb = new StringBuilder();
-        sb.append("UPDATE fixed_price_listing as fpl set ");
-        Iterator<String> fItr = fieldsToBeUpdated.listIterator();
-
-        while(fItr.hasNext()) {
-            String field = fItr.next();
-            sb.append(String.format("%s=fpl2.%s", field, field));
-            if(fItr.hasNext()) {
-                sb.append(",");
-            }
-        }
-
-        sb.append(" from ( values ");
-        Iterator<FixedPriceListing> listingIterator = listingList.listIterator();
-        while(listingIterator.hasNext()) {
-            FixedPriceListing listing = listingIterator.next();
-            sb.append(String.format("(%d, %d, %d, %d)",
-                    listing.getFplId(),
-                    listing.getId(),
-                    listing.getPrice(),
-                    listing.getQuantity()));
-
-            if(listingIterator.hasNext()) {
-                sb.append(",");
-            }
-        }
-
-        sb.append(" ) as fpl2(");
-        fItr = fieldsToBeUpdated.listIterator();
-        while(fItr.hasNext()) {
-            String field = fItr.next();
-            sb.append(String.format("%s", field));
-            if(fItr.hasNext()) {
-                sb.append(",");
-            } else {
-                sb.append(")");
-            }
-        }
-
-        sb.append("where fpl.id=fpl2.id;");
-
+    public boolean modify(FixedPriceListing listing) {
         try {
+            PreparedStatement statement;
+
             if(conn == null) {
                 conn = Util.getConnection();
             }
-            PreparedStatement statement = conn.prepareStatement(sb.toString());
+
+            statement = conn.prepareStatement(
+                    "UPDATE fixed_price_listing as fpl set " +
+                            "id=fpl2.id, " +
+                            "price=fpl2.price, " +
+                            "quantity=fpl2.quantity, " +
+                            "general_listing_id=fpl2.general_listing_id " +
+                            "from (values " +
+                            "(?, ?, ?, ?) " +
+                            ") as fpl2(id, price, quantity, general_listing_id) " +
+                            "where fpl2.id=fpl.id;");
+            statement.setInt(1, listing.getFplId());
+            statement.setInt(2, listing.getPrice());
+            statement.setInt(3, listing.getQuantity());
+            statement.setInt(4, listing.getId());
             statement.execute();
         } catch (SQLException e) {
             return false;
@@ -121,58 +83,29 @@ public class FixedPriceListingMapper extends Mapper<FixedPriceListing> {
         return true;
     }
 
-    @Override
-    public Map<Integer, FixedPriceListing> find(Map<String, String> map) {
-        return find(map, 0);
-    }
-
-    @Override
-    public Map<Integer, FixedPriceListing> find(Map<String, String> map, int mode) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("SELECT * FROM fixed_price_listing");
-        PreparedStatement statement;
-        Iterator<Map.Entry<String, String>> itr = map.entrySet().iterator();
-        Map<Integer, FixedPriceListing> list = new HashMap<>();
-        ResultSet rs;
-
-        if(itr.hasNext()) {
-            sb.append(" WHERE ");
-        } else {
-            sb.append(";");
-        }
-
-        while(itr.hasNext()) {
-            Map.Entry<String, String> entry = itr.next();
-            sb.append(String.format("%s='%s'", entry.getKey(), entry.getValue()));
-            if(itr.hasNext()) {
-                if(mode == 0) { // 0 for and, 1 for or
-                    sb.append(" AND ");
-                } else {
-                    sb.append(" OR ");
-                }
-            } else {
-                sb.append(";");
-            }
-        }
-
+    public FixedPriceListing findById(Integer id) {
+        FixedPriceListing listing = new FixedPriceListingImpl(); // We default to a fixed price listing
         try {
+            PreparedStatement statement;
+
             if(conn == null) {
                 conn = Util.getConnection();
             }
-            statement = conn.prepareStatement(sb.toString());
-            statement.execute();
 
-            rs = statement.getResultSet();
+            statement = conn.prepareStatement(
+                    "SELECT * FROM fixed_price_listing where id=?;"
+            );
+            statement.setInt(1, id);
+            statement.execute();
+            ResultSet rs = statement.getResultSet();
             while(rs.next()) {
-                FixedPriceListing listing = new FixedPriceListingImpl(); // We default to a fixed price listing
                 listing.setPrice(rs.getInt("price"));
                 listing.setQuantity(rs.getInt("quantity"));
                 listing.setFplId(rs.getInt("id"));
-                list.put(listing.getFplId(), listing);
             }
         } catch (SQLException e) {
-            System.out.println(e);
+            return null;
         }
-        return list;
+        return listing;
     }
 }

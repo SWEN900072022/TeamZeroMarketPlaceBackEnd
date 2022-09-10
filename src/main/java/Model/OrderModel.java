@@ -70,7 +70,8 @@ public class OrderModel {
 
             // Register the modified objects and the new order
             listingRepo.registerModified(listing);
-            Order order = new Order(listingId[i], quantity[i]);
+            int userId = Integer.parseInt(JWTUtil.getSubject(jwt));
+            Order order = new Order(listingId[i], quantity[i], userId);
             orderRepo.registerNew(order);
         }
 

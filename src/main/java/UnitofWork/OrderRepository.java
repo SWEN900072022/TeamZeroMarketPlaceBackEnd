@@ -68,16 +68,22 @@ public class OrderRepository implements IUnitofWork<Order> {
 
     private void commitNew() {
         List<Order> orderList = context.get(UnitActions.INSERT.toString());
-        oMapper.insert(orderList);
+        for(Order order : orderList) {
+            oMapper.insert(order);
+        }
     }
 
     private void commitModify() {
         List<Order> orderList = context.get(UnitActions.MODIFY.toString());
-        oMapper.modify(orderList);
+        for(Order order : orderList) {
+            oMapper.modify(order);
+        }
     }
 
     private void commitDel() {
         List<Order> orderList = context.get(UnitActions.DELETE.toString());
-        oMapper.delete(orderList);
+        for(Order order : orderList) {
+            oMapper.delete(order);
+        }
     }
 }

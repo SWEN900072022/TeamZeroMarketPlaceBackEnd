@@ -5,6 +5,7 @@ import Entity.Listing;
 import Enums.ListingTypes;
 import Util.Util;
 
+import javax.swing.plaf.nimbus.State;
 import java.sql.*;
 import java.util.*;
 
@@ -14,177 +15,112 @@ public class ListingMapper extends Mapper<Listing>{
 
     }
 
-    public boolean insert(List<Listing> listingList) {
+    public boolean insert(Listing listing) {
         try {
-            insertOperation(listingList, false);
+            insertOperation(listing, false);
         } catch (SQLException e) {
             return false;
         }
         return true;
     }
 
-    public List<Listing> insertWithResultSet(List<Listing> listingList) {
+    public Listing insertWithResultSet(Listing listing) {
         try {
-            listingList = insertOperation(listingList, true);
+            listing = insertOperation(listing, true);
         } catch (SQLException e) {
-            return new ArrayList<>();
+            return null;
         }
-        return listingList;
+        return listing;
     }
 
-    private List<Listing> insertOperation(List<Listing>listingList, boolean shouldReturn) throws SQLException {
-        StringBuilder sb = new StringBuilder();
+    private Listing insertOperation(Listing listing, boolean shouldReturn) throws SQLException {
         PreparedStatement statement;
-        ListIterator<Listing> listingListIterator = listingList.listIterator();
-        sb.append("INSERT INTO listing (description, title, type, created_by_id) VALUES");
-
-        while(listingListIterator.hasNext()) {
-            Listing listing = listingListIterator.next();
-            sb.append(String.format("('%s','%s','%s', '%s')",
-                            listing.getDescription(),
-                            listing.getTitle(),
-                            listing.getTypeString(),
-                            listing.getCreatedById()));
-            if(!listingListIterator.hasNext()) {
-                sb.append(";");
-            } else {
-                sb.append(",");
-            }
-        }
 
         if(conn == null) {
             conn = Util.getConnection();
         }
-        statement = conn.prepareStatement(sb.toString(), Statement.RETURN_GENERATED_KEYS);
+
+        statement = conn.prepareStatement(
+                "INSERT INTO listing (description, title, created_by_id, type) " +
+                        "VALUES (?, ?, ?, ?);",
+                Statement.RETURN_GENERATED_KEYS
+        );
+        statement.setString(1, listing.getDescription());
+        statement.setString(2, listing.getTitle());
+        statement.setInt(3, listing.getCreatedById());
+        statement.setString(4, listing.getTypeString());
         statement.execute();
 
         if(!shouldReturn) {
-            return new ArrayList<>(); // Return an empty list if should return is false
+            return null; // Return an empty list if should return is false
         }
 
         ResultSet generatedKeys = statement.getGeneratedKeys();
-        listingListIterator = listingList.listIterator();
-        while(generatedKeys.next() && listingListIterator.hasNext()) {
-            Listing listing = listingListIterator.next();
+        while(generatedKeys.next()) {
             listing.setId(generatedKeys.getInt("id"));
         }
-        return listingList;
+        return listing;
     }
 
-    public boolean delete(List<Listing> listingList) {
+    public boolean delete(Listing listingList) {
         return true;
     }
 
-    public boolean modify(List<Listing> listingList) {
-        List<String> fieldsToBeUpdated = Listing.getListAttributes();
-        StringBuilder sb = new StringBuilder();
-        sb.append("UPDATE listing as l set ");
-        Iterator<String> fItr = fieldsToBeUpdated.listIterator();
-
-        while(fItr.hasNext()) {
-            String field = fItr.next();
-            sb.append(String.format("%s=l2.%s", field, field));
-            if(fItr.hasNext()) {
-                sb.append(",");
-            }
-        }
-
-        sb.append(" from ( values ");
-        Iterator<Listing> listingIterator = listingList.listIterator();
-        while(listingIterator.hasNext()) {
-            Listing listing = listingIterator.next();
-            sb.append(String.format("(%d, %s, %s, %s, %d)",
-                    listing.getId(),
-                    listing.getType(),
-                    listing.getDescription(),
-                    listing.getTitle(),
-                    listing.getCreatedById()));
-
-            if(fItr.hasNext()) {
-                sb.append(",");
-            }
-        }
-
-        sb.append(" ) as l2(");
-        fItr = fieldsToBeUpdated.listIterator();
-
-        while(fItr.hasNext()) {
-            String field = fItr.next();
-            sb.append(String.format("%s", field));
-            if(fItr.hasNext()) {
-                sb.append(",");
-            } else {
-                sb.append(")");
-            }
-        }
-
-        sb.append("where l.id=l2.id;");
-
+    public boolean modify(Listing listing) {
         try {
             if(conn == null) {
                 conn = Util.getConnection();
             }
-            PreparedStatement statement = conn.prepareStatement(sb.toString());
+
+            PreparedStatement statement = conn.prepareStatement(
+                    "UPDATE listing as l set " +
+                            "description=l2.description, " +
+                            "title=l2.title, " +
+                            "created_by_id=l2.created_by_id, " +
+                            "id=l2.id, " +
+                            "type=l2.type " +
+                            "from (values " +
+                            "(?, ?, ?, ?, ?)" +
+                            ") as l2(description, title, created_by_id, id, type) " +
+                            "where l.id=l2.id;");
+            statement.setString(1, listing.getDescription());
+            statement.setString(2, listing.getTitle());
+            statement.setInt(3, listing.getCreatedById());
+            statement.setInt(4, listing.getId());
+            statement.setString(5, listing.getTypeString());
             statement.execute();
         } catch (SQLException e) {
-            // Something went wrong, return false
             return false;
         }
         return true;
     }
 
-    public Map<Integer, Listing> find(Map<String, String> map) {
-        return find(map, 0);
-    }
-
-    public Map<Integer, Listing> find(Map<String, String>map, int mode) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("SELECT * FROM listing");
-        PreparedStatement statement;
-        Iterator<Map.Entry<String, String>> itr = map.entrySet().iterator();
-        Map<Integer, Listing> list = new HashMap<>();
-        ResultSet rs;
-
-        if(itr.hasNext()) {
-            sb.append(" WHERE ");
-        } else {
-            sb.append(";");
-        }
-
-        while(itr.hasNext()) {
-            Map.Entry<String, String> entry = itr.next();
-            sb.append(String.format("%s in %s", entry.getKey(), entry.getValue()));
-            if(itr.hasNext()) {
-                if(mode == 0) { // 0 for and, 1 for or
-                    sb.append(" AND ");
-                } else {
-                    sb.append(" OR ");
-                }
-            } else {
-                sb.append(";");
-            }
-        }
-
+    public Listing findById(Integer id) {
+        Listing listing = new FixedPriceListingImpl();
         try {
+            PreparedStatement statement;
+
             if(conn == null) {
                 conn = Util.getConnection();
             }
-            statement = conn.prepareStatement(sb.toString());
+
+            statement = conn.prepareStatement(
+                    "SELECT * FROM listing where id=?;"
+            );
+            statement.setInt(1, id);
             statement.execute();
 
-            rs = statement.getResultSet();
+            ResultSet rs = statement.getResultSet();
             while(rs.next()) {
-                Listing listing = new FixedPriceListingImpl(); // We default to a fixed price listing
                 listing.setDescription(rs.getString("description"));
                 listing.setTitle(rs.getString("title"));
                 listing.setType(ListingTypes.fromString(rs.getString("type")));
                 listing.setId(rs.getInt("id"));
                 listing.setCreatedById(rs.getInt("created_by_id"));
-                list.put(listing.getId(), listing);
             }
         } catch (SQLException e) {
-            System.out.println(e);
+            return null;
         }
-        return list;
+        return listing;
     }
 }
