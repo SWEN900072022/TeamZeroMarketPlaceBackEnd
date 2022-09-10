@@ -2,7 +2,9 @@ package Entity;
 
 import Mapper.FixedPriceListingMapper;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FixedPriceListingImpl extends Listing implements FixedPriceListing {
@@ -60,5 +62,15 @@ public class FixedPriceListingImpl extends Listing implements FixedPriceListing 
         FixedPriceListing resultListing = (FixedPriceListing) result.values().toArray()[0];
         this.price = resultListing.getPrice();
         this.quantity = resultListing.getQuantity();
+        this.fplId = resultListing.getFplId();
+    }
+
+    public static List<String> getFPListAttributes() {
+        List<String> attr = new ArrayList<>();
+        attr.add("id");
+        attr.add("general_listing_id");
+        attr.add("price");
+        attr.add("quantity");
+        return attr;
     }
 }

@@ -36,6 +36,7 @@ public class UserModel {
 
         if(map.isEmpty()) {
             repo.registerNew(user);
+            repo.commit();
             return true;
         }
         return false;

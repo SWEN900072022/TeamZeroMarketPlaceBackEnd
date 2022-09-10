@@ -51,7 +51,60 @@ public class UserMapper extends Mapper<User> {
     }
 
     public boolean modify(List<User> userList) {
-        return false;
+        List<String> fieldsToBeUpdated = User.getUserAttributes();
+        StringBuilder sb = new StringBuilder();
+        sb.append("UPDATE users as u set ");
+        Iterator<String> fItr = fieldsToBeUpdated.listIterator();
+
+        while(fItr.hasNext()) {
+            String field = fItr.next();
+            sb.append(String.format("%s=u2.%s", field, field));
+            if(fItr.hasNext()) {
+                sb.append(",");
+            }
+        }
+
+        sb.append(" from ( values ");
+        Iterator<User> userIterator = userList.listIterator();
+        while(userIterator.hasNext()) {
+            User user = userIterator.next();
+            sb.append(String.format("(%s, %s, %s, %s, %s)",
+                    user.getUsername(),
+                    user.getPassword(),
+                    user.getEmail(),
+                    user.getId(),
+                    user.getRoles()));
+
+            if(fItr.hasNext()) {
+                sb.append(",");
+            }
+        }
+
+        sb.append(" ) as u2(");
+        fItr = fieldsToBeUpdated.listIterator();
+
+        while(fItr.hasNext()) {
+            String field = fItr.next();
+            sb.append(String.format("%s", field));
+            if(fItr.hasNext()) {
+                sb.append(",");
+            } else {
+                sb.append(")");
+            }
+        }
+
+        sb.append("where u.id=u2.id;");
+
+        try {
+            if(conn == null) {
+                conn = Util.getConnection();
+            }
+            PreparedStatement statement = conn.prepareStatement(sb.toString());
+            statement.execute();
+        } catch (SQLException e) {
+            return false;
+        }
+        return true;
     }
 
     public Map<Integer, User> find(Map<String, String> map) {

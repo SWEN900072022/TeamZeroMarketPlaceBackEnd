@@ -59,7 +59,7 @@ public class ListingMapper extends Mapper<Listing>{
         statement.execute();
 
         if(!shouldReturn) {
-            return new ArrayList<>(); // Return an empty list if shoudl return is false
+            return new ArrayList<>(); // Return an empty list if should return is false
         }
 
         ResultSet generatedKeys = statement.getGeneratedKeys();
@@ -76,6 +76,60 @@ public class ListingMapper extends Mapper<Listing>{
     }
 
     public boolean modify(List<Listing> listingList) {
+        List<String> fieldsToBeUpdated = Listing.getListAttributes();
+        StringBuilder sb = new StringBuilder();
+        sb.append("UPDATE listing as l set ");
+        Iterator<String> fItr = fieldsToBeUpdated.listIterator();
+
+        while(fItr.hasNext()) {
+            String field = fItr.next();
+            sb.append(String.format("%s=l2.%s", field, field));
+            if(fItr.hasNext()) {
+                sb.append(",");
+            }
+        }
+
+        sb.append(" from ( values ");
+        Iterator<Listing> listingIterator = listingList.listIterator();
+        while(listingIterator.hasNext()) {
+            Listing listing = listingIterator.next();
+            sb.append(String.format("(%d, %s, %s, %s, %d)",
+                    listing.getId(),
+                    listing.getType(),
+                    listing.getDescription(),
+                    listing.getTitle(),
+                    listing.getCreatedById()));
+
+            if(fItr.hasNext()) {
+                sb.append(",");
+            }
+        }
+
+        sb.append(" ) as l2(");
+        fItr = fieldsToBeUpdated.listIterator();
+
+        while(fItr.hasNext()) {
+            String field = fItr.next();
+            sb.append(String.format("%s", field));
+            if(fItr.hasNext()) {
+                sb.append(",");
+            } else {
+                sb.append(")");
+            }
+        }
+
+        sb.append("where l.id=l2.id;");
+
+        try {
+            if(conn == null) {
+                conn = Util.getConnection();
+            }
+            PreparedStatement statement = conn.prepareStatement(sb.toString());
+            statement.execute();
+        } catch (SQLException e) {
+            // Something went wrong, return false
+            return false;
+        }
         return true;
     }
 
@@ -99,7 +153,7 @@ public class ListingMapper extends Mapper<Listing>{
 
         while(itr.hasNext()) {
             Map.Entry<String, String> entry = itr.next();
-            sb.append(String.format("%s='%s'", entry.getKey(), entry.getValue()));
+            sb.append(String.format("%s in %s", entry.getKey(), entry.getValue()));
             if(itr.hasNext()) {
                 if(mode == 0) { // 0 for and, 1 for or
                     sb.append(" AND ");

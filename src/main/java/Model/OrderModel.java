@@ -7,6 +7,7 @@ import Enums.ListingTypes;
 import UnitofWork.IUnitofWork;
 import UnitofWork.ListingRepository;
 import UnitofWork.OrderRepository;
+import Util.JWTUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +27,23 @@ public class OrderModel {
         this.listingRepo = listingRepo;
     }
 
-    public boolean createOrders(Integer[] listingId, Integer[] quantity) {
+    public boolean createOrders(Integer[] listingId, Integer[] quantity, String jwt) {
+        // Check to see if the jwt token is valid
+        try {
+            if(!JWTUtil.validateToken(jwt)) {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+
         // First we validate that the quantity is sufficient
         Map<Integer,Listing> listingMap  = listingRepo.read(listingId);
-        List<Listing> modifiedListing = new ArrayList<>(); // FixedPriceListing List
+
+        if(listingMap.size() != listingId.length) {
+            // Some listing id is invalid
+            return false;
+        }
 
         // Iterate the listing and check if there are sufficient
         for(int i = 0; i < listingId.length; i++) {
@@ -49,7 +63,7 @@ public class OrderModel {
                 }
 
                 listing = (Listing)fpListing;
-            } else {
+            } else if(listing.getType() == ListingTypes.AUCTION) {
                 // Auction
                 // Not implemented
             }

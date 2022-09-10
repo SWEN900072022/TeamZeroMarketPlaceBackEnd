@@ -1,5 +1,7 @@
 package Entity;
 
+import java.util.List;
+
 public interface FixedPriceListing {
     public int getPrice();
     public void setPrice(int price);

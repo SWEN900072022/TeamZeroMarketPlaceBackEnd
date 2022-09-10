@@ -8,8 +8,6 @@ import UnitofWork.IUnitofWork;
 import UnitofWork.ListingRepository;
 import Util.JWTUtil;
 
-import java.io.UnsupportedEncodingException;
-
 public class ListingModel {
     private IUnitofWork<Listing> repo;
     public ListingModel() {

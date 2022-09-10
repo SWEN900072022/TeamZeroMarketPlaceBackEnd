@@ -2,6 +2,9 @@ package Entity;
 
 import Enums.ListingTypes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class Listing {
     private String description;
     private String title;
@@ -75,5 +78,15 @@ public abstract class Listing {
         } else {
             return ListingTypes.AUCTION;
         }
+    }
+
+    public static  List<String> getListAttributes() {
+        List<String> attr = new ArrayList<>();
+        attr.add("id");
+        attr.add("type");
+        attr.add("description");
+        attr.add("title");
+        attr.add("created_by_id");
+        return attr;
     }
 }

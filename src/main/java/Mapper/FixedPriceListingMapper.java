@@ -61,13 +61,64 @@ public class FixedPriceListingMapper extends Mapper<FixedPriceListing> {
     }
 
     @Override
-    public boolean delete(List<FixedPriceListing> TEntity) {
+    public boolean delete(List<FixedPriceListing> listingList) {
         return false;
     }
 
     @Override
-    public boolean modify(List<FixedPriceListing> TEntity) {
-        return false;
+    public boolean modify(List<FixedPriceListing> listingList) {
+        List<String> fieldsToBeUpdated = FixedPriceListingImpl.getFPListAttributes();
+        StringBuilder sb = new StringBuilder();
+        sb.append("UPDATE fixed_price_listing as fpl set ");
+        Iterator<String> fItr = fieldsToBeUpdated.listIterator();
+
+        while(fItr.hasNext()) {
+            String field = fItr.next();
+            sb.append(String.format("%s=fpl2.%s", field, field));
+            if(fItr.hasNext()) {
+                sb.append(",");
+            }
+        }
+
+        sb.append(" from ( values ");
+        Iterator<FixedPriceListing> listingIterator = listingList.listIterator();
+        while(listingIterator.hasNext()) {
+            FixedPriceListing listing = listingIterator.next();
+            sb.append(String.format("(%d, %d, %d, %d)",
+                    listing.getFplId(),
+                    listing.getId(),
+                    listing.getPrice(),
+                    listing.getQuantity()));
+
+            if(listingIterator.hasNext()) {
+                sb.append(",");
+            }
+        }
+
+        sb.append(" ) as fpl2(");
+        fItr = fieldsToBeUpdated.listIterator();
+        while(fItr.hasNext()) {
+            String field = fItr.next();
+            sb.append(String.format("%s", field));
+            if(fItr.hasNext()) {
+                sb.append(",");
+            } else {
+                sb.append(")");
+            }
+        }
+
+        sb.append("where fpl.id=fpl2.id;");
+
+        try {
+            if(conn == null) {
+                conn = Util.getConnection();
+            }
+            PreparedStatement statement = conn.prepareStatement(sb.toString());
+            statement.execute();
+        } catch (SQLException e) {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -117,6 +168,7 @@ public class FixedPriceListingMapper extends Mapper<FixedPriceListing> {
                 listing.setPrice(rs.getInt("price"));
                 listing.setQuantity(rs.getInt("quantity"));
                 listing.setFplId(rs.getInt("id"));
+                list.put(listing.getFplId(), listing);
             }
         } catch (SQLException e) {
             System.out.println(e);

@@ -2,6 +2,9 @@ package Entity;
 
 import Enums.UserRoles;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class User{
     private String email;
     private String username;
@@ -83,5 +86,15 @@ public class User{
 
     public String toString() {
         return email + " " + username + " " + password;
+    }
+
+    public static List<String> getUserAttributes() {
+        List<String> attr = new ArrayList<>();
+        attr.add("username");
+        attr.add("password");
+        attr.add("email");
+        attr.add("id");
+        attr.add("roles");
+        return attr;
     }
 }

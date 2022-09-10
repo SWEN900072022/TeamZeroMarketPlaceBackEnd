@@ -52,8 +52,59 @@ public class OrderMapper extends Mapper<Order> {
     }
 
     @Override
-    public boolean modify(List<Order> TEntity) {
-        return false;
+    public boolean modify(List<Order> orderList) {
+        List<String> fieldsToBeUpdated = Order.getOrderAttribute();
+        StringBuilder sb = new StringBuilder();
+        sb.append("UPDATE orders as o set ");
+        Iterator<String> fItr = fieldsToBeUpdated.listIterator();
+
+        while(fItr.hasNext()) {
+            String field = fItr.next();
+            sb.append(String.format("%s=o2.%s", field, field));
+            if(fItr.hasNext()) {
+                sb.append(",");
+            }
+        }
+
+        sb.append(" from ( values ");
+        Iterator<Order> orderIterator = orderList.listIterator();
+        while(orderIterator.hasNext()) {
+            Order order = orderIterator.next();
+            sb.append(String.format("(%s, %s, %s)",
+                    order.getId(),
+                    order.getListingId(),
+                    order.getQuantity()));
+
+            if(fItr.hasNext()) {
+                sb.append(",");
+            }
+        }
+
+        sb.append(" ) as o2(");
+        fItr = fieldsToBeUpdated.listIterator();
+
+        while(fItr.hasNext()) {
+            String field = fItr.next();
+            sb.append(String.format("%s", field));
+            if(fItr.hasNext()) {
+                sb.append(",");
+            } else {
+                sb.append(")");
+            }
+        }
+
+        sb.append("where o.id=o2.id");
+
+        try {
+            if(conn == null) {
+                conn = Util.getConnection();
+            }
+            PreparedStatement statement = conn.prepareStatement(sb.toString());
+            statement.execute();
+        } catch (SQLException e) {
+            return false;
+        }
+        return true;
     }
 
     @Override
