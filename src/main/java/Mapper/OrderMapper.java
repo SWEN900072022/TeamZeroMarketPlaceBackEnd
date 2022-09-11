@@ -80,7 +80,7 @@ public class OrderMapper extends Mapper<Order> {
 
             statement = conn.prepareStatement(injector.getSQLQuery());
             for(int i = 1; i <= queryParam.size(); i++) {
-                Object param = queryParam.get(i);
+                Object param = queryParam.get(i-1);
                 if(param instanceof Integer) {
                     statement.setInt(i, (Integer)param);
                 } else if(param instanceof String) {

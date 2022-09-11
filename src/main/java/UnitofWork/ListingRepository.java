@@ -51,10 +51,9 @@ public class ListingRepository implements IUnitofWork<Listing>{
                 result.put(id, listingIdentityMap.get(id));
             } else {
                 List<Object>param = new ArrayList<>();
-                param.add("listing");
                 param.add(id);
 
-                Listing listing = lMapper.find(new FindIdInjector(),param);
+                Listing listing = lMapper.find(new FindIdInjector("listing"),param);
                 result.put(id, listing);
             }
         }

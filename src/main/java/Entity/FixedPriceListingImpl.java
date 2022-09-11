@@ -55,10 +55,9 @@ public class FixedPriceListingImpl extends Listing implements FixedPriceListing 
         FixedPriceListingMapper mapper = new FixedPriceListingMapper();
 
         List<Object>param = new ArrayList<>();
-        param.add("fixed_price_listing");
-        param.add(getFplId());
+        param.add(getId());
 
-        FixedPriceListing result = mapper.find(new FindIdInjector(), param);
+        FixedPriceListing result = mapper.find(new FindIdInjector("fixed_price_listing"), param);
 
         // There should only be one item in the result set
         this.price = result.getPrice();
