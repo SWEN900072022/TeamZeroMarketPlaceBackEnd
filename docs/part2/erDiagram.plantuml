@@ -1,42 +1,42 @@
 @startuml
 entity orders {
-    *orderId : number <<genrated>>
+    orderID: serial
     --
-    *userId : number <<FK>>
-    *address : text
+    userID: integer <<FK>>
+    address: text
 }
 
 entity orderItem{
-    orderID: serial <<FK>>
-    listingID: serial <<FK>>
+    orderID: integer <<FK>>
+    listingID: integer <<FK>>
     --
-    quantity: int
-    unitPrice : float
+    quantity: integer
+    unitPrice: float
 }
-
-entity notifications {
-    *notificationId : number <<genrated>>
-    --
-    *recipientId : number <<FK>>
-    *message : text
-}
-
 
 entity users{
-    user_id : serial
+    userID: serial
     --
-    password : varchar(100)
-    roles : string
+    username: varchar(255)
+    email: varchar(255)
+    password: varchar(255)
+    role: varchar(255)
+    sessionID: varchar(255 ) 
 
 }
 
 entity listings{
     listingID : serial
+    groupID : integer <<FK>>
     --
-    title: string 
-    description : varchar(100)
-
-
+    type: varchar(255)
+    title: varchar(255) 
+    description : text
+    quantity: integer
+    price : decimal(7,2)
+    startTime: timestamp
+    endTime: timestamp
+    
 }
 
 entity sellerGroups{
@@ -47,10 +47,24 @@ entity sellerGroups{
 }
 
 entity groupMembership{
-    groupID : serial <<FK>>
-    customerID : serial <<FK>>
+    groupID : integer <<FK>>
+    userID : integer <<FK>>
     --
-    
+}
+
+entity shoppingCartItems{
+    userID: integer <<FK>> 
+    listingID: integer <<FK>>
+    --
+    timeAdded: timestamp 
+}
+
+entity bids{
+    listingID: integer <<FK>>
+    userID: integer <<FK>>
+    --
+    bidAmount: decimal(7,2)
+
 }
 users ||--o{ orders
 users ||--o{ groupMembership
@@ -58,6 +72,12 @@ users ||--o{ groupMembership
 orders ||--|{orderItem
 orderItem }o--||listings
 groupMembership }o--|| sellerGroups
-users ||--o{notifications
 
+users ||--o{ shoppingCartItems
+shoppingCartItems }o--||listings
+
+sellerGroups||--o{listings
+
+users||--o{bids
+bids}o--||listings
 @enduml 
