@@ -1,4 +1,3 @@
-import Entity.FixedPriceListingImpl;
 import Entity.Listing;
 import Model.ListingModel;
 import UnitofWork.IUnitofWork;
@@ -24,7 +23,7 @@ public class ListingModelTest {
     public void successfulFixedPriceListingCreation() {
         // Should have a valid jwt token and no exceptions in the commit stage
         String jwt = JWTUtil.generateToken("a", new HashMap<>()); // valid token
-        Listing testListing = new FixedPriceListingImpl();
+        Listing testListing = new Listing();
         boolean result = listingModel.createListing(testListing, jwt);
         assertTrue(result);
     }
@@ -32,16 +31,7 @@ public class ListingModelTest {
     @Test
     public void incorrectJWTToken() {
         String jwt = "";
-        Listing testListing = new FixedPriceListingImpl();
-        boolean result = listingModel.createListing(testListing, jwt);
-        assertFalse(result);
-    }
-
-    @Test
-    public void unsuccessfulFixedPriceListingCreation() {
-        repo.setCommitFaults(true);
-        String jwt = JWTUtil.generateToken("a", new HashMap<>());
-        Listing testListing = new FixedPriceListingImpl();
+        Listing testListing = new Listing();
         boolean result = listingModel.createListing(testListing, jwt);
         assertFalse(result);
     }
@@ -63,7 +53,7 @@ public class ListingModelTest {
         }
 
         @Override
-        public Map<Integer, Listing> read(Integer[] id) {
+        public Map<Integer, Listing> read(Integer[] id, String tableName) {
             return null;
         }
 
@@ -83,11 +73,8 @@ public class ListingModelTest {
         }
 
         @Override
-        public void commit() throws Exception {
+        public void commit(){
             // Throw exception if there are commit faults
-            if(commitFaults) {
-                throw new Exception();
-            }
         }
     }
 }

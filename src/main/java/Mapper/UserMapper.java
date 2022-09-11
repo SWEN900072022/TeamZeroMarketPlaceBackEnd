@@ -4,11 +4,10 @@ import Entity.User;
 import Injector.FindConditionInjector;
 import Util.Util;
 
-import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.*;
 
-public class UserMapper extends Mapper<User> {
+public class UserMapper implements Mapper<User> {
     private Connection conn = null;
 
     @Override

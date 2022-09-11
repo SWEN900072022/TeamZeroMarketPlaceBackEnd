@@ -1,6 +1,5 @@
 package Servlets;
 
-import Entity.FixedPriceListingImpl;
 import Entity.Listing;
 import Model.ListingModel;
 import Util.JWTUtil;
@@ -30,7 +29,7 @@ public class CreateListingServlet extends HttpServlet {
 
             try {
                 int createdById = Integer.parseInt(JWTUtil.getSubject(jwt));
-                Listing listing = new FixedPriceListingImpl(description, title,createdById, price, quantity);
+                Listing listing = new Listing(description, title, type, createdById, price, quantity);
                 ListingModel listingModel = new ListingModel();
                 isSuccessful = listingModel.createListing(listing, jwt);
             } catch (NumberFormatException e) {

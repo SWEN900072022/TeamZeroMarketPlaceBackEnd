@@ -7,7 +7,7 @@ import Util.Util;
 import java.sql.*;
 import java.util.*;
 
-public class OrderMapper extends Mapper<Order> {
+public class OrderMapper implements Mapper<Order> {
     private Connection conn = null;
 
     public OrderMapper() {

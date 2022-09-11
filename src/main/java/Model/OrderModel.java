@@ -1,16 +1,14 @@
 package Model;
 
-import Entity.FixedPriceListing;
 import Entity.Listing;
 import Entity.Order;
 import Enums.ListingTypes;
+import Mapper.ListingMapper;
+import Mapper.OrderMapper;
 import UnitofWork.IUnitofWork;
-import UnitofWork.ListingRepository;
-import UnitofWork.OrderRepository;
+import UnitofWork.Repository;
 import Util.JWTUtil;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class OrderModel {
@@ -18,8 +16,8 @@ public class OrderModel {
     private IUnitofWork<Listing> listingRepo;
 
     public OrderModel() {
-        orderRepo = new OrderRepository();
-        listingRepo = new ListingRepository();
+        orderRepo = new Repository<Order>(new OrderMapper());
+        listingRepo = new Repository<Listing>(new ListingMapper());
     }
 
     public OrderModel(IUnitofWork<Order> orderRepo, IUnitofWork<Listing> listingRepo) {
@@ -38,7 +36,7 @@ public class OrderModel {
         }
 
         // First we validate that the quantity is sufficient
-        Map<Integer,Listing> listingMap  = listingRepo.read(listingId);
+        Map<Integer,Listing> listingMap  = listingRepo.read(listingId, "listing");
 
         if(listingMap.size() != listingId.length) {
             // Some listing id is invalid
@@ -53,16 +51,13 @@ public class OrderModel {
             // Check highest bidder id if auction
             if(listing.getType() == ListingTypes.FIXED_PRICE) {
                 // Fixed price
-                FixedPriceListing fpListing = (FixedPriceListing) listing;
-                fpListing.load();
-                if(fpListing.getQuantity() < quantity[i]) {
+                listing.load();
+                if(listing.getQuantity() < quantity[i]) {
                     // There isn't enough to support to order, abort transaction
                     return false;
                 } else {
-                    fpListing.setQuantity(fpListing.getQuantity() - quantity[i]);
+                    listing.setQuantity(listing.getQuantity() - quantity[i]);
                 }
-
-                listing = (Listing)fpListing;
             } else if(listing.getType() == ListingTypes.AUCTION) {
                 // Auction
                 // Not implemented

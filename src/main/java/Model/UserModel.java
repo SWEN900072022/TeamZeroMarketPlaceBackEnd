@@ -2,31 +2,30 @@ package Model;
 
 import Entity.User;
 import Injector.FindEmailAndPasswordInjector;
-import Injector.FindIdInjector;
 import Injector.FindUserOrEmailInjector;
 import Mapper.Mapper;
 import Mapper.UserMapper;
-import UnitofWork.UserRepository;
+import UnitofWork.IUnitofWork;
+import UnitofWork.Repository;
 import Util.JWTUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class UserModel {
     private final Mapper<User> uMapper;
-    private UserRepository repo;
+    private IUnitofWork<User> repo;
 
     public UserModel() {
         // Create a mapper for the model to write data to
         uMapper = new UserMapper();
-        repo = new UserRepository();
+        repo = new Repository<User>(uMapper);
     }
 
     public UserModel(Mapper<User> mapper) {
         this.uMapper = mapper;
-        repo = new UserRepository();
+        repo = new Repository<User>(mapper);
     }
 
     public boolean register(User user) {

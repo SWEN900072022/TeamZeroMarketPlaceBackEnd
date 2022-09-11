@@ -2,16 +2,14 @@ package Model;
 
 import Entity.Listing;
 import Mapper.ListingMapper;
-import Mapper.Mapper;
-import Mapper.FixedPriceListingMapper;
 import UnitofWork.IUnitofWork;
-import UnitofWork.ListingRepository;
+import UnitofWork.Repository;
 import Util.JWTUtil;
 
 public class ListingModel {
     private IUnitofWork<Listing> repo;
     public ListingModel() {
-        repo = new ListingRepository();
+        repo = new Repository<Listing>(new ListingMapper());
     }
 
     public ListingModel(IUnitofWork<Listing> repo) {
