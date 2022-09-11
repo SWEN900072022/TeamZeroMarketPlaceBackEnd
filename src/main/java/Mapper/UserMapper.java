@@ -1,111 +1,120 @@
 package Mapper;
 
 import Entity.User;
+import Injector.FindConditionInjector;
 import Util.Util;
 
+import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.*;
 
 public class UserMapper extends Mapper<User> {
     private Connection conn = null;
 
-    public UserMapper() {
-    }
-
-    public boolean insert(List<User> userList) {
-        StringBuilder sb = new StringBuilder();
-        PreparedStatement statement;
-        ListIterator<User> userListIterator = userList.listIterator();
-        sb.append("INSERT INTO users (username, password, email, roles) VALUES");
-
-        while(userListIterator.hasNext()) {
-            User user = userListIterator.next();
-            sb.append(String.format("('%s','%s','%s', '%s')",
-                            user.getUsername(),
-                            user.getPassword(),
-                            user.getEmail(),
-                            user.getRoles()));
-            if(!userListIterator.hasNext()) {
-                sb.append(";");
-            } else {
-                sb.append(",");
-            }
-        }
-
+    @Override
+    public boolean insert(User user) {
         try {
-            if(conn == null) {
-                conn = Util.getConnection();
-            }
-            statement = conn.prepareStatement(sb.toString());
-            statement.execute();
+            insertOperation(user, false);
         } catch (SQLException e) {
-            // Print out the exceptions for now
-            System.out.println(e);
             return false;
         }
         return true;
     }
 
-    public boolean delete(List<User> userList) {
-        return false;
-    }
-
-    public boolean modify(List<User> userList) {
-        return false;
-    }
-
-    public List<User> find(Map<String, String> map) {
-        return find(map, 0);
-    }
-
-    public List<User> find(Map<String, String> map, int mode) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("SELECT * FROM users");
+    private User insertOperation(User user, boolean shouldReturn) throws SQLException {
         PreparedStatement statement;
-        Iterator<Map.Entry<String, String>> itr = map.entrySet().iterator();
-        List<User> list = new ArrayList<>();
-        ResultSet rs;
 
-        if(itr.hasNext()) {
-            sb.append(" WHERE ");
-        } else {
-            sb.append(";");
+        if(conn == null) {
+            conn = Util.getConnection();
         }
 
-        while(itr.hasNext()) {
-            Map.Entry<String, String> entry = itr.next();
-            sb.append(String.format("%s='%s'", entry.getKey(), entry.getValue()));
-            if(itr.hasNext()) {
-                if(mode == 0) {
-                    sb.append(" AND ");
-                } else {
-                    sb.append(" OR ");
-                }
-            } else {
-                sb.append(";");
-            }
+        statement = conn.prepareStatement(
+                "INSERT INTO users (username, password, email, roles)" +
+                        "VALUES (?, ?, ?, ?);"
+        );
+        statement.setString(1, user.getUsername());
+        statement.setString(2, user.getPassword());
+        statement.setString(3, user.getEmail());
+        statement.setString(4, user.getRoles());
+        statement.execute();
+
+        if(!shouldReturn) {
+            return null;
         }
 
+        ResultSet generatedKeys = statement.getGeneratedKeys();
+        while(generatedKeys.next()) {
+            user.setId(generatedKeys.getInt(1));
+        }
+        return user;
+    }
+
+    public boolean delete(User user) {
+        return false;
+    }
+
+    public boolean modify(User user) {
         try {
+            PreparedStatement statement;
+
             if(conn == null) {
                 conn = Util.getConnection();
             }
-            statement = conn.prepareStatement(sb.toString());
+
+            statement = conn.prepareStatement(
+                    "UPDATE users as u set " +
+                            "username=u2.username, " +
+                            "password=u2.password, " +
+                            "email=u2.email, " +
+                            "id=u2.id, " +
+                            "role=u2.role " +
+                            "from (values " +
+                            "(?, ?, ?, ?, ?)" +
+                            ") as u2(username, password, email, id, role) " +
+                            "where u.id=u2.id;");
+            statement.setString(1, user.getUsername());
+            statement.setString(2, user.getPassword());
+            statement.setString(3, user.getEmail());
+            statement.setInt(4, user.getId());
+            statement.setString(5, user.getRoles());
+            statement.execute();
+        } catch (SQLException e) {
+            return false;
+        }
+        return true;
+    }
+
+    public User find(FindConditionInjector injector, List<Object> queryParam) {
+        User user = new User();
+        try {
+            PreparedStatement statement;
+
+            if(conn == null) {
+                conn = Util.getConnection();
+            }
+
+            statement = conn.prepareStatement(injector.getSQLQuery());
+            for(int i = 1; i <= queryParam.size(); i++) {
+                Object param = queryParam.get(i-1);
+                if(param instanceof Integer) {
+                    statement.setInt(i, (Integer)param);
+                } else if(param instanceof String) {
+                    statement.setString(i, (String)param);
+                }
+            }
             statement.execute();
 
-            rs = statement.getResultSet();
+            ResultSet rs = statement.getResultSet();
             while(rs.next()) {
-                User user = new User();
                 user.setEmail(rs.getString("email"));
                 user.setUsername(rs.getString("username"));
                 user.setRoles(rs.getString("roles"));
                 user.setPassword(rs.getString("password"));
                 user.setId(rs.getInt("id"));
-                list.add(user);
             }
         } catch (SQLException e) {
-            System.out.println(e);
+            return null;
         }
-        return list;
+        return user;
     }
 }

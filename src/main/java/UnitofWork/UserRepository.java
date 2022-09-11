@@ -26,6 +26,11 @@ public class UserRepository implements IUnitofWork<User>{
     }
 
     @Override
+    public Map<Integer, User> read(Integer[] id) {
+        return null;
+    }
+
+    @Override
     public void registerNew(User user) {
         register(user, UnitActions.INSERT.toString());
     }
@@ -70,16 +75,22 @@ public class UserRepository implements IUnitofWork<User>{
 
     private void commitNew() {
         List<User> userList = context.get(UnitActions.INSERT.toString());
-        uMapper.insert(userList);
+        for(User user : userList) {
+            uMapper.insert(user);
+        }
     }
 
     private void commitModify() {
         List<User> userList = context.get(UnitActions.MODIFY.toString());
-        uMapper.modify(userList);
+        for(User user : userList) {
+            uMapper.modify(user);
+        }
     }
 
     private void commitDel() {
         List<User> userList = context.get(UnitActions.DELETE.toString());
-        uMapper.modify(userList);
+        for(User user : userList) {
+            uMapper.delete(user);
+        }
     }
 }

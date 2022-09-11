@@ -2,7 +2,8 @@ package Entity;
 
 import Enums.UserRoles;
 
-import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class User{
     private String email;
@@ -85,5 +86,12 @@ public class User{
 
     public String toString() {
         return email + " " + username + " " + password;
+    }
+
+    public boolean isEmpty() {
+        if(username == null && email == null && password == null) {
+            return true;
+        }
+        return false;
     }
 }

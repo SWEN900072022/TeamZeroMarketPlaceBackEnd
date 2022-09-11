@@ -1,14 +1,11 @@
-import Entity.FixedPriceListing;
+import Entity.FixedPriceListingImpl;
 import Entity.Listing;
-import Mapper.Mapper;
 import Model.ListingModel;
 import UnitofWork.IUnitofWork;
-import UnitofWork.ListingRepository;
 import Util.JWTUtil;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -27,7 +24,7 @@ public class ListingModelTest {
     public void successfulFixedPriceListingCreation() {
         // Should have a valid jwt token and no exceptions in the commit stage
         String jwt = JWTUtil.generateToken("a", new HashMap<>()); // valid token
-        Listing testListing = new FixedPriceListing();
+        Listing testListing = new FixedPriceListingImpl();
         boolean result = listingModel.createListing(testListing, jwt);
         assertTrue(result);
     }
@@ -35,7 +32,7 @@ public class ListingModelTest {
     @Test
     public void incorrectJWTToken() {
         String jwt = "";
-        Listing testListing = new FixedPriceListing();
+        Listing testListing = new FixedPriceListingImpl();
         boolean result = listingModel.createListing(testListing, jwt);
         assertFalse(result);
     }
@@ -44,7 +41,7 @@ public class ListingModelTest {
     public void unsuccessfulFixedPriceListingCreation() {
         repo.setCommitFaults(true);
         String jwt = JWTUtil.generateToken("a", new HashMap<>());
-        Listing testListing = new FixedPriceListing();
+        Listing testListing = new FixedPriceListingImpl();
         boolean result = listingModel.createListing(testListing, jwt);
         assertFalse(result);
     }
@@ -63,6 +60,11 @@ public class ListingModelTest {
 
         public void setCommitFaults(boolean commitFaults) {
             this.commitFaults = commitFaults;
+        }
+
+        @Override
+        public Map<Integer, Listing> read(Integer[] id) {
+            return null;
         }
 
         @Override
