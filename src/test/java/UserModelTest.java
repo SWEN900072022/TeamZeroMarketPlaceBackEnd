@@ -1,4 +1,5 @@
 import Entity.User;
+import Injector.FindConditionInjector;
 import Mapper.Mapper;
 import Model.UserModel;
 import Util.JWTUtil;
@@ -12,11 +13,11 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserModelTest {
-    private mockUserMapper mapper;
+    private MockUserMapper mapper;
     private UserModel userModel;
 
     public UserModelTest() {
-        mapper = new mockUserMapper();
+        mapper = new MockUserMapper();
         userModel = new UserModel(mapper);
     }
 
@@ -58,40 +59,38 @@ public class UserModelTest {
         assertNull(jwt);
     }
 
-    class mockUserMapper extends Mapper<User> {
+    class MockUserMapper extends Mapper<User> {
         private boolean isEmptyResult = false;
-        public Map<Integer, User> result = new HashMap<>();
-
-        public mockUserMapper() {
-
-        }
+        public User result = new User();
 
         public void setEmptyResult(boolean emptyResult) {
             this.isEmptyResult = emptyResult;
             if(emptyResult) {
-                result = new HashMap<>();
+                result = new User();
             } else {
-                result.put(0, new User());
+                result.setEmail("a");
+                result.setPassword("a");
+                result.setUsername("a");
             }
         }
 
-        public boolean insert(List<User> userList) {
+        @Override
+        public boolean insert(User TEntity) {
             return this.isEmptyResult;
         }
 
-        public boolean delete(List<User> userList) {
+        @Override
+        public boolean delete(User TEntity) {
             return false;
         }
 
-        public boolean modify(List<User> userList) {
+        @Override
+        public boolean modify(User TEntity) {
             return false;
         }
 
-        public Map<Integer, User> find(Map<String, String> map) {
-            return find(map, 0);
-        }
-
-        public Map<Integer, User> find(Map<String, String> map, int mode) {
+        @Override
+        public User find(FindConditionInjector injector, List<Object> queryParam) {
             return this.result;
         }
     }

@@ -88,13 +88,10 @@ public class User{
         return email + " " + username + " " + password;
     }
 
-    public static List<String> getUserAttributes() {
-        List<String> attr = new ArrayList<>();
-        attr.add("username");
-        attr.add("password");
-        attr.add("email");
-        attr.add("id");
-        attr.add("roles");
-        return attr;
+    public boolean isEmpty() {
+        if(username == null && email == null && password == null) {
+            return true;
+        }
+        return false;
     }
 }

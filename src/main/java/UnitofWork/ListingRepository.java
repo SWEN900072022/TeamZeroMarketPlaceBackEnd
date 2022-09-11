@@ -5,6 +5,7 @@ import Entity.FixedPriceListingImpl;
 import Entity.Listing;
 import Enums.ListingTypes;
 import Enums.UnitActions;
+import Injector.FindIdInjector;
 import Mapper.FixedPriceListingMapper;
 import Mapper.ListingMapper;
 
@@ -49,7 +50,11 @@ public class ListingRepository implements IUnitofWork<Listing>{
             if(listingIdentityMap.containsKey(id)) {
                 result.put(id, listingIdentityMap.get(id));
             } else {
-                Listing listing = lMapper.findById(id);
+                List<Object>param = new ArrayList<>();
+                param.add("listing");
+                param.add(id);
+
+                Listing listing = lMapper.find(new FindIdInjector(),param);
                 result.put(id, listing);
             }
         }

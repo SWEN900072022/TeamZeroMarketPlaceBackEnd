@@ -1,6 +1,7 @@
 package Mapper;
 
 import Entity.User;
+import Injector.FindConditionInjector;
 import Util.Util;
 
 import javax.xml.transform.Result;
@@ -83,7 +84,7 @@ public class UserMapper extends Mapper<User> {
         return true;
     }
 
-    public User findById(Integer id) {
+    public User find(FindConditionInjector injector, List<Object> queryParam) {
         User user = new User();
         try {
             PreparedStatement statement;
@@ -92,10 +93,15 @@ public class UserMapper extends Mapper<User> {
                 conn = Util.getConnection();
             }
 
-            statement = conn.prepareStatement(
-                    "SELECT * FROM users where id=?;"
-            );
-            statement.setInt(1, id);
+            statement = conn.prepareStatement(injector.getSQLQuery());
+            for(int i = 1; i <= queryParam.size(); i++) {
+                Object param = queryParam.get(i);
+                if(param instanceof Integer) {
+                    statement.setInt(i, (Integer)param);
+                } else if(param instanceof String) {
+                    statement.setString(i, (String)param);
+                }
+            }
             statement.execute();
 
             ResultSet rs = statement.getResultSet();
@@ -111,5 +117,4 @@ public class UserMapper extends Mapper<User> {
         }
         return user;
     }
-
 }

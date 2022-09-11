@@ -3,6 +3,7 @@ package Mapper;
 import Entity.FixedPriceListingImpl;
 import Entity.Listing;
 import Enums.ListingTypes;
+import Injector.FindConditionInjector;
 import Util.Util;
 
 import javax.swing.plaf.nimbus.State;
@@ -95,7 +96,7 @@ public class ListingMapper extends Mapper<Listing>{
         return true;
     }
 
-    public Listing findById(Integer id) {
+    public Listing find(FindConditionInjector injector, List<Object> queryParam) {
         Listing listing = new FixedPriceListingImpl();
         try {
             PreparedStatement statement;
@@ -104,10 +105,15 @@ public class ListingMapper extends Mapper<Listing>{
                 conn = Util.getConnection();
             }
 
-            statement = conn.prepareStatement(
-                    "SELECT * FROM listing where id=?;"
-            );
-            statement.setInt(1, id);
+            statement = conn.prepareStatement(injector.getSQLQuery());
+            for(int i = 1; i <= queryParam.size(); i++) {
+                Object param = queryParam.get(i);
+                if(param instanceof Integer) {
+                    statement.setInt(i, (Integer)param);
+                } else if(param instanceof String) {
+                    statement.setString(i, (String)param);
+                }
+            }
             statement.execute();
 
             ResultSet rs = statement.getResultSet();

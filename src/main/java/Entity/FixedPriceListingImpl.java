@@ -1,5 +1,6 @@
 package Entity;
 
+import Injector.FindIdInjector;
 import Mapper.FixedPriceListingMapper;
 
 import java.util.ArrayList;
@@ -53,7 +54,11 @@ public class FixedPriceListingImpl extends Listing implements FixedPriceListing 
         // Create a mapper and load the values into the object
         FixedPriceListingMapper mapper = new FixedPriceListingMapper();
 
-        FixedPriceListing result = mapper.findById(getFplId());
+        List<Object>param = new ArrayList<>();
+        param.add("fixed_price_listing");
+        param.add(getFplId());
+
+        FixedPriceListing result = mapper.find(new FindIdInjector(), param);
 
         // There should only be one item in the result set
         this.price = result.getPrice();

@@ -4,6 +4,7 @@ import Entity.FixedPriceListing;
 import Entity.FixedPriceListingImpl;
 import Entity.Listing;
 import Enums.ListingTypes;
+import Injector.FindConditionInjector;
 import Util.Util;
 
 import java.sql.*;
@@ -83,7 +84,7 @@ public class FixedPriceListingMapper extends Mapper<FixedPriceListing> {
         return true;
     }
 
-    public FixedPriceListing findById(Integer id) {
+    public FixedPriceListing find(FindConditionInjector injector, List<Object> queryParam) {
         FixedPriceListing listing = new FixedPriceListingImpl(); // We default to a fixed price listing
         try {
             PreparedStatement statement;
@@ -92,11 +93,17 @@ public class FixedPriceListingMapper extends Mapper<FixedPriceListing> {
                 conn = Util.getConnection();
             }
 
-            statement = conn.prepareStatement(
-                    "SELECT * FROM fixed_price_listing where id=?;"
-            );
-            statement.setInt(1, id);
+            statement = conn.prepareStatement(injector.getSQLQuery());
+            for(int i = 1; i <= queryParam.size(); i++) {
+                Object param = queryParam.get(i);
+                if(param instanceof Integer) {
+                    statement.setInt(i, (Integer)param);
+                } else if(param instanceof String) {
+                    statement.setString(i, (String)param);
+                }
+            }
             statement.execute();
+
             ResultSet rs = statement.getResultSet();
             while(rs.next()) {
                 listing.setPrice(rs.getInt("price"));

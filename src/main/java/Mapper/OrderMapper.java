@@ -1,6 +1,7 @@
 package Mapper;
 
 import Entity.Order;
+import Injector.FindConditionInjector;
 import Util.Util;
 
 import java.sql.*;
@@ -68,13 +69,24 @@ public class OrderMapper extends Mapper<Order> {
         return true;
     }
 
-    public Order findById(Integer id) {
+    public Order find(FindConditionInjector injector, List<Object> queryParam) {
         Order order = new Order();
         try {
-            PreparedStatement statement = conn.prepareStatement(
-                    "SELECT * FROM orders where id=?;"
-            );
-            statement.setInt(1, id);
+            PreparedStatement statement;
+
+            if(conn == null) {
+                conn = Util.getConnection();
+            }
+
+            statement = conn.prepareStatement(injector.getSQLQuery());
+            for(int i = 1; i <= queryParam.size(); i++) {
+                Object param = queryParam.get(i);
+                if(param instanceof Integer) {
+                    statement.setInt(i, (Integer)param);
+                } else if(param instanceof String) {
+                    statement.setString(i, (String)param);
+                }
+            }
             statement.execute();
 
             ResultSet rs = statement.getResultSet();
