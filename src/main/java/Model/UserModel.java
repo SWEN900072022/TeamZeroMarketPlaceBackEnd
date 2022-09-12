@@ -1,11 +1,15 @@
 package Model;
 
 import Entity.User;
+import Injector.FindEmailAndPasswordInjector;
+import Injector.FindIdInjector;
+import Injector.FindUserOrEmailInjector;
 import Mapper.Mapper;
 import Mapper.UserMapper;
 import UnitofWork.UserRepository;
 import Util.JWTUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,13 +32,13 @@ public class UserModel {
     public boolean register(User user) {
         // We are registering we want to make sure that it is not
         // a duplicate account
-        Map<String, String> queryMap = new HashMap<>();
-        queryMap.put("username", user.getUsername());
-        queryMap.put("email", user.getEmail());
+        List<Object> param = new ArrayList<>();
+        param.add(user.getUsername());
+        param.add(user.getEmail());
 
-        List<User> list = uMapper.find(queryMap, 1);
+        User user1 = uMapper.find(new FindUserOrEmailInjector(), param);
 
-        if(list.isEmpty()) {
+        if(user1.isEmpty()) {
             repo.registerNew(user);
             repo.commit();
             return true;
@@ -50,20 +54,21 @@ public class UserModel {
 
     public String login(User user) {
         // Validate to see whether the user is an actual user
-        Map<String, String> queryMap = new HashMap<>();
-        queryMap.put("email", user.getEmail());
-        queryMap.put("password", user.getPassword());
 
-        List<User> list = uMapper.find(queryMap);
+        List<Object> param = new ArrayList<>();
+        param.add(user.getEmail());
+        param.add(user.getPassword());
 
-        if(list.isEmpty()) {
+        User user1 = uMapper.find(new FindEmailAndPasswordInjector(), param);
+
+        if(user1.isEmpty()) {
             // User does not exist
             return null;
         }
 
         // User exists here
         // Generate jwt token for upcoming sessions
-        return JWTUtil.generateToken(user.getEmail(), queryMap);
+        return JWTUtil.generateToken(String.valueOf(user1.getId()), new HashMap<>());
 
     }
 }

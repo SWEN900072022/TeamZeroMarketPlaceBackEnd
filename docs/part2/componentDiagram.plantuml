@@ -1,0 +1,77 @@
+@startuml
+
+() loginUser
+() registerUser
+() searchListing
+() createListing
+() removeListing
+() modifyListing
+() createSellerGroup
+() inviteSellerGroup
+() view
+() modify
+() review
+
+component FrontEndController
+
+component "REST API" {
+    component UserSessionManagement
+    component Search
+    component Listing
+    component SellerGroup
+    component Admin
+}
+
+component "Business Logic" {
+    component UserModel
+    component ListingModel
+    component SellerGroupModel
+}
+
+component Database {
+    component "Back End Database"
+}
+
+FrontEndController --> loginUser
+FrontEndController --> registerUser
+FrontEndController --> searchListing
+FrontEndController --> createListing
+FrontEndController --> removeListing
+FrontEndController --> modifyListing
+FrontEndController --> createSellerGroup
+FrontEndController --> inviteSellerGroup
+FrontEndController --> view
+FrontEndController --> modify
+FrontEndController --> review
+
+loginUser -- UserSessionManagement
+registerUser -- UserSessionManagement
+searchListing -- Search
+createListing -- Listing
+removeListing -- Listing
+modifyListing -- Listing
+createSellerGroup -- SellerGroup
+inviteSellerGroup -- SellerGroup
+view -- Admin
+modify -- Admin
+review -- Admin
+
+UserSessionManagement ..> () "User Details" : fromJson
+Search ..> () "Search Details" : fromJson
+Listing ..> () "Listing Details" : fromJson
+SellerGroup ..> () "SellerGroup Details" : fromJson
+Admin ..> () "List of User Details" : fromJson
+Admin ..> () "List of Listing Details" : fromJson
+
+() "User Details" -- UserModel
+() "Search Details" -- ListingModel
+() "Listing Details" -- ListingModel
+() "SellerGroup Details" -- SellerGroupModel
+() "List of User Details" -- UserModel
+() "List of Listing Details" -- ListingModel
+
+UserModel ..> [Back End Database]
+ListingModel ..> [Back End Database]
+SellerGroupModel ..> [Back End Database]
+
+@enduml
