@@ -1,6 +1,6 @@
 package Injector;
 
-public class FindIdInjector implements FindConditionInjector {
+public class FindIdInjector extends GeneralFindConditionInjector {
     private String tableName;
     public FindIdInjector(String tableName) {
         this.tableName = tableName;

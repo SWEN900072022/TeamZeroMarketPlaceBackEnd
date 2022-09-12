@@ -61,6 +61,6 @@ public class UserModel {
 
         // User exists here
         // Generate jwt token for upcoming sessions
-        return JWTUtil.generateToken(String.valueOf(user1.getId()), new HashMap<>());
+        return JWTUtil.generateToken(String.valueOf(user1.getUserId()), new HashMap<>());
     }
 }

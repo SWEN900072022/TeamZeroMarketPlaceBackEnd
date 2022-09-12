@@ -4,64 +4,43 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Order {
-    private int id;
-    private int listingId;
-    private int quantity;
-    private int orderedBy;
-
+    private int orderId;
+    private int userId;
+    private String address;
 
     public Order() {
-        this.id = 0;
-        this.listingId = 0;
-        this.quantity = 0;
-        this.orderedBy = 0;
+        this.orderId = 0;
+        this.userId = 0;
+        this.address = "";
     }
 
-    public int getOrderedBy() {
-        return orderedBy;
+    public Order(int orderId, int userId, String address) {
+        this.orderId = orderId;
+        this.userId = userId;
+        this.address = address;
     }
 
-    public void setOrderedBy(int orderedBy) {
-        this.orderedBy = orderedBy;
+    public int getOrderId() {
+        return orderId;
     }
 
-    public Order(int listingId, int quantity, int orderedBy) {
-        this.id = 0;
-        this.listingId = listingId;
-        this.quantity = quantity;
-        this.orderedBy = orderedBy;
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
     }
 
-    public int getId() {
-        return id;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
-    public int getListingId() {
-        return listingId;
+    public String getAddress() {
+        return address;
     }
 
-    public void setListingId(int listingId) {
-        this.listingId = listingId;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public static List<String> getOrderAttribute() {
-        List<String> attr = new ArrayList<>();
-        attr.add("id");
-        attr.add("listing_id");
-        attr.add("quantity");
-        attr.add("ordered_by");
-        return attr;
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

@@ -3,13 +3,12 @@ package Mapper;
 import Entity.Order;
 import Injector.FindConditionInjector;
 import Util.Util;
+import com.sun.org.apache.xpath.internal.operations.Or;
 
 import java.sql.*;
 import java.util.*;
 
-public class OrderMapper implements Mapper<Order> {
-    private Connection conn = null;
-
+public class OrderMapper extends GeneralMapper<Order> {
     public OrderMapper() {
 
     }
@@ -24,11 +23,10 @@ public class OrderMapper implements Mapper<Order> {
             }
 
             statement = conn.prepareStatement(
-                    "INSERT INTO orders (listing_id, quantity, ordered_by) " +
+                    "INSERT INTO orders (userId, address) " +
                             "VALUES (?, ?, ?);", Statement.RETURN_GENERATED_KEYS);
-            statement.setInt(1, order.getListingId());
-            statement.setInt(2, order.getQuantity());
-            statement.setInt(3, order.getOrderedBy());
+            statement.setInt(1, order.getUserId());
+            statement.setString(2, order.getAddress());
             statement.execute();
         } catch (SQLException e) {
             return false;
@@ -49,19 +47,17 @@ public class OrderMapper implements Mapper<Order> {
         try {
             PreparedStatement statement = conn.prepareStatement(
                     "UPDATE orders as o set " +
-                            "id=o2.id, " +
-                            "listing_id=o2.listing_id, " +
-                            "quantity=o2.quantity, " +
-                            "ordered_by=o2.ordered_by " +
+                            "orderId=o2.orderId, " +
+                            "userId=o2.userId, " +
+                            "address=o2.address " +
                             "from (values " +
-                            "(?, ?, ?, ?)" +
-                            ") as o2(id, listing_id, quantity, ordered_by) " +
-                            "where o.id=o2.id;"
+                            "(?, ?, ?)" +
+                            ") as o2(orderId, userId, address) " +
+                            "where o.orderId=o2.orderId;"
             );
-            statement.setInt(1, order.getId());
-            statement.setInt(2, order.getListingId());
-            statement.setInt(3, order.getQuantity());
-            statement.setInt(4, order.getOrderedBy());
+            statement.setInt(1, order.getOrderId());
+            statement.setInt(2, order.getUserId());
+            statement.setString(3, order.getAddress());
             statement.execute();
         } catch (SQLException e) {
             return false;
@@ -72,34 +68,33 @@ public class OrderMapper implements Mapper<Order> {
     public Order find(FindConditionInjector injector, List<Object> queryParam) {
         Order order = new Order();
         try {
-            PreparedStatement statement;
-
-            if(conn == null) {
-                conn = Util.getConnection();
-            }
-
-            statement = conn.prepareStatement(injector.getSQLQuery());
-            for(int i = 1; i <= queryParam.size(); i++) {
-                Object param = queryParam.get(i-1);
-                if(param instanceof Integer) {
-                    statement.setInt(i, (Integer)param);
-                } else if(param instanceof String) {
-                    statement.setString(i, (String)param);
-                }
-            }
-            statement.execute();
-
-            ResultSet rs = statement.getResultSet();
-            while (rs.next()) {
-                // Process the result set into an object
-                order.setListingId(rs.getInt("listing_id"));
-                order.setQuantity(rs.getInt("quantity"));
-                order.setId(rs.getInt("id"));
-                order.setOrderedBy(rs.getInt("ordered_by"));
+            ResultSet rs = getResultSet(injector, queryParam);
+            if (rs.next()) {
+                order.setOrderId(rs.getInt("orderId"));
+                order.setUserId(rs.getInt("userId"));
+                order.setAddress(rs.getString("address"));
             }
         } catch (SQLException e) {
             return null;
         }
         return order;
+    }
+
+    @Override
+    public List<Order> findMulti(FindConditionInjector injector, List<Object> queryParam) {
+        List<Order> orderList = new ArrayList<>();
+        try {
+            ResultSet rs = getResultSet(injector, queryParam);
+            while(rs.next()) {
+                Order order = new Order();
+                order.setOrderId(rs.getInt("orderId"));
+                order.setUserId(rs.getInt("userId"));
+                order.setAddress(rs.getString("address"));
+                orderList.add(order);
+            }
+        } catch (SQLException e) {
+            return null;
+        }
+        return orderList;
     }
 }

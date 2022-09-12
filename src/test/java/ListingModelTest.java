@@ -1,10 +1,12 @@
 import Entity.Listing;
+import Injector.FindConditionInjector;
 import Model.ListingModel;
 import UnitofWork.IUnitofWork;
 import Util.JWTUtil;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -53,7 +55,22 @@ public class ListingModelTest {
         }
 
         @Override
-        public Map<Integer, Listing> read(Integer[] id, String tableName) {
+        public Listing read(FindConditionInjector injector, List<Object> param, String key) {
+            return null;
+        }
+
+        @Override
+        public List<Listing> readMulti(FindConditionInjector injector, List<Object> param, String key) {
+            return null;
+        }
+
+        @Override
+        public Listing read(FindConditionInjector injector, List<Object> param) {
+            return null;
+        }
+
+        @Override
+        public List<Listing> readMulti(FindConditionInjector injector, List<Object> param) {
             return null;
         }
 

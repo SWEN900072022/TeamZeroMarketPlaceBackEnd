@@ -12,90 +12,58 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Listing {
-    private String description;
-    private String title;
+    private int listingId;
+    private int groupId;
     private ListingTypes type;
-    private int id;
-    private int createdById;
+    private String title;
+    private String description;
     private int quantity;
     private Money price;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 
     public Listing() {
-        this.description = null;
-        this.title = null;
-        this.type = ListingTypes.FIXED_PRICE; // 0 for fixed, 1 for auctions
-        this.id = 0;
-        this.createdById = 0;
+        this.listingId = 0;
+        this.groupId = 0;
+        this.type = null;
+        this.title = "";
+        this.description = "";
         this.quantity = 0;
         this.price = Money.of(0, Monetary.getCurrency("AUD"));
-        this.startDate = LocalDateTime.now();
-        this.endDate = LocalDateTime.now();
+        this.startTime = null;
+        this.endTime = null;
     }
 
-    public Listing(String description, String title, int type, int createdById) {
-        this.description = description;
+    public Listing(int listingId, int groupId, ListingTypes type, String title, String description, int quantity, Money price, LocalDateTime startTime, LocalDateTime endTime) {
+        this.listingId = listingId;
+        this.groupId = groupId;
+        this.type = type;
         this.title = title;
-        this.type = setType(type);
-        this.id = 0;
-        this.createdById = createdById;
-        this.quantity = 0;
-        this.price = Money.of(0, Monetary.getCurrency("AUD"));
-        this.startDate = LocalDateTime.now();
-        this.endDate = LocalDateTime.now();
-    }
-
-    public Listing(String description, String title, int type, int createdById, int price, int quantity) {
         this.description = description;
-        this.title = title;
-        this.type = setType(type);
-        this.id = 0;
-        this.createdById = createdById;
         this.quantity = quantity;
-        this.price = Money.of(price, Monetary.getCurrency("AUD"));
-        this.startDate = LocalDateTime.now();
-        this.endDate = LocalDateTime.now();
+        this.price = price;
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 
-    public int getId() {
-        return id;
+    public int getListingId() {
+        return listingId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setListingId(int listingId) {
+        this.listingId = listingId;
     }
 
-    public int getCreatedById() {
-        return createdById;
+    public int getGroupId() {
+        return groupId;
     }
 
-    public void setCreatedById(int createdById) {
-        this.createdById = createdById;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
     }
 
     public ListingTypes getType() {
         return type;
-    }
-
-    public String getTypeString() {
-        return type.toString();
     }
 
     public void setType(ListingTypes type) {
@@ -108,6 +76,22 @@ public class Listing {
         } else {
             return ListingTypes.AUCTION;
         }
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public int getQuantity() {
@@ -126,36 +110,34 @@ public class Listing {
         this.price = price;
     }
 
-    public LocalDateTime getStartDate() {
-        return startDate;
+    public LocalDateTime getStartTime() {
+        return startTime;
     }
 
-    public void setStartDate(LocalDateTime startDate) {
-        this.startDate = startDate;
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
     }
 
-    public LocalDateTime getEndDate() {
-        return endDate;
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
-    public void setEndDate(LocalDateTime endDate) {
-        this.endDate = endDate;
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     public void load() {
         // Lazy Initialisation
         // Create a mapper and load the values into the object
         Mapper<Listing> mapper = new ListingMapper();
-        List<Object>param = new ArrayList<>();
-        param.add(id);
+        List<Object> param = new ArrayList<>();
+        param.add(listingId);
 
-        if(type == ListingTypes.FIXED_PRICE) {
-            Listing listing = mapper.find(new FindIdInjector("listing"), param);
+        Listing listing = mapper.find(new FindIdInjector("listings"), param);
 
-            this.price = listing.getPrice();
-            this.quantity = listing.getQuantity();
-        } else {
-            // Auction loading unimplemented
-        }
+        this.price = listing.getPrice();
+        this.quantity = listing.getQuantity();
+        this.startTime = listing.getStartTime();
+        this.endTime = listing.getEndTime();
     }
 }

@@ -2,22 +2,21 @@ package Entity;
 
 import org.javamoney.moneta.Money;
 
-import javax.money.CurrencyUnit;
 import javax.money.Monetary;
 import java.math.BigDecimal;
 
-public class Bids {
+public class Bid {
     private int listingId;
     private int userId;
     private Money bidAmount;
 
-    public Bids() {
+    public Bid() {
         this.bidAmount = Money.of(0, Monetary.getCurrency("AUD"));
         this.listingId = 0;
         this.userId = 0;
     }
 
-    public Bids(int listingId, int userId, BigDecimal bidAmount) {
+    public Bid(int listingId, int userId, BigDecimal bidAmount) {
         this.bidAmount = Money.of(bidAmount, Monetary.getCurrency("AUD"));
         this.listingId = listingId;
         this.userId = userId;

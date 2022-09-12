@@ -1,6 +1,7 @@
 package UnitofWork;
 
 import Enums.UnitActions;
+import Injector.FindConditionInjector;
 import Injector.FindIdInjector;
 import Mapper.Mapper;
 
@@ -11,8 +12,9 @@ import java.util.Map;
 
 public class Repository<T> implements IUnitofWork<T>{
     private final Map<String, List<T>> context;
-    private final Mapper mapper;
-    private Map<Integer, T> identityMap;
+    private final Mapper<T> mapper;
+    private Map<String, T> identityMap;
+    private Map<String, List<T>> OneToManyIdentityMap;
 
     public Repository(Mapper mapper) {
         context = new HashMap<>();
@@ -21,22 +23,41 @@ public class Repository<T> implements IUnitofWork<T>{
     }
 
     @Override
-    public Map<Integer, T> read(Integer[] idList, String tableName) {
-        Map<Integer, T> result = new HashMap<>();
-
-        for(Integer id : idList) {
-            if(identityMap.containsKey(id)) {
-                result.put(id, identityMap.get(id));
-            } else {
-                List<Object>param = new ArrayList<>();
-                param.add(id);
-
-                T entity = (T)mapper.find(new FindIdInjector(tableName), param);
-                result.put(id, entity);
-                identityMap.put(id, entity);
-            }
+    public T read(FindConditionInjector injector, List<Object>param, String key) {
+        if(identityMap.containsKey(key)) {
+            return identityMap.get(key);
+        } else {
+            T entity = mapper.find(injector, param);
+            identityMap.put(key, entity);
+            return entity;
         }
-        return result;
+    }
+
+    @Override
+    public List<T> readMulti(FindConditionInjector injector, List<Object>param, String key) {
+        if(identityMap.containsKey(key)) {
+            return OneToManyIdentityMap.get(key);
+        } else {
+            List<T> entity = mapper.findMulti(injector, param);
+            OneToManyIdentityMap.put(key, entity);
+            return entity;
+        }
+    }
+
+    /*
+    * This is not cached by the identity mapper
+    * */
+    @Override
+    public T read(FindConditionInjector injector, List<Object>param) {
+        return mapper.find(injector, param);
+    }
+
+    /*
+    * This is not cached by the identity mapper
+    * */
+    @Override
+    public List<T> readMulti(FindConditionInjector injector, List<Object>param) {
+        return mapper.findMulti(injector, param);
     }
 
     @Override

@@ -2,36 +2,33 @@ package Entity;
 
 import Enums.UserRoles;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class User{
     private String email;
     private String username;
     private String password;
-    private int id;
-    private UserRoles roles;
+    private int userId;
+    private UserRoles role;
 
     public User() {
         this.email = null;
         this.username = null;
         this.password = null;
-        this.id = 0;
-        this.roles = UserRoles.CUSTOMER;
+        this.userId = 0;
+        this.role = UserRoles.CUSTOMER;
     }
     public User(String email, String username, String password) {
         this.email = email;
         this.username = username;
         this.password = password;
-        this.id = 0;
-        this.roles = UserRoles.CUSTOMER;
+        this.userId = 0;
+        this.role = UserRoles.CUSTOMER;
     }
 
     public User(String email, String username, String password, String roles) {
         this.email = email;
         this.username = username;
         this.password = password;
-        this.id = 0;
+        this.userId = 0;
         setRoles(roles);
     }
 
@@ -47,7 +44,7 @@ public class User{
         return this.email;
     }
 
-    public String getRoles() { return this.roles.toString(); }
+    public String getRole() { return this.role.toString(); }
 
     public void setUsername(String username) {
         this.username = username;
@@ -61,27 +58,27 @@ public class User{
         this.password = password;
     }
 
-    public void setRoles(UserRoles roles) {
-        this.roles = roles;
+    public void setRole(UserRoles role) {
+        this.role = role;
     }
 
     public void setRoles(String roles) {
         switch(roles) {
             case "seller":
-                this.roles = UserRoles.SELLER;
+                this.role = UserRoles.SELLER;
                 break;
             case "customer":
             default:
-                this.roles = UserRoles.CUSTOMER;
+                this.role = UserRoles.CUSTOMER;
         }
     }
 
-    public int getId() {
-        return id;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String toString() {
