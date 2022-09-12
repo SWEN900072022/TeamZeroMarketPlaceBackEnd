@@ -64,6 +64,7 @@ public class UserModelTest {
     class MockUserMapper extends Mapper<User> {
         private boolean isEmptyResult = false;
         public User result = new User();
+        List <User> allUsers= new ArrayList<User>();
 
         public void setEmptyResult(boolean emptyResult) {
             this.isEmptyResult = emptyResult;
@@ -97,8 +98,8 @@ public class UserModelTest {
         }
 
         @Override
-        public List<User> getAll() {
-            return this.result;
+        public List<User> findAllItems(FindConditionInjector injector) {
+            return allUsers;
         }
     }
 }

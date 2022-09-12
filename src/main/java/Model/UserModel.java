@@ -1,6 +1,7 @@
 package Model;
 
 import Entity.User;
+import Injector.FindAllInjector;
 import Injector.FindEmailAndPasswordInjector;
 import Injector.FindIdInjector;
 import Injector.FindUserOrEmailInjector;
@@ -48,7 +49,7 @@ public class UserModel {
 
 
     public List<User> getAllUsers() {
-        List<User> list = uMapper.getAll();
+        List<User> list = uMapper.findAllItems(new FindAllInjector("users"));
         return list;
     }
 

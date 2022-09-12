@@ -118,7 +118,7 @@ public class UserMapper extends Mapper<User> {
         return user;
     }
 
-    public List<User> getAll(){
+    public List<User> findAllItems(FindConditionInjector injector){
         List <User> allUsers= new ArrayList<User>();
         PreparedStatement statement;
         ResultSet rs;
@@ -126,7 +126,7 @@ public class UserMapper extends Mapper<User> {
             if(conn==null){
                 conn = Util.getConnection();
             }
-            statement = conn.prepareStatement("SELECT * FROM users");
+            statement = conn.prepareStatement(injector.getSQLQuery());
             rs = statement.executeQuery();
             while(rs.next()){
                 User user = new User();

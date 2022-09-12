@@ -115,4 +115,26 @@ public class FixedPriceListingMapper extends Mapper<FixedPriceListing> {
         }
         return listing;
     }
+    public List<FixedPriceListing> findAllItems(FindConditionInjector injector){
+        List <FixedPriceListing> allListings= new ArrayList<FixedPriceListing>();
+        PreparedStatement statement;
+        ResultSet rs;
+        try{
+            if(conn==null){
+                conn = Util.getConnection();
+            }
+            statement = conn.prepareStatement(injector.getSQLQuery());
+            rs = statement.executeQuery();
+            while(rs.next()){
+                FixedPriceListing listing = new FixedPriceListingImpl();
+                listing.setPrice(rs.getInt("price"));
+                listing.setQuantity(rs.getInt("quantity"));
+                listing.setFplId(rs.getInt("id"));
+                allListings.add(listing);
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return allListings;
+    }
 }

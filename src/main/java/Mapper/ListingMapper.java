@@ -2,6 +2,7 @@ package Mapper;
 
 import Entity.FixedPriceListingImpl;
 import Entity.Listing;
+import Entity.Order;
 import Enums.ListingTypes;
 import Injector.FindConditionInjector;
 import Util.Util;
@@ -128,5 +129,30 @@ public class ListingMapper extends Mapper<Listing>{
             return null;
         }
         return listing;
+    }
+
+    public List<Listing> findAllItems(FindConditionInjector injector){
+        List <Listing> allListings= new ArrayList<Listing>();
+        PreparedStatement statement;
+        ResultSet rs;
+        try{
+            if(conn==null){
+                conn = Util.getConnection();
+            }
+            statement = conn.prepareStatement(injector.getSQLQuery());
+            rs = statement.executeQuery();
+            while(rs.next()){
+                Listing listing = new FixedPriceListingImpl();
+                listing.setDescription(rs.getString("description"));
+                listing.setTitle(rs.getString("title"));
+                listing.setType(ListingTypes.fromString(rs.getString("type")));
+                listing.setId(rs.getInt("id"));
+                listing.setCreatedById(rs.getInt("created_by_id"));
+                allListings.add(listing);
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return allListings;
     }
 }

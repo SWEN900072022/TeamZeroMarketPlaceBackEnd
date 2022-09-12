@@ -1,6 +1,7 @@
 package Mapper;
 
 import Entity.Order;
+import Entity.User;
 import Injector.FindConditionInjector;
 import Util.Util;
 
@@ -101,5 +102,29 @@ public class OrderMapper extends Mapper<Order> {
             return null;
         }
         return order;
+    }
+
+    public List<Order> findAllItems(FindConditionInjector injector){
+        List <Order> allOrders= new ArrayList<Order>();
+        PreparedStatement statement;
+        ResultSet rs;
+        try{
+            if(conn==null){
+                conn = Util.getConnection();
+            }
+            statement = conn.prepareStatement(injector.getSQLQuery());
+            rs = statement.executeQuery();
+            while(rs.next()){
+                Order order = new Order();
+                order.setListingId(rs.getInt("listing_id"));
+                order.setQuantity(rs.getInt("quantity"));
+                order.setId(rs.getInt("id"));
+                order.setOrderedBy(rs.getInt("ordered_by"));
+                allOrders.add(order);
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return allOrders;
     }
 }
