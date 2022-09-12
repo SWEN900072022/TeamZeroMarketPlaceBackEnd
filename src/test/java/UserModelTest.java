@@ -90,5 +90,10 @@ public class UserModelTest {
         public User find(FindConditionInjector injector, List<Object> queryParam) {
             return this.result;
         }
+
+        @Override
+        public List<User> findMulti(FindConditionInjector injector, List<Object> queryParam) {
+            return null;
+        }
     }
 }

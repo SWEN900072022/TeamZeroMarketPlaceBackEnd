@@ -13,15 +13,15 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-@WebServlet(name = "RegisterUserServlet", value = "/register")
+@WebServlet(name = "RegisterUserServlet", value = "/user/register")
 public class RegisterUserServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        String username = request.getParameter("username");
-//        String email = request.getParameter("email");
-//        String password = request.getParameter("password");
-//        String role = request.getParameter("role");
+        String username = request.getParameter("username");
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+        String role = request.getParameter("role");
 //
 //        User user = new User(email, username, password, role);
 //        UserModel uModel = new UserModel();

@@ -16,10 +16,11 @@ public class Repository<T> implements IUnitofWork<T>{
     private Map<String, T> identityMap;
     private Map<String, List<T>> OneToManyIdentityMap;
 
-    public Repository(Mapper mapper) {
+    public Repository(Mapper<T> mapper) {
         context = new HashMap<>();
         this.mapper = mapper;
         identityMap = new HashMap<>();
+        OneToManyIdentityMap = new HashMap<>();
     }
 
     @Override
