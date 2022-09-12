@@ -17,23 +17,23 @@ import java.util.Map;
 public class CheckoutServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String quantity = request.getParameter("quantity");
-        String listingId = request.getParameter("listing_id");
-        String jwt = request.getHeader("jwt");
-
-        Gson gson = new Gson();
-        Integer[] quantityList = gson.fromJson(quantity, Integer[].class);
-        Integer[] listingIdList = gson.fromJson(listingId, Integer[].class);
-        // Note when handling the list, make sure that the order is not disrupted
-
-        OrderModel orderModel = new OrderModel();
-        boolean isSuccessful = orderModel.createOrders(listingIdList, quantityList, jwt);
-
-        Map<String, Boolean>result = new HashMap<>();
-        result.put("result", isSuccessful);
-        String json = gson.toJson(result);
-
-        PrintWriter out = response.getWriter();
-        out.println(json);
+//        String quantity = request.getParameter("quantity");
+//        String listingId = request.getParameter("listing_id");
+//        String jwt = request.getHeader("jwt");
+//
+//        Gson gson = new Gson();
+//        Integer[] quantityList = gson.fromJson(quantity, Integer[].class);
+//        Integer[] listingIdList = gson.fromJson(listingId, Integer[].class);
+//        // Note when handling the list, make sure that the order is not disrupted
+//
+//        OrderModel orderModel = new OrderModel();
+//        boolean isSuccessful = orderModel.createOrders(listingIdList, quantityList, jwt);
+//
+//        Map<String, Boolean>result = new HashMap<>();
+//        result.put("result", isSuccessful);
+//        String json = gson.toJson(result);
+//
+//        PrintWriter out = response.getWriter();
+//        out.println(json);
     }
 }

@@ -14,17 +14,14 @@ import java.util.HashMap;
 import java.util.List;
 
 public class UserModel {
-    private final Mapper<User> uMapper;
     private IUnitofWork<User> repo;
 
     public UserModel() {
         // Create a mapper for the model to write data to
-        uMapper = new UserMapper();
-        repo = new Repository<User>(uMapper);
+        repo = new Repository<User>(new UserMapper());
     }
 
     public UserModel(Mapper<User> mapper) {
-        this.uMapper = mapper;
         repo = new Repository<User>(mapper);
     }
 
@@ -35,7 +32,7 @@ public class UserModel {
         param.add(user.getUsername());
         param.add(user.getEmail());
 
-        User user1 = uMapper.find(new FindUserOrEmailInjector(), param);
+        User user1 = repo.read(new FindUserOrEmailInjector(), param);
 
         if(user1.isEmpty()) {
             repo.registerNew(user);
@@ -52,7 +49,7 @@ public class UserModel {
         param.add(user.getEmail());
         param.add(user.getPassword());
 
-        User user1 = uMapper.find(new FindEmailAndPasswordInjector(), param);
+        User user1 = repo.read(new FindEmailAndPasswordInjector(), param);
 
         if(user1.isEmpty()) {
             // User does not exist
