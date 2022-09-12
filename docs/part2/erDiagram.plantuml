@@ -1,0 +1,83 @@
+@startuml
+entity orders {
+    orderID: serial
+    --
+    userID: integer <<FK>>
+    address: text
+}
+
+entity orderItem{
+    orderID: integer <<FK>>
+    listingID: integer <<FK>>
+    --
+    quantity: integer
+    unitPrice: float
+}
+
+entity users{
+    userID: serial
+    --
+    username: varchar(255)
+    email: varchar(255)
+    password: varchar(255)
+    role: varchar(255)
+    sessionID: varchar(255 ) 
+
+}
+
+entity listings{
+    listingID : serial
+    groupID : integer <<FK>>
+    --
+    type: varchar(255)
+    title: varchar(255) 
+    description : text
+    quantity: integer
+    price : decimal(7,2)
+    startTime: timestamp
+    endTime: timestamp
+    
+}
+
+entity sellerGroups{
+    groupID : serial
+    --
+    groupName: string
+
+}
+
+entity groupMembership{
+    groupID : integer <<FK>>
+    userID : integer <<FK>>
+    --
+}
+
+entity shoppingCartItems{
+    userID: integer <<FK>> 
+    listingID: integer <<FK>>
+    --
+    timeAdded: timestamp 
+}
+
+entity bids{
+    listingID: integer <<FK>>
+    userID: integer <<FK>>
+    --
+    bidAmount: decimal(7,2)
+
+}
+users ||--o{ orders
+users ||--o{ groupMembership
+
+orders ||--|{orderItem
+orderItem }o--||listings
+groupMembership }o--|| sellerGroups
+
+users ||--o{ shoppingCartItems
+shoppingCartItems }o--||listings
+
+sellerGroups||--o{listings
+
+users||--o{bids
+bids}o--||listings
+@enduml 
