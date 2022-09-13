@@ -17,7 +17,6 @@ public abstract class GeneralMapper<T> implements Mapper<T> {
         PreparedStatement statement;
 
         if(conn == null) {
-            System.out.println("testing connection");
             conn = Util.getConnection();
         }
 
