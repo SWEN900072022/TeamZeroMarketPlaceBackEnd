@@ -90,7 +90,7 @@ public class UserMapper extends GeneralMapper<User> {
                 user.setUsername(rs.getString("username"));
                 user.setRoles(rs.getString("role"));
                 user.setPassword(rs.getString("password"));
-                user.setUserId(rs.getInt("userId"));
+                user.setUserId(rs.getInt("userid"));
             }
         } catch (SQLException e) {
             return null;
@@ -100,7 +100,7 @@ public class UserMapper extends GeneralMapper<User> {
 
     @Override
     public List<User> findMulti(FindConditionInjector injector, List<Object> queryParam) {
-        List<User> userList = new ArrayList<>();
+        List<User> userList = new ArrayList<User>();
         try {
             ResultSet rs = getResultSet(injector, queryParam);
             while(rs.next()) {
@@ -109,10 +109,12 @@ public class UserMapper extends GeneralMapper<User> {
                 user.setUsername(rs.getString("username"));
                 user.setRoles(rs.getString("role"));
                 user.setPassword(rs.getString("password"));
-                user.setUserId(rs.getInt("userId"));
+                user.setUserId(rs.getInt("userid"));
                 userList.add(user);
             }
         } catch (SQLException e) {
+            System.out.println("error in query");
+//            e.printStackTrace();
             return null;
         }
         return userList;

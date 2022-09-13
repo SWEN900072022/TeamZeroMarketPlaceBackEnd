@@ -1,6 +1,7 @@
 package Mapper;
 
 import Entity.Order;
+import Entity.User;
 import Injector.FindConditionInjector;
 import Util.Util;
 
@@ -96,4 +97,5 @@ public class OrderMapper extends GeneralMapper<Order> {
         }
         return orderList;
     }
+
 }

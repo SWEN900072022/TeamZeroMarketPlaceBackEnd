@@ -1,7 +1,9 @@
 package Model;
 
 import Entity.User;
+import Injector.FindAllInjector;
 import Injector.FindEmailAndPasswordInjector;
+import Injector.FindIdInjector;
 import Injector.FindUserOrEmailInjector;
 import Mapper.Mapper;
 import Mapper.UserMapper;
@@ -42,6 +44,13 @@ public class UserModel {
         return false;
     }
 
+
+    public List<User> getAllUsers() {
+        List<Object> param = new ArrayList<>();
+        List<User> userList = repo.readMulti(new FindAllInjector("users"), param);
+        return userList;
+    }
+
     public String login(User user) {
         // Validate to see whether the user is an actual user
 
@@ -59,5 +68,6 @@ public class UserModel {
         // User exists here
         // Generate jwt token for upcoming sessions
         return JWTUtil.generateToken(String.valueOf(user1.getUserId()), new HashMap<>());
+
     }
 }

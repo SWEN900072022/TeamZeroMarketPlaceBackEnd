@@ -5,6 +5,7 @@ import Model.UserModel;
 import Util.JWTUtil;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -61,6 +62,7 @@ public class UserModelTest {
     class MockUserMapper implements Mapper<User> {
         private boolean isEmptyResult = false;
         public User result = new User();
+        List <User> allUsers= new ArrayList<User>();
 
         public void setEmptyResult(boolean emptyResult) {
             this.isEmptyResult = emptyResult;

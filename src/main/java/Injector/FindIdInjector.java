@@ -22,7 +22,7 @@ public class FindIdInjector extends GeneralFindConditionInjector {
     }
 
     private String getUserSQLQuery() {
-        return "SELECT * FROM users where id=?;";
+        return "SELECT * FROM users where userid=?;";
     }
 
     private String getOrdersSQLQuery() {
