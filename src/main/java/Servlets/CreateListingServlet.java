@@ -1,6 +1,5 @@
 package Servlets;
 
-import Entity.FixedPriceListingImpl;
 import Entity.Listing;
 import Model.ListingModel;
 import Util.JWTUtil;
@@ -18,34 +17,34 @@ import java.util.Map;
 public class CreateListingServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String title = request.getParameter("title");
-        String description = request.getParameter("description");
-        int type = Integer.parseInt(request.getParameter("type"));
-        String jwt = request.getHeader("jwt");
-
-        if(type == 0) {
-            int price = Integer.parseInt(request.getParameter("price"));
-            int quantity = Integer.parseInt(request.getParameter("quantity"));
-            boolean isSuccessful = false;
-
-            try {
-                int createdById = Integer.parseInt(JWTUtil.getSubject(jwt));
-                Listing listing = new FixedPriceListingImpl(description, title,createdById, price, quantity);
-                ListingModel listingModel = new ListingModel();
-                isSuccessful = listingModel.createListing(listing, jwt);
-            } catch (NumberFormatException e) {
-                isSuccessful = false;
-            }
-
-            Map<String, Boolean> result = new HashMap<>();
-            result.put("result", isSuccessful);
-            Gson gson = new Gson();
-            String json = gson.toJson(result);
-
-            PrintWriter out = response.getWriter();
-            out.println(json);
-        } else {
-            // Unimplemented
-        }
+//        String title = request.getParameter("title");
+//        String description = request.getParameter("description");
+//        int type = Integer.parseInt(request.getParameter("type"));
+//        String jwt = request.getHeader("jwt");
+//
+//        if(type == 0) {
+//            int price = Integer.parseInt(request.getParameter("price"));
+//            int quantity = Integer.parseInt(request.getParameter("quantity"));
+//            boolean isSuccessful = false;
+//
+//            try {
+//                int createdById = Integer.parseInt(JWTUtil.getSubject(jwt));
+//                Listing listing = new Listing(description, title, type, createdById, price, quantity);
+//                ListingModel listingModel = new ListingModel();
+//                isSuccessful = listingModel.createListing(listing, jwt);
+//            } catch (NumberFormatException e) {
+//                isSuccessful = false;
+//            }
+//
+//            Map<String, Boolean> result = new HashMap<>();
+//            result.put("result", isSuccessful);
+//            Gson gson = new Gson();
+//            String json = gson.toJson(result);
+//
+//            PrintWriter out = response.getWriter();
+//            out.println(json);
+//        } else {
+//            // Unimplemented
+//        }
     }
 }

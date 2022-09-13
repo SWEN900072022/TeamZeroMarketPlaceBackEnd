@@ -1,18 +1,18 @@
 package Mapper;
 
-import Entity.FixedPriceListingImpl;
 import Entity.Listing;
 import Entity.Order;
 import Enums.ListingTypes;
 import Injector.FindConditionInjector;
 import Util.Util;
+import org.javamoney.moneta.Money;
 
-import javax.swing.plaf.nimbus.State;
+import javax.money.Monetary;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.*;
 
-public class ListingMapper extends Mapper<Listing>{
-    private Connection conn = null;
+public class ListingMapper extends GeneralMapper<Listing> {
     public ListingMapper() {
 
     }
@@ -43,14 +43,18 @@ public class ListingMapper extends Mapper<Listing>{
         }
 
         statement = conn.prepareStatement(
-                "INSERT INTO listing (description, title, created_by_id, type) " +
-                        "VALUES (?, ?, ?, ?);",
+                "INSERT INTO listings (groupId, type, title, description, quantity, price, startTime, endTime) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
                 Statement.RETURN_GENERATED_KEYS
         );
-        statement.setString(1, listing.getDescription());
-        statement.setString(2, listing.getTitle());
-        statement.setInt(3, listing.getCreatedById());
-        statement.setString(4, listing.getTypeString());
+        statement.setInt(1, listing.getGroupId());
+        statement.setString(2, listing.getType().toString());
+        statement.setString(3, listing.getTitle());
+        statement.setString(4, listing.getDescription());
+        statement.setInt(5, listing.getQuantity());
+        statement.setBigDecimal(6, listing.getPrice().getNumberStripped());
+        statement.setObject(7, listing.getStartTime());
+        statement.setObject(8, listing.getEndTime());
         statement.execute();
 
         if(!shouldReturn) {
@@ -59,7 +63,7 @@ public class ListingMapper extends Mapper<Listing>{
 
         ResultSet generatedKeys = statement.getGeneratedKeys();
         while(generatedKeys.next()) {
-            listing.setId(generatedKeys.getInt("id"));
+            listing.setListingId(generatedKeys.getInt("listingId"));
         }
         return listing;
     }
@@ -75,21 +79,29 @@ public class ListingMapper extends Mapper<Listing>{
             }
 
             PreparedStatement statement = conn.prepareStatement(
-                    "UPDATE listing as l set " +
-                            "description=l2.description, " +
+                    "UPDATE listings as l set " +
+                            "groupid=l2.groupId, " +
+                            "type=l2.type, " +
                             "title=l2.title, " +
-                            "created_by_id=l2.created_by_id, " +
-                            "id=l2.id, " +
-                            "type=l2.type " +
+                            "description=l2.description, " +
+                            "quantity=l2.quantity, " +
+                            "price=l2.price, " +
+                            "starttime=l2.startTime, " +
+                            "endtime=l2.endTime," +
+                            "listingid = l2.listingId " +
                             "from (values " +
-                            "(?, ?, ?, ?, ?)" +
-                            ") as l2(description, title, created_by_id, id, type) " +
-                            "where l.id=l2.id;");
-            statement.setString(1, listing.getDescription());
-            statement.setString(2, listing.getTitle());
-            statement.setInt(3, listing.getCreatedById());
-            statement.setInt(4, listing.getId());
-            statement.setString(5, listing.getTypeString());
+                            "(?, ?, ?, ?, ?, ?, ?, ?, ?)" +
+                            ") as l2(groupId, type, title, description, quantity, price, startTime, endTime, listingId) " +
+                            "where l.listingId=l2.listingId;");
+            statement.setInt(1, listing.getGroupId());
+            statement.setString(2, listing.getType().toString());
+            statement.setString(3, listing.getTitle());
+            statement.setString(4, listing.getDescription());
+            statement.setInt(5, listing.getQuantity());
+            statement.setBigDecimal(6, listing.getPrice().getNumberStripped());
+            statement.setObject(7, listing.getStartTime());
+            statement.setObject(8, listing.getEndTime());
+            statement.setObject(9, listing.getListingId());
             statement.execute();
         } catch (SQLException e) {
             return false;
@@ -98,32 +110,19 @@ public class ListingMapper extends Mapper<Listing>{
     }
 
     public Listing find(FindConditionInjector injector, List<Object> queryParam) {
-        Listing listing = new FixedPriceListingImpl();
+        Listing listing = new Listing();
         try {
-            PreparedStatement statement;
-
-            if(conn == null) {
-                conn = Util.getConnection();
-            }
-
-            statement = conn.prepareStatement(injector.getSQLQuery());
-            for(int i = 1; i <= queryParam.size(); i++) {
-                Object param = queryParam.get(i-1);
-                if(param instanceof Integer) {
-                    statement.setInt(i, (Integer)param);
-                } else if(param instanceof String) {
-                    statement.setString(i, (String)param);
-                }
-            }
-            statement.execute();
-
-            ResultSet rs = statement.getResultSet();
-            while(rs.next()) {
-                listing.setDescription(rs.getString("description"));
-                listing.setTitle(rs.getString("title"));
+            ResultSet rs = getResultSet(injector, queryParam);
+            if(rs.next()) {
+                listing.setListingId(rs.getInt("listingId"));
+                listing.setGroupId(rs.getInt("groupId"));
                 listing.setType(ListingTypes.fromString(rs.getString("type")));
-                listing.setId(rs.getInt("id"));
-                listing.setCreatedById(rs.getInt("created_by_id"));
+                listing.setTitle(rs.getString("title"));
+                listing.setDescription(rs.getString("description"));
+                listing.setQuantity(rs.getInt("quantity"));
+                listing.setPrice(Money.of(rs.getBigDecimal("price"), Monetary.getCurrency("AUD")));
+                listing.setStartTime(rs.getObject("startTime", LocalDateTime.class));
+                listing.setEndTime(rs.getObject("endTime", LocalDateTime.class));
             }
         } catch (SQLException e) {
             return null;
@@ -131,28 +130,29 @@ public class ListingMapper extends Mapper<Listing>{
         return listing;
     }
 
-    public List<Listing> findAllItems(FindConditionInjector injector){
-        List <Listing> allListings= new ArrayList<Listing>();
-        PreparedStatement statement;
-        ResultSet rs;
-        try{
-            if(conn==null){
-                conn = Util.getConnection();
-            }
-            statement = conn.prepareStatement(injector.getSQLQuery());
-            rs = statement.executeQuery();
-            while(rs.next()){
-                Listing listing = new FixedPriceListingImpl();
-                listing.setDescription(rs.getString("description"));
-                listing.setTitle(rs.getString("title"));
+    @Override
+    public List<Listing> findMulti(FindConditionInjector injector, List<Object> queryParam) {
+        List<Listing> listingList = new ArrayList<>();
+        try {
+            ResultSet rs = getResultSet(injector, queryParam);
+            while(rs.next()) {
+                Listing listing = new Listing();
+                listing.setListingId(rs.getInt("listingId"));
+                listing.setGroupId(rs.getInt("groupId"));
                 listing.setType(ListingTypes.fromString(rs.getString("type")));
-                listing.setId(rs.getInt("id"));
-                listing.setCreatedById(rs.getInt("created_by_id"));
-                allListings.add(listing);
+                listing.setTitle(rs.getString("title"));
+                listing.setDescription(rs.getString("description"));
+                listing.setQuantity(rs.getInt("quantity"));
+                listing.setPrice(Money.of(rs.getBigDecimal("price"), Monetary.getCurrency("AUD")));
+                listing.setStartTime(rs.getObject("startTime", LocalDateTime.class));
+                listing.setEndTime(rs.getObject("endTime", LocalDateTime.class));
+                listingList.add(listing);
             }
         } catch (SQLException e) {
-            System.out.println(e);
+            return null;
         }
-        return allListings;
+        return listingList;
     }
+
+
 }

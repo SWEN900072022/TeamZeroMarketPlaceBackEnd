@@ -28,6 +28,7 @@ public final class Util {
         } catch(SQLException e) {
             try {
                 // This is for dev
+                System.out.println(getEnvValue("POSTGRES_URL"));
                 conn = DriverManager.getConnection(
                         getEnvValue("POSTGRES_URL"),
                         getEnvValue("POSTGRES_USER"),
