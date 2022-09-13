@@ -5,10 +5,7 @@ import Model.UserModel;
 import Util.JWTUtil;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -61,7 +58,7 @@ public class UserModelTest {
         assertNull(jwt);
     }
 
-    class MockUserMapper extends Mapper<User> {
+    class MockUserMapper implements Mapper<User> {
         private boolean isEmptyResult = false;
         public User result = new User();
 
@@ -94,6 +91,11 @@ public class UserModelTest {
         @Override
         public User find(FindConditionInjector injector, List<Object> queryParam) {
             return this.result;
+        }
+
+        @Override
+        public List<User> findMulti(FindConditionInjector injector, List<Object> queryParam) {
+            return null;
         }
     }
 }

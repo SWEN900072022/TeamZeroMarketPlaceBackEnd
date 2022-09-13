@@ -1,6 +1,6 @@
 package Injector;
 
-public class FindUserOrEmailInjector implements FindConditionInjector{
+public class FindUserOrEmailInjector extends GeneralFindConditionInjector{
 
     @Override
     public String getSQLQuery() {
