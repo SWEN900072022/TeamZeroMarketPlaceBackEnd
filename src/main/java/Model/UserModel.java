@@ -28,6 +28,11 @@ public class UserModel {
         gmRepo = new Repository<GroupMembership>(new GroupMembershipMapper());
     }
 
+    public UserModel(IUnitofWork<User> userRepo) {
+        this.userRepo = userRepo;
+        gmRepo = new Repository<GroupMembership>(new GroupMembershipMapper());
+    }
+
     public boolean register(User user) {
         // We are registering we want to make sure that it is not
         // a duplicate account
