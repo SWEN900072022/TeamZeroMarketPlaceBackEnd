@@ -15,8 +15,8 @@ public class FindAllInjector implements FindConditionInjector{
                 return getAllOrdersSQLQuery();
             case "listing":
                 return getAllListingSQLQuery();
-            case "fixed_price_listing":
-                return getAllFPListingSQLQuery();
+            case "orderitems":
+                return getAllOrderItemsSQLQuery();
         }
         return "";
     }
@@ -33,8 +33,8 @@ public class FindAllInjector implements FindConditionInjector{
         return "SELECT * FROM listing;";
     }
 
-    private String getAllFPListingSQLQuery() {
-        return "SELECT * FROM fixed_price_listing;";
+    private String getAllOrderItemsSQLQuery() {
+        return "SELECT * FROM orderitems";
     }
 }
 
