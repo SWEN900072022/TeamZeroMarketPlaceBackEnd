@@ -16,20 +16,20 @@ import java.util.Map;
 public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        String email = request.getParameter("email");
-//        String password = request.getParameter("password");
-//        String role = request.getParameter("role");
-//
-//        User user = new User(email, null, password, role);
-//        UserModel uModel = new UserModel();
-//        String jwt = uModel.login(user);
-//
-//        Map<String, String> result = new HashMap<>();
-//        result.put("jwt", jwt);
-//        Gson gson = new Gson();
-//        String json = gson.toJson(result);
-//
-//        PrintWriter out = response.getWriter();
-//        out.println(json);
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+        String role = request.getParameter("role");
+
+        User user = new User(email, null, password, role);
+        UserModel uModel = new UserModel();
+        String jwt = uModel.login(user);
+
+        Map<String, String> result = new HashMap<>();
+        result.put("jwt", jwt);
+        Gson gson = new Gson();
+        String json = gson.toJson(result);
+
+        PrintWriter out = response.getWriter();
+        out.println(json);
     }
 }

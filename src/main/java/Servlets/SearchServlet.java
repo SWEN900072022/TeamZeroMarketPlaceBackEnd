@@ -1,9 +1,12 @@
 package Servlets;
 
 import Entity.Listing;
+import JsonSerializer.MoneySerializer;
 import Model.ListingModel;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import org.javamoney.moneta.Money;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -20,7 +23,7 @@ public class SearchServlet extends HttpServlet {
         String filterList = request.getParameter("filter");
         String jwt = request.getHeader("jwt");
 
-        Type typeOfFilter = TypeToken.getParameterized(List.class, Filter.class).getType();
+        Type typeOfFilter = TypeToken.getParameterized(List.class, Entity.Filter.class).getType();
 
         Gson gson = new Gson();
         List<Entity.Filter> filterConditions = gson.fromJson(filterList, typeOfFilter);
@@ -28,6 +31,9 @@ public class SearchServlet extends HttpServlet {
         ListingModel lModel = new ListingModel();
         List<Listing> list = lModel.search(filterConditions, jwt);
 
+        GsonBuilder gb = new GsonBuilder();
+        gb.registerTypeAdapter(Money.class, new MoneySerializer());
+        gson = gb.create();
         String json = gson.toJson(list);
 
         PrintWriter out = response.getWriter();
