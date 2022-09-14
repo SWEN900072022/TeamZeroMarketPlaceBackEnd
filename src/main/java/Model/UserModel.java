@@ -1,11 +1,13 @@
 package Model;
 
+import Entity.GroupMembership;
 import Entity.User;
+import Enums.UserRoles;
 import Injector.FindAllInjector;
 import Injector.FindEmailAndPasswordInjector;
 import Injector.FindIdInjector;
 import Injector.FindUserOrEmailInjector;
-import Mapper.Mapper;
+import Mapper.GroupMembershipMapper;
 import Mapper.UserMapper;
 import UnitofWork.IUnitofWork;
 import UnitofWork.Repository;
@@ -14,17 +16,16 @@ import Util.JWTUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UserModel {
-    private IUnitofWork<User> repo;
+    private IUnitofWork<User> userRepo;
+    private IUnitofWork<GroupMembership> gmRepo;
 
     public UserModel() {
         // Create a mapper for the model to write data to
-        repo = new Repository<User>(new UserMapper());
-    }
-
-    public UserModel(Mapper<User> mapper) {
-        repo = new Repository<User>(mapper);
+        userRepo = new Repository<User>(new UserMapper());
+        gmRepo = new Repository<GroupMembership>(new GroupMembershipMapper());
     }
 
     public boolean register(User user) {
@@ -34,11 +35,11 @@ public class UserModel {
         param.add(user.getUsername());
         param.add(user.getEmail());
 
-        User user1 = repo.read(new FindUserOrEmailInjector(), param);
+        User user1 = userRepo.read(new FindUserOrEmailInjector(), param);
 
         if(user1.isEmpty()) {
-            repo.registerNew(user);
-            repo.commit();
+            userRepo.registerNew(user);
+            userRepo.commit();
             return true;
         }
         return false;
@@ -47,7 +48,7 @@ public class UserModel {
 
     public List<User> getAllUsers() {
         List<Object> param = new ArrayList<>();
-        List<User> userList = repo.readMulti(new FindAllInjector("users"), param);
+        List<User> userList = userRepo.readMulti(new FindAllInjector("users"), param);
         return userList;
     }
 
@@ -58,16 +59,26 @@ public class UserModel {
         param.add(user.getEmail());
         param.add(user.getPassword());
 
-        User user1 = repo.read(new FindEmailAndPasswordInjector(), param);
+        User user1 = userRepo.read(new FindEmailAndPasswordInjector(), param);
 
         if(user1.isEmpty()) {
             // User does not exist
             return null;
         }
 
+        Map<String, String> claims = new HashMap<>();
+        claims.put("role", user1.getRole());
+
+        // If the user is a seller, we include the seller group in the tokem
+        if(user1.getRole() == UserRoles.SELLER.toString()) {
+            param = new ArrayList<>();
+            param.add(user.getUserId());
+            GroupMembership gm =gmRepo.read(new FindIdInjector("groupmembership"), param);
+            claims.put("groupId", Integer.toString(gm.getGroupId()));
+        }
+
         // User exists here
         // Generate jwt token for upcoming sessions
-        return JWTUtil.generateToken(String.valueOf(user1.getUserId()), new HashMap<>());
-
+        return JWTUtil.generateToken(String.valueOf(user1.getUserId()), claims);
     }
 }
