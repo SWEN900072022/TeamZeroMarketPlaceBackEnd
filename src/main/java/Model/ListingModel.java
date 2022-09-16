@@ -2,6 +2,7 @@ package Model;
 
 import Entity.Filter;
 import Entity.Listing;
+import Injector.FindAllInjector;
 import Injector.FindConditionInjector;
 import Injector.FindGroupNameInListing;
 import Injector.FindTitleInjector;
@@ -51,14 +52,19 @@ public class ListingModel {
         try{
             if(!JWTUtil.validateToken(jwt)) {
                 // if not valid, return false
-                return null;
+                return new ArrayList<>();
             }
         } catch (Exception e) {
             // Something went wrong
-            return null;
+            return new ArrayList<>();
         }
 
         List<Listing> result = new ArrayList<>();
+
+        if(filterConditions == null || filterConditions.isEmpty() ) {
+            result = repo.readMulti(new FindAllInjector("listing"), new ArrayList<>());
+            return result;
+        }
 
         // Populate the custom findInjector
         for(Filter filter : filterConditions) {
