@@ -2,27 +2,41 @@ package Model;
 
 import Entity.Listing;
 import Entity.Order;
+import Entity.OrderItem;
 import Enums.ListingTypes;
+import Injector.FindAllInjector;
 import Mapper.ListingMapper;
+import Mapper.OrderItemMapper;
 import Mapper.OrderMapper;
 import UnitofWork.IUnitofWork;
 import UnitofWork.Repository;
 import Util.JWTUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class OrderModel {
     private IUnitofWork<Order> orderRepo;
     private IUnitofWork<Listing> listingRepo;
+    private IUnitofWork<OrderItem> orderItemRepo;
 
     public OrderModel() {
         orderRepo = new Repository<Order>(new OrderMapper());
         listingRepo = new Repository<Listing>(new ListingMapper());
+        orderItemRepo = new Repository<OrderItem>(new OrderItemMapper());
     }
 
     public OrderModel(IUnitofWork<Order> orderRepo, IUnitofWork<Listing> listingRepo) {
         this.orderRepo = orderRepo;
         this.listingRepo = listingRepo;
+        orderItemRepo = new Repository<OrderItem>(new OrderItemMapper());
+    }
+
+    public List<OrderItem> getAllOrderItem() {
+        List<Object> param = new ArrayList<>();
+        List<OrderItem> orderItemList = orderItemRepo.readMulti(new FindAllInjector("orderitems"), param);
+        return orderItemList;
     }
 
     public void createOrders() {
