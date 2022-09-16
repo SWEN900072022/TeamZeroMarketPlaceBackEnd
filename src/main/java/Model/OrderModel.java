@@ -27,6 +27,12 @@ public class OrderModel {
         orderItemRepo = new Repository<OrderItem>(new OrderItemMapper());
     }
 
+    public OrderModel(IUnitofWork<Order> orderRepo, IUnitofWork<Listing> listingRepo, IUnitofWork<OrderItem> orderItemRepo) {
+        this.orderRepo = orderRepo;
+        this.listingRepo = listingRepo;
+        this.orderItemRepo = orderItemRepo;
+    }
+
     public boolean createOrderItem(List<OrderItem> orderItemList,Order order, String jwt) {
         // Check to see if the jwt token is valid
         try {
@@ -44,7 +50,7 @@ public class OrderModel {
         for (OrderItem oi : orderItemList) {
             List<Object> param = new ArrayList<>();
             param.add(oi.getListingId());
-            Listing l = listingRepo.read(new FindIdInjector("listing"), param);
+            Listing l = listingRepo.read(new FindIdInjector("listing"), param, Integer.toString(oi.getListingId()));
             if(l == null) {
                 // The listing does not exist
                 return false;

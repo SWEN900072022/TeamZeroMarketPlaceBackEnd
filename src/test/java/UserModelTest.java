@@ -1,15 +1,10 @@
-import Entity.GroupMembership;
-import Entity.Listing;
 import Entity.User;
 import Enums.UserRoles;
-import Injector.FindConditionInjector;
+import MockClasses.MockGroupMembershipRepository;
+import MockClasses.MockUserRepository;
 import Model.UserModel;
-import UnitofWork.IUnitofWork;
 import Util.JWTUtil;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -102,134 +97,5 @@ public class UserModelTest {
         assertNotNull(JWTUtil.getClaim("role", jwt));
         assertEquals(user.getRole(), JWTUtil.getClaim("role", jwt));
         assertNotNull(JWTUtil.getClaim("groupId", jwt));
-    }
-
-    class MockUserRepository implements IUnitofWork<User> {
-        private User user;
-        public boolean isSeller = false;
-        public boolean isNull = false;
-
-        public MockUserRepository() {
-            this.user = new User();
-            user.setEmail("a");
-            user.setPassword("a");
-            user.setUsername("a");
-            user.setRoles(UserRoles.CUSTOMER.toString());
-            user.setUserId(1);
-        }
-
-        @Override
-        public User read(FindConditionInjector injector, List<Object> param, String key) {
-            return null;
-        }
-
-        @Override
-        public List<User> readMulti(FindConditionInjector injector, List<Object> param, String key) {
-            return null;
-        }
-
-        @Override
-        public User read(FindConditionInjector injector, List<Object> param) {
-//            if(!checkInjectorString(injector)) {
-//                // Incorrect SQL query
-//                return null;
-//            }
-
-            if(isSeller) {
-                this.user.setRole(UserRoles.SELLER);
-            }
-
-            if(isNull) {
-                return null;
-            }
-
-            return this.user;
-        }
-
-        @Override
-        public List<User> readMulti(FindConditionInjector injector, List<Object> param) {
-            return null;
-        }
-
-        @Override
-        public void registerNew(User entity) {
-
-        }
-
-        @Override
-        public void registerModified(User entity) {
-
-        }
-
-        @Override
-        public void registerDeleted(User entity) {
-
-        }
-
-        @Override
-        public void commit() {
-
-        }
-
-        private boolean checkInjectorString(FindConditionInjector injector) {
-            if(Objects.equals(injector.toString(), "SELECT * FROM users where email=? and password=?;")) {
-                // This is should be the string for finding duplicate emails
-                return true;
-            }
-
-            if(Objects.equals(injector.toString(), "SELECT * FROM groupmembership where userid=?;")) {
-                return true;
-            }
-            return false;
-        }
-    }
-
-    class MockGroupMembershipRepository implements IUnitofWork<GroupMembership> {
-        public GroupMembership gm;
-        public MockGroupMembershipRepository() {
-            gm = new GroupMembership();
-            gm.setGroupId(1);
-            gm.setUserId(1);
-        }
-
-        @Override
-        public GroupMembership read(FindConditionInjector injector, List<Object> param, String key) {
-            return null;
-        }
-
-        @Override
-        public List<GroupMembership> readMulti(FindConditionInjector injector, List<Object> param, String key) {
-            return null;
-        }
-
-        @Override
-        public GroupMembership read(FindConditionInjector injector, List<Object> param) {
-            return gm;
-        }
-
-        @Override
-        public List<GroupMembership> readMulti(FindConditionInjector injector, List<Object> param) {
-            return null;
-        }
-
-        @Override
-        public void registerNew(GroupMembership entity) {
-
-        }
-
-        @Override
-        public void registerModified(GroupMembership entity) {
-
-        }
-
-        @Override
-        public void registerDeleted(GroupMembership entity) {
-
-        }
-
-        @Override
-        public void commit() {
-
-        }
     }
 }
