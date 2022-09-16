@@ -75,4 +75,23 @@ public final class JWTUtil {
 
         return sub;
     }
+
+    public static String getClaim(String claim, String jwt) {
+        String secret = getEnvValue("JWT_SECRET");
+        String sub;
+
+        try {
+            sub = Jwts.parserBuilder()
+                    .setSigningKey(
+                            Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8))
+                    )
+                    .build()
+                    .parseClaimsJws(jwt)
+                    .getBody()
+                    .get(claim, String.class);
+        } catch (JwtException e) {
+            return "";
+        }
+        return sub;
+    }
 }

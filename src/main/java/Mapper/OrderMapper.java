@@ -1,8 +1,7 @@
 package Mapper;
 
 import Entity.Order;
-import Entity.User;
-import Injector.FindConditionInjector;
+import Injector.IInjector;
 import Util.Util;
 
 import java.sql.*;
@@ -35,11 +34,6 @@ public class OrderMapper extends GeneralMapper<Order> {
     }
 
     @Override
-    public boolean delete(Order TEntity) {
-        return false;
-    }
-
-    @Override
     public boolean modify(Order order) {
         if (conn == null) {
             conn = Util.getConnection();
@@ -65,7 +59,7 @@ public class OrderMapper extends GeneralMapper<Order> {
         return true;
     }
 
-    public Order find(FindConditionInjector injector, List<Object> queryParam) {
+    public Order find(IInjector injector, List<Object> queryParam) {
         Order order = new Order();
         try {
             ResultSet rs = getResultSet(injector, queryParam);
@@ -81,7 +75,7 @@ public class OrderMapper extends GeneralMapper<Order> {
     }
 
     @Override
-    public List<Order> findMulti(FindConditionInjector injector, List<Object> queryParam) {
+    public List<Order> findMulti(IInjector injector, List<Object> queryParam) {
         List<Order> orderList = new ArrayList<>();
         try {
             ResultSet rs = getResultSet(injector, queryParam);

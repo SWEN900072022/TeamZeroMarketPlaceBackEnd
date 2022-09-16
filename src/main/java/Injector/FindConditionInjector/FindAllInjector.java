@@ -1,6 +1,8 @@
-package Injector;
+package Injector.FindConditionInjector;
 
-public class FindAllInjector implements FindConditionInjector{
+import Injector.IInjector;
+
+public class FindAllInjector implements IInjector {
     private String tableName;
     public FindAllInjector(String tableName) {
         this.tableName = tableName;

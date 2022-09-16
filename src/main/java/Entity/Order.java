@@ -3,7 +3,7 @@ package Entity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Order {
+public class Order extends EntityObject{
     private int orderId;
     private int userId;
     private String address;

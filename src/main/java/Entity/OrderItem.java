@@ -2,7 +2,7 @@ package Entity;
 
 import org.javamoney.moneta.Money;
 
-public class OrderItem {
+public class OrderItem extends EntityObject{
     private int orderId;
     private int listingId;
     private int quantity;

@@ -1,10 +1,9 @@
 package Model;
 
 import Entity.User;
-import Injector.FindAllInjector;
-import Injector.FindEmailAndPasswordInjector;
-import Injector.FindIdInjector;
-import Injector.FindUserOrEmailInjector;
+import Injector.FindConditionInjector.FindAllInjector;
+import Injector.FindConditionInjector.FindEmailAndPasswordInjector;
+import Injector.FindConditionInjector.FindUserOrEmailInjector;
 import Mapper.Mapper;
 import Mapper.UserMapper;
 import UnitofWork.IUnitofWork;

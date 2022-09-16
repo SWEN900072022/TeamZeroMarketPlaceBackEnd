@@ -1,5 +1,5 @@
 import Entity.User;
-import Injector.FindConditionInjector;
+import Injector.IInjector;
 import Mapper.Mapper;
 import Model.UserModel;
 import Util.JWTUtil;
@@ -91,12 +91,12 @@ public class UserModelTest {
         }
 
         @Override
-        public User find(FindConditionInjector injector, List<Object> queryParam) {
+        public User find(IInjector injector, List<Object> queryParam) {
             return this.result;
         }
 
         @Override
-        public List<User> findMulti(FindConditionInjector injector, List<Object> queryParam) {
+        public List<User> findMulti(IInjector injector, List<Object> queryParam) {
             return null;
         }
     }

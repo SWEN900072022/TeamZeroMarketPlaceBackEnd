@@ -2,14 +2,18 @@ package Model;
 
 import Entity.Listing;
 import Entity.Order;
-import Enums.ListingTypes;
+import Enums.UserRoles;
+import Injector.DeleteConditionInjector.DeleteIdInjector;
+import Injector.FindConditionInjector.FindIdInjector;
+import Injector.FindConditionInjector.FindOrderWIthGroupId;
 import Mapper.ListingMapper;
 import Mapper.OrderMapper;
 import UnitofWork.IUnitofWork;
 import UnitofWork.Repository;
 import Util.JWTUtil;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OrderModel {
     private IUnitofWork<Order> orderRepo;
@@ -27,6 +31,93 @@ public class OrderModel {
 
     public void createOrders() {
 
+    }
+
+    public boolean cancelOrders(List<Order> ordersToBeDeletedList, String jwt) {
+        // Check token, verify that the user can delete the order, delete order
+        String role;
+        try {
+            if (!JWTUtil.validateToken(jwt)) {
+                // if not valid, return false
+                return false;
+            }
+            role = JWTUtil.getClaim("role", jwt);
+        } catch (Exception e) {
+            // Something went wrong
+            return false;
+        }
+
+        // Users and sellers can only cancel orders that they control admin can remove any
+        if (role == null || role == "") {
+            return false;
+        }
+
+        if (role == UserRoles.CUSTOMER.toString()) {
+            // Check to see if the user own the order
+            for (Order o : ordersToBeDeletedList) {
+                List<Object> param = new ArrayList<>();
+                param.add(o.getOrderId());
+
+                Order o1 = orderRepo.read(
+                        new FindIdInjector("orders"),
+                        param,
+                        Integer.toString(o.getOrderId())
+                );
+
+                if (o.getUserId() != Integer.parseInt(JWTUtil.getSubject(jwt))) {
+                    return false;
+                } else {
+                    // Register the order to be changed
+                    param = new ArrayList<>();
+                    param.add(o.getOrderId());
+
+                    o.setInjector(new DeleteIdInjector("orders"));
+                    o.setParam(param);
+                    orderRepo.registerDeleted(o);
+                    // This should remove the ones n orderitems as well since they are foreign keys
+                }
+            }
+        } else if (role == UserRoles.SELLER.toString()) {
+            // Check to see if the seller owns the order
+            for (Order o : ordersToBeDeletedList) {
+                List<Object> param = new ArrayList<>();
+                param.add(o.getOrderId());
+
+                Listing l = listingRepo.read(
+                        new FindOrderWIthGroupId(),
+                        param,
+                        Integer.toString(o.getOrderId())
+                );
+
+                if (l.getGroupId() != Integer.parseInt(JWTUtil.getClaim("groupId", jwt))) {
+                    return false;
+                } else {
+                    // Register the order to be changed
+                    param = new ArrayList<>();
+                    param.add(o.getOrderId());
+
+                    o.setInjector(new DeleteIdInjector("orders"));
+                    o.setParam(param);
+                    orderRepo.registerDeleted(o);
+                    // This should remove the ones n orderitems as well since they are foreign keys
+                }
+
+            }
+        } else if (role == UserRoles.ADMIN.toString()) {
+            // Admin can just remove any listing
+            for (Order o : ordersToBeDeletedList) {
+                List<Object> param = new ArrayList<>();
+                param.add(o.getOrderId());
+
+                o.setInjector(new DeleteIdInjector("orders"));
+                o.setParam(param);
+                orderRepo.registerDeleted(o);
+            }
+        } else {
+            // Unknown role
+            return false;
+        }
+        return true;
     }
 
 //    public boolean createOrders(Integer[] listingId, Integer[] quantity, String jwt) {

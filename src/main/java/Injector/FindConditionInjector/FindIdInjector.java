@@ -1,4 +1,4 @@
-package Injector;
+package Injector.FindConditionInjector;
 
 public class FindIdInjector extends GeneralFindConditionInjector {
     private String tableName;
@@ -13,7 +13,7 @@ public class FindIdInjector extends GeneralFindConditionInjector {
                 return getUserSQLQuery();
             case "orders":
                 return getOrdersSQLQuery();
-            case "listing":
+            case "listings":
                 return getListingSQLQuery();
             case "fixed_price_listing":
                 return getFPListingSQLQuery();
@@ -26,7 +26,7 @@ public class FindIdInjector extends GeneralFindConditionInjector {
     }
 
     private String getOrdersSQLQuery() {
-        return "SELECT * FROM orders where id=?;";
+        return "SELECT * FROM orders where orderid=?;";
     }
 
     private String getListingSQLQuery() {
