@@ -16,7 +16,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Type;
 import java.util.List;
 
-@WebServlet(name = "SearchServlet", value = "/user/search")
+@WebServlet(name = "SearchServlet", value = "/search")
 public class SearchServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
