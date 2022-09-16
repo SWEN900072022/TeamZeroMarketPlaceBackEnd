@@ -33,7 +33,18 @@ public class UserModel {
         gmRepo = new Repository<GroupMembership>(new GroupMembershipMapper());
     }
 
+    public UserModel(IUnitofWork<User> userRepo, IUnitofWork<GroupMembership> gmRepo) {
+        this.userRepo = userRepo;
+        this.gmRepo = gmRepo;
+    }
+
+
     public boolean register(User user) {
+        // We need to ensure that the user object is not null, if it is return null
+        if(user.isEmpty()) {
+            return false;
+        }
+
         // We are registering we want to make sure that it is not
         // a duplicate account
         List<Object> param = new ArrayList<>();
@@ -42,7 +53,7 @@ public class UserModel {
 
         User user1 = userRepo.read(new FindUserOrEmailInjector(), param);
 
-        if(user1.isEmpty()) {
+        if(!user1.isEmpty()) {
             userRepo.registerNew(user);
             userRepo.commit();
             return true;
@@ -59,16 +70,19 @@ public class UserModel {
 
     public String login(User user) {
         // Validate to see whether the user is an actual user
-
         List<Object> param = new ArrayList<>();
         param.add(user.getEmail());
         param.add(user.getPassword());
 
         User user1 = userRepo.read(new FindEmailAndPasswordInjector(), param);
 
+        if(user1 == null) {
+            return "";
+        }
+
         if(user1.isEmpty()) {
             // User does not exist
-            return null;
+            return "";
         }
 
         Map<String, String> claims = new HashMap<>();
