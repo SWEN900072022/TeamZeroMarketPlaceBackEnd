@@ -53,7 +53,7 @@ public class UserModel {
 
         User user1 = userRepo.read(new FindUserOrEmailInjector(), param);
 
-        if(!user1.isEmpty()) {
+        if(user1.isEmpty()) {
             userRepo.registerNew(user);
             userRepo.commit();
             return true;
