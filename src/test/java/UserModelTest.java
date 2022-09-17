@@ -27,6 +27,7 @@ public class UserModelTest {
      * not null
      */
     public void idealUserRegistration() {
+        this.uRepo.isNoneUser = true;
         User user = new User();
         user.setUsername("abc");
         user.setEmail("abc");

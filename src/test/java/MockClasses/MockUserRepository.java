@@ -12,6 +12,7 @@ public class MockUserRepository implements IUnitofWork<User> {
     private User user;
     public boolean isSeller = false;
     public boolean isNull = false;
+    public boolean isNoneUser = false;
 
     public MockUserRepository() {
         this.user = new User();
@@ -45,6 +46,10 @@ public class MockUserRepository implements IUnitofWork<User> {
 
         if(isNull) {
             return null;
+        }
+
+        if(isNoneUser) {
+            return new User();
         }
 
         return this.user;
