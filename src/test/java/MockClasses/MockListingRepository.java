@@ -6,6 +6,7 @@ import Injector.FindConditionInjector.FindTitleInjector;
 import Injector.IInjector;
 import UnitofWork.IUnitofWork;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +15,7 @@ public class MockListingRepository implements IUnitofWork<Listing> {
     public boolean isNull = false;
     public boolean commitException = false;
     public boolean isGroup = false;
+    public boolean isBidEnd = false;
     private List<Listing>listingList = new ArrayList<>();
 
     public MockListingRepository() {
@@ -22,6 +24,8 @@ public class MockListingRepository implements IUnitofWork<Listing> {
         listing.setQuantity(10);
         listing.setTitle("a");
         listing.setGroupId(1);
+        listing.setStartTime(LocalDateTime.now().minusHours(2));
+        listing.setEndTime(LocalDateTime.now().plusHours(2));
 
         Listing listing1 = new Listing();
         listing1.setTitle("b");
@@ -46,6 +50,11 @@ public class MockListingRepository implements IUnitofWork<Listing> {
             return new Listing();
         }
 
+        if(isBidEnd) {
+            listing.setEndTime(LocalDateTime.now().minusHours(1));
+            return listing;
+        }
+
         return listing;
     }
 
@@ -62,6 +71,11 @@ public class MockListingRepository implements IUnitofWork<Listing> {
 
         if(!isGroup) {
             return new Listing();
+        }
+
+        if(isBidEnd) {
+            listing.setEndTime(LocalDateTime.now().minusHours(1));
+            return listing;
         }
 
         return listing;
@@ -111,3 +125,4 @@ public class MockListingRepository implements IUnitofWork<Listing> {
     public void commit() {
     }
 }
+
