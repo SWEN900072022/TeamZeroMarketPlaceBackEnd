@@ -52,9 +52,14 @@ public class OrderModel {
             return false;
         }
 
-        if (role == UserRoles.CUSTOMER.toString()) {
+        if (role.equals(UserRoles.CUSTOMER.toString())) {
             // Check to see if the user own the order
             for (Order o : ordersToBeDeletedList) {
+                // If the order is null or empty, we skip it
+                if(o == null || o.isEmpty()) {
+                    continue; // Move on to the next one
+                }
+
                 List<Object> param = new ArrayList<>();
                 param.add(o.getOrderId());
 
@@ -77,9 +82,14 @@ public class OrderModel {
                     // This should remove the ones n orderitems as well since they are foreign keys
                 }
             }
-        } else if (role == UserRoles.SELLER.toString()) {
+        } else if (role.equals(UserRoles.SELLER.toString())) {
             // Check to see if the seller owns the order
             for (Order o : ordersToBeDeletedList) {
+                // If the order is null or empty, we skip it
+                if(o == null || o.isEmpty()) {
+                    continue; // Move on to the next one
+                }
+
                 List<Object> param = new ArrayList<>();
                 param.add(o.getOrderId());
 
@@ -103,9 +113,14 @@ public class OrderModel {
                 }
 
             }
-        } else if (role == UserRoles.ADMIN.toString()) {
+        } else if (role.equals(UserRoles.ADMIN.toString())) {
             // Admin can just remove any listing
             for (Order o : ordersToBeDeletedList) {
+                // If the order is null or empty, we skip it
+                if(o == null || o.isEmpty()) {
+                    continue; // Move on to the next one
+                }
+
                 List<Object> param = new ArrayList<>();
                 param.add(o.getOrderId());
 
