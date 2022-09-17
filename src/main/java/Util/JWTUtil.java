@@ -83,7 +83,7 @@ public final class JWTUtil {
         try {
             sub = Jwts.parserBuilder()
                     .setSigningKey(
-                        Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8))
+                            Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8))
                     )
                     .build()
                     .parseClaimsJws(jwt)
