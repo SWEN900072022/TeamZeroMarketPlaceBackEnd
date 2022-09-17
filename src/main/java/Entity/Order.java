@@ -2,8 +2,9 @@ package Entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class Order {
+public class Order extends EntityObject{
     private int orderId;
     private int userId;
     private String address;
@@ -42,5 +43,12 @@ public class Order {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public boolean isEmpty() {
+        if(orderId == 0) {
+            return true;
+        }
+        return false;
     }
 }

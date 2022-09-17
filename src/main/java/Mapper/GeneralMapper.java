@@ -1,6 +1,8 @@
 package Mapper;
 
-import Injector.FindConditionInjector;
+import Entity.Bid;
+import Entity.EntityObject;
+import Injector.IInjector;
 import Util.Util;
 
 import java.math.BigDecimal;
@@ -13,7 +15,7 @@ import java.util.List;
 public abstract class GeneralMapper<T> implements Mapper<T> {
     protected Connection conn = null;
 
-    public ResultSet getResultSet(FindConditionInjector injector, List<Object> queryParam) throws SQLException {
+    public ResultSet getResultSet(IInjector injector, List<Object> queryParam) throws SQLException {
         PreparedStatement statement;
 
         if(conn == null) {
@@ -35,5 +37,21 @@ public abstract class GeneralMapper<T> implements Mapper<T> {
         }
         statement.execute();
         return statement.getResultSet();
+    }
+
+    public boolean delete(T TEntity) {
+        EntityObject TEntityObject;
+        if(TEntity instanceof EntityObject) {
+            TEntityObject = (EntityObject) TEntity;
+        } else {
+            return false;
+        }
+
+        try {
+            getResultSet(TEntityObject.getInjector(), TEntityObject.getParam());
+        } catch(SQLException e) {
+            return false;
+        }
+        return true;
     }
 }

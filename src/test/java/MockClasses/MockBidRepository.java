@@ -1,7 +1,7 @@
 package MockClasses;
 
 import Entity.Bid;
-import Injector.FindConditionInjector;
+import Injector.IInjector;
 import UnitofWork.IUnitofWork;
 import org.javamoney.moneta.Money;
 
@@ -18,7 +18,7 @@ public class MockBidRepository implements IUnitofWork<Bid> {
     }
 
     @Override
-    public Bid read(FindConditionInjector injector, List<Object> param, String key) {
+    public Bid read(IInjector injector, List<Object> param, String key) {
         if(isLowBid) {
             bid.setBidAmount(Money.of(1.00, Monetary.getCurrency("AUD")));
         }
@@ -26,12 +26,12 @@ public class MockBidRepository implements IUnitofWork<Bid> {
     }
 
     @Override
-    public List<Bid> readMulti(FindConditionInjector injector, List<Object> param, String key) {
+    public List<Bid> readMulti(IInjector injector, List<Object> param, String key) {
         return null;
     }
 
     @Override
-    public Bid read(FindConditionInjector injector, List<Object> param) {
+    public Bid read(IInjector injector, List<Object> param) {
         if(isLowBid) {
             bid.setBidAmount(Money.of(1.00, Monetary.getCurrency("AUD")));
         }
@@ -39,7 +39,7 @@ public class MockBidRepository implements IUnitofWork<Bid> {
     }
 
     @Override
-    public List<Bid> readMulti(FindConditionInjector injector, List<Object> param) {
+    public List<Bid> readMulti(IInjector injector, List<Object> param) {
         return null;
     }
 

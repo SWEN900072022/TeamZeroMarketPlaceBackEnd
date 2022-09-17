@@ -1,7 +1,7 @@
 package Mapper;
 
 import Entity.User;
-import Injector.FindConditionInjector;
+import Injector.IInjector;
 import Util.Util;
 
 import java.sql.*;
@@ -46,10 +46,6 @@ public class UserMapper extends GeneralMapper<User> {
         return user;
     }
 
-    public boolean delete(User user) {
-        return false;
-    }
-
     public boolean modify(User user) {
         try {
             PreparedStatement statement;
@@ -81,7 +77,7 @@ public class UserMapper extends GeneralMapper<User> {
         return true;
     }
 
-    public User find(FindConditionInjector injector, List<Object> queryParam) {
+    public User find(IInjector injector, List<Object> queryParam) {
         User user = new User();
         try {
             ResultSet rs = getResultSet(injector, queryParam);
@@ -99,7 +95,7 @@ public class UserMapper extends GeneralMapper<User> {
     }
 
     @Override
-    public List<User> findMulti(FindConditionInjector injector, List<Object> queryParam) {
+    public List<User> findMulti(IInjector injector, List<Object> queryParam) {
         List<User> userList = new ArrayList<User>();
         try {
             ResultSet rs = getResultSet(injector, queryParam);

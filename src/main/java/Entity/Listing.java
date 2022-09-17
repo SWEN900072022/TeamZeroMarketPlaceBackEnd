@@ -1,7 +1,6 @@
 package Entity;
 
 import Enums.ListingTypes;
-import Injector.FindIdInjector;
 import Mapper.Mapper;
 import Mapper.ListingMapper;
 import org.javamoney.moneta.Money;
@@ -10,8 +9,9 @@ import javax.money.Monetary;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class Listing {
+public class Listing extends EntityObject{
     private int listingId;
     private int groupId;
     private ListingTypes type;
@@ -32,6 +32,35 @@ public class Listing {
         this.price = Money.of(0, Monetary.getCurrency("AUD"));
         this.startTime = null;
         this.endTime = null;
+    }
+
+    public boolean isEmptyFixedPrice() {
+        if(
+            this.groupId == 0 ||
+            this.type == null ||
+            this.title == "" ||
+            this.description == "" ||
+            this.quantity < 0 ||
+            this.price.isEqualTo(Money.of(0, Monetary.getCurrency("AUD")))
+        ) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isEmptyAuction() {
+        if(
+            this.groupId == 0 ||
+            this.type == null ||
+            this.title == "" ||
+            this.description == "" ||
+            this.quantity < 0 ||
+            this.startTime == null ||
+            this.endTime == null
+        ) {
+            return false;
+        }
+        return true;
     }
 
     public Listing(int listingId, int groupId, ListingTypes type, String title, String description, int quantity, Money price, LocalDateTime startTime, LocalDateTime endTime) {
@@ -126,18 +155,16 @@ public class Listing {
         this.endTime = endTime;
     }
 
-    public void load() {
-        // Lazy Initialisation
-        // Create a mapper and load the values into the object
-        Mapper<Listing> mapper = new ListingMapper();
-        List<Object> param = new ArrayList<>();
-        param.add(listingId);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Listing listing = (Listing) o;
+        return getListingId() == listing.getListingId() && getGroupId() == listing.getGroupId() && getQuantity() == listing.getQuantity() && getType() == listing.getType() && Objects.equals(getTitle(), listing.getTitle()) && Objects.equals(getDescription(), listing.getDescription()) && Objects.equals(getPrice(), listing.getPrice()) && Objects.equals(getStartTime(), listing.getStartTime()) && Objects.equals(getEndTime(), listing.getEndTime());
+    }
 
-        Listing listing = mapper.find(new FindIdInjector("listings"), param);
-
-        this.price = listing.getPrice();
-        this.quantity = listing.getQuantity();
-        this.startTime = listing.getStartTime();
-        this.endTime = listing.getEndTime();
+    @Override
+    public int hashCode() {
+        return Objects.hash(getListingId(), getGroupId(), getType(), getTitle(), getDescription(), getQuantity(), getPrice(), getStartTime(), getEndTime());
     }
 }

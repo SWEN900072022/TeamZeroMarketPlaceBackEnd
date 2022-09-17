@@ -1,7 +1,7 @@
 package Mapper;
 
 import Entity.Bid;
-import Injector.FindConditionInjector;
+import Injector.IInjector;
 import Util.Util;
 import org.javamoney.moneta.Money;
 
@@ -43,11 +43,6 @@ public class BidMapper extends GeneralMapper<Bid>{
     }
 
     @Override
-    public boolean delete(Bid TEntity) {
-        return false;
-    }
-
-    @Override
     public boolean modify(Bid TEntity) {
         try {
             if(conn == null) {
@@ -74,7 +69,7 @@ public class BidMapper extends GeneralMapper<Bid>{
     }
 
     @Override
-    public Bid find(FindConditionInjector injector, List<Object> queryParam) {
+    public Bid find(IInjector injector, List<Object> queryParam) {
         Bid bid = new Bid();
         try {
             ResultSet rs = getResultSet(injector, queryParam);
@@ -90,7 +85,7 @@ public class BidMapper extends GeneralMapper<Bid>{
     }
 
     @Override
-    public List<Bid> findMulti(FindConditionInjector injector, List<Object> queryParam) {
+    public List<Bid> findMulti(IInjector injector, List<Object> queryParam) {
         List<Bid> bidList = new ArrayList<>();
         try {
             ResultSet rs = getResultSet(injector, queryParam);

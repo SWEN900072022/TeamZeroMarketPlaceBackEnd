@@ -1,6 +1,6 @@
 package Entity;
 
-public class GroupMembership {
+public class GroupMembership extends EntityObject{
     private int groupId;
     private int userId;
 

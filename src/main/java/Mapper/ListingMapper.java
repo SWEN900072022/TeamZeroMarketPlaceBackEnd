@@ -1,9 +1,8 @@
 package Mapper;
 
 import Entity.Listing;
-import Entity.Order;
 import Enums.ListingTypes;
-import Injector.FindConditionInjector;
+import Injector.IInjector;
 import Util.Util;
 import org.javamoney.moneta.Money;
 
@@ -68,10 +67,6 @@ public class ListingMapper extends GeneralMapper<Listing> {
         return listing;
     }
 
-    public boolean delete(Listing listingList) {
-        return true;
-    }
-
     public boolean modify(Listing listing) {
         try {
             if(conn == null) {
@@ -109,7 +104,7 @@ public class ListingMapper extends GeneralMapper<Listing> {
         return true;
     }
 
-    public Listing find(FindConditionInjector injector, List<Object> queryParam) {
+    public Listing find(IInjector injector, List<Object> queryParam) {
         Listing listing = new Listing();
         try {
             ResultSet rs = getResultSet(injector, queryParam);
@@ -131,7 +126,7 @@ public class ListingMapper extends GeneralMapper<Listing> {
     }
 
     @Override
-    public List<Listing> findMulti(FindConditionInjector injector, List<Object> queryParam) {
+    public List<Listing> findMulti(IInjector injector, List<Object> queryParam) {
         List<Listing> listingList = new ArrayList<>();
         try {
             ResultSet rs = getResultSet(injector, queryParam);

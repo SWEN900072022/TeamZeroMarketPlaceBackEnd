@@ -3,7 +3,7 @@ package Model;
 import Entity.Bid;
 import Entity.Listing;
 import Injector.FindBidFromListing;
-import Injector.FindIdInjector;
+import Injector.FindConditionInjector.FindIdInjector;
 import Mapper.BidMapper;
 import Mapper.ListingMapper;
 import UnitofWork.IUnitofWork;

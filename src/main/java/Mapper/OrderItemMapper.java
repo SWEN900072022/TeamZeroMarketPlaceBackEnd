@@ -1,7 +1,7 @@
 package Mapper;
 
 import Entity.OrderItem;
-import Injector.FindConditionInjector;
+import Injector.IInjector;
 import Util.Util;
 import org.javamoney.moneta.Money;
 
@@ -45,11 +45,6 @@ public class OrderItemMapper extends GeneralMapper<OrderItem> {
     }
 
     @Override
-    public boolean delete(OrderItem TEntity) {
-        return false;
-    }
-
-    @Override
     public boolean modify(OrderItem TEntity) {
         try {
             if(conn == null) {
@@ -79,7 +74,7 @@ public class OrderItemMapper extends GeneralMapper<OrderItem> {
     }
 
     @Override
-    public OrderItem find(FindConditionInjector injector, List<Object> queryParam) {
+    public OrderItem find(IInjector injector, List<Object> queryParam) {
         OrderItem oi = new OrderItem();
         try {
             ResultSet rs = getResultSet(injector, queryParam);
@@ -96,7 +91,7 @@ public class OrderItemMapper extends GeneralMapper<OrderItem> {
     }
 
     @Override
-    public List<OrderItem> findMulti(FindConditionInjector injector, List<Object> queryParam) {
+    public List<OrderItem> findMulti(IInjector injector, List<Object> queryParam) {
         List<OrderItem> oiList = new ArrayList<>();
         try {
             ResultSet rs = getResultSet(injector, queryParam);

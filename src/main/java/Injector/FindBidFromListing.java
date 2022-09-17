@@ -1,6 +1,6 @@
 package Injector;
 
-public class FindBidFromListing implements FindConditionInjector{
+public class FindBidFromListing implements IInjector{
     @Override
     public String getSQLQuery() {
         return "SELECT * " +
