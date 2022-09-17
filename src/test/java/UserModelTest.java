@@ -1,103 +1,101 @@
 import Entity.User;
-import Injector.FindConditionInjector;
-import Mapper.Mapper;
+import Enums.UserRoles;
+import MockClasses.MockGroupMembershipRepository;
+import MockClasses.MockUserRepository;
 import Model.UserModel;
 import Util.JWTUtil;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserModelTest {
-    private MockUserMapper mapper;
-    private UserModel userModel;
-
+    /**
+     * Initialise the repositories needed for the test
+     */
+    private UserModel uModel;
+    private MockUserRepository uRepo;
+    private MockGroupMembershipRepository gmRepo;
     public UserModelTest() {
-        mapper = new MockUserMapper();
-        userModel = new UserModel(mapper);
+        this.uRepo = new MockUserRepository();
+        this.gmRepo = new MockGroupMembershipRepository();
+        this.uModel = new UserModel(uRepo, gmRepo);
     }
 
     @Test
-    public void successfulRegistration() {
-        // Set uMapper to return false (i.e. no duplicate names)
-        mapper.setEmptyResult(true);
-        boolean isSuccessful = userModel.register(new User());
+    /**
+     * This is for the ideal case where all the fields of the user object is
+     * not null
+     */
+    public void idealUserRegistration() {
+        User user = new User();
+        user.setUsername("abc");
+        user.setEmail("abc");
+        user.setPassword("abc");
+
+        boolean isSuccessful = uModel.register(user); // Register the user
         assertTrue(isSuccessful);
     }
 
     @Test
-    public void failedRegistration() {
-        // Exhibits the behaviour when there are duplicate names
-        mapper.setEmptyResult(false);
-        boolean isSuccessful = userModel.register(new User());
+    public void userIsEmptyRegistration() {
+        User user = new User(); // The user is not set by the frontend
+
+        boolean isSuccessful = uModel.register(user);
         assertFalse(isSuccessful);
     }
 
     @Test
-    public void successfulLogin() {
-        mapper.setEmptyResult(false);
+    /**
+     * This is for the ideal login situation where the user object is correctly set
+     */
+    public void idealUserLogin() {
         User user = new User();
         user.setEmail("a");
-        String jwt = userModel.login(user);
+        user.setPassword("a");
+        user.setUsername("a");
+        user.setRoles(UserRoles.CUSTOMER.toString());
+        user.setUserId(1);
+
+        String jwt = uModel.login(user);
         assertNotNull(jwt);
 
-        // Make sure that the jwt token is valid
-        try {
-            boolean isValid = JWTUtil.validateToken(jwt);
-            assertTrue(isValid);
-        } catch(Exception ex) {
-
-        }
+        // This should be a user token
+        assertNotNull(JWTUtil.getSubject(jwt));
+        assertEquals(Integer.toString(user.getUserId()), JWTUtil.getSubject(jwt));
+        assertNotNull(JWTUtil.getClaim("role", jwt));
+        assertEquals(user.getRole(), JWTUtil.getClaim("role", jwt));
+        assertNull(JWTUtil.getClaim("groupId", jwt));
     }
 
     @Test
-    public void failedLogin() {
-        mapper.setEmptyResult(true);
-        String jwt = userModel.login(new User());
-        assertNull(jwt);
+    public void failedNullLogin() {
+        User user = new User();
+
+        this.uRepo.isNull = true;
+
+        String jwt = uModel.login(user);
+        assertEquals("", jwt);
     }
 
-    class MockUserMapper implements Mapper<User> {
-        private boolean isEmptyResult = false;
-        public User result = new User();
-        List <User> allUsers= new ArrayList<User>();
+    @Test
+    public void idealSellerLogin() {
+        User user = new User();
+        user.setEmail("a");
+        user.setPassword("ab");
+        user.setUsername("a");
+        user.setRoles(UserRoles.SELLER.toString());
+        user.setUserId(1);
 
-        public void setEmptyResult(boolean emptyResult) {
-            this.isEmptyResult = emptyResult;
-            if(emptyResult) {
-                result = new User();
-            } else {
-                result.setEmail("a");
-                result.setPassword("a");
-                result.setUsername("a");
-            }
-        }
+        this.uRepo.isSeller = true;
 
-        @Override
-        public boolean insert(User TEntity) {
-            return this.isEmptyResult;
-        }
+        String jwt = uModel.login(user);
+        assertNotNull(jwt);
 
-        @Override
-        public boolean delete(User TEntity) {
-            return false;
-        }
-
-        @Override
-        public boolean modify(User TEntity) {
-            return false;
-        }
-
-        @Override
-        public User find(FindConditionInjector injector, List<Object> queryParam) {
-            return this.result;
-        }
-
-        @Override
-        public List<User> findMulti(FindConditionInjector injector, List<Object> queryParam) {
-            return null;
-        }
+        // This should be a seller token now
+        assertNotNull(JWTUtil.getSubject(jwt));
+        assertEquals(Integer.toString(user.getUserId()), JWTUtil.getSubject(jwt));
+        assertNotNull(JWTUtil.getClaim("role", jwt));
+        assertEquals(user.getRole(), JWTUtil.getClaim("role", jwt));
+        assertNotNull(JWTUtil.getClaim("groupId", jwt));
     }
 }
