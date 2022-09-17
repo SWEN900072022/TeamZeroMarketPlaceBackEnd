@@ -1,7 +1,7 @@
 package Mapper;
 
 import Entity.ShoppingCartItem;
-import Injector.FindConditionInjector;
+import Injector.IInjector;
 import Util.Util;
 
 import java.sql.PreparedStatement;
@@ -38,11 +38,6 @@ public class ShoppingCartItemsMapper extends GeneralMapper<ShoppingCartItem> {
     }
 
     @Override
-    public boolean delete(ShoppingCartItem TEntity) {
-        return false;
-    }
-
-    @Override
     public boolean modify(ShoppingCartItem TEntity) {
         try {
             if(conn == null) {
@@ -68,7 +63,7 @@ public class ShoppingCartItemsMapper extends GeneralMapper<ShoppingCartItem> {
     }
 
     @Override
-    public ShoppingCartItem find(FindConditionInjector injector, List<Object> queryParam) {
+    public ShoppingCartItem find(IInjector injector, List<Object> queryParam) {
         ShoppingCartItem sci = new ShoppingCartItem();
         try {
             ResultSet rs = getResultSet(injector, queryParam);
@@ -83,7 +78,7 @@ public class ShoppingCartItemsMapper extends GeneralMapper<ShoppingCartItem> {
     }
 
     @Override
-    public List<ShoppingCartItem> findMulti(FindConditionInjector injector, List<Object> queryParam) {
+    public List<ShoppingCartItem> findMulti(IInjector injector, List<Object> queryParam) {
         List<ShoppingCartItem> sciList = new ArrayList<>();
         try {
             ResultSet rs = getResultSet(injector, queryParam);

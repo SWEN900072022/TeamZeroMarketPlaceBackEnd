@@ -5,7 +5,7 @@ import org.javamoney.moneta.Money;
 import javax.money.Monetary;
 import java.math.BigDecimal;
 
-public class Bid {
+public class Bid extends EntityObject{
     private int listingId;
     private int userId;
     private Money bidAmount;

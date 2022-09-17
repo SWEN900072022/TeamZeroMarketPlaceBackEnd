@@ -22,17 +22,17 @@ public class RegisterUserServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         String role = request.getParameter("role");
-//
-//        User user = new User(email, username, password, role);
-//        UserModel uModel = new UserModel();
-//        boolean hasRegistered = uModel.register(user);
-//
-//        Map<String, Boolean>result = new HashMap<>();
-//        result.put("result", hasRegistered);
-//        Gson gson = new Gson();
-//        String json = gson.toJson(result);
-//
-//        PrintWriter out = response.getWriter();
-//        out.println(json);
+
+        User user = new User(email, username, password, role);
+        UserModel uModel = new UserModel();
+        boolean hasRegistered = uModel.register(user);
+
+        Map<String, Boolean>result = new HashMap<>();
+        result.put("result", hasRegistered);
+        Gson gson = new Gson();
+        String json = gson.toJson(result);
+
+        PrintWriter out = response.getWriter();
+        out.println(json);
     }
 }

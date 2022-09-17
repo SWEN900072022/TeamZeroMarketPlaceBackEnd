@@ -1,7 +1,7 @@
 package Mapper;
 
 import Entity.SellerGroup;
-import Injector.FindConditionInjector;
+import Injector.IInjector;
 import Util.Util;
 
 import java.sql.PreparedStatement;
@@ -58,11 +58,6 @@ public class SellerGroupMapper extends GeneralMapper<SellerGroup> {
     }
 
     @Override
-    public boolean delete(SellerGroup TEntity) {
-        return false;
-    }
-
-    @Override
     public boolean modify(SellerGroup TEntity) {
         try {
             if(conn == null) {
@@ -88,7 +83,7 @@ public class SellerGroupMapper extends GeneralMapper<SellerGroup> {
     }
 
     @Override
-    public SellerGroup find(FindConditionInjector injector, List<Object> queryParam) {
+    public SellerGroup find(IInjector injector, List<Object> queryParam) {
         SellerGroup sg = new SellerGroup();
         try {
             ResultSet rs = getResultSet(injector, queryParam);
@@ -103,7 +98,7 @@ public class SellerGroupMapper extends GeneralMapper<SellerGroup> {
     }
 
     @Override
-    public List<SellerGroup> findMulti(FindConditionInjector injector, List<Object> queryParam) {
+    public List<SellerGroup> findMulti(IInjector injector, List<Object> queryParam) {
         List<SellerGroup> sgList = new ArrayList<>();
         try {
             ResultSet rs = getResultSet(injector, queryParam);

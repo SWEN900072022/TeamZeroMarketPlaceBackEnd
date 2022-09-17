@@ -17,7 +17,6 @@ public class GetAllUsersServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-//        UserMapper userMapper = new UserMapper();
         UserModel uModel = new UserModel();
         List<User> list;
         list = uModel.getAllUsers();

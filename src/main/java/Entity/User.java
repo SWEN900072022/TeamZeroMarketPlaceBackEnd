@@ -2,7 +2,7 @@ package Entity;
 
 import Enums.UserRoles;
 
-public class User{
+public class User extends EntityObject{
     private String email;
     private String username;
     private String password;
@@ -45,6 +45,9 @@ public class User{
     }
 
     public String getRole() { return this.role.toString(); }
+    public UserRoles getRoleEnum() {
+        return this.role;
+    }
 
     public void setUsername(String username) {
         this.username = username;
