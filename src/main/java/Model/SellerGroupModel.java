@@ -18,6 +18,10 @@ public class SellerGroupModel {
         sellerGroupRepo = new Repository<SellerGroup>(new SellerGroupMapper());
     }
 
+    public SellerGroupModel(IUnitofWork<SellerGroup> sellerGroupRepo) {
+        this.sellerGroupRepo = sellerGroupRepo;
+    }
+
     public boolean createSellerGroup(SellerGroup sg, String jwt) {
         // Get the role from the jwt
         String role;
@@ -34,7 +38,7 @@ public class SellerGroupModel {
         }
 
         // Check to see if the role is empty or null or not admin
-        if(role == null || role == "" || role != UserRoles.ADMIN.toString()) {
+        if(role == null || role.equals("") || !role.equals(UserRoles.ADMIN.toString())) {
             return false;
         }
 
