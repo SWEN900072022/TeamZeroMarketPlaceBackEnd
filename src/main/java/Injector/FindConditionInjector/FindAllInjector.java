@@ -23,6 +23,10 @@ public class FindAllInjector implements IInjector {
         return "";
     }
 
+    private String getAllOrderItemsSQLQuery() {
+        return "SELECT * FROM orderitems;";
+    }
+
     private String getAllUserSQLQuery() {
         return "SELECT * FROM users;";
     }
@@ -33,10 +37,6 @@ public class FindAllInjector implements IInjector {
 
     private String getAllListingSQLQuery() {
         return "SELECT * FROM listing;";
-    }
-
-    private String getAllOrderItemsSQLQuery() {
-        return "SELECT * FROM orderitems";
     }
 }
 

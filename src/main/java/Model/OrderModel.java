@@ -3,6 +3,8 @@ package Model;
 import Entity.Listing;
 import Entity.Order;
 import Entity.OrderItem;
+import Enums.ListingTypes;
+import Entity.OrderItem;
 import Entity.User;
 import Enums.UserRoles;
 import Injector.DeleteConditionInjector.DeleteIdInjector;
@@ -21,11 +23,12 @@ import Util.JWTUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class OrderModel {
     private IUnitofWork<Order> orderRepo;
-    private IUnitofWork<OrderItem> orderItemRepo;
     private IUnitofWork<Listing> listingRepo;
+    private IUnitofWork<OrderItem> orderItemRepo;
     private IUnitofWork<User> userRepo;
 
     public OrderModel() {
@@ -40,6 +43,12 @@ public class OrderModel {
         this.listingRepo = listingRepo;
         this.userRepo = userRepo;
         this.orderItemRepo = orderItemRepo;
+    }
+
+    public List<OrderItem> getAllOrderItem() {
+        List<Object> param = new ArrayList<>();
+        List<OrderItem> orderItemList = orderItemRepo.readMulti(new FindAllInjector("orderitems"), param);
+        return orderItemList;
     }
 
     public boolean createOrderItem(List<OrderItem> orderItemList, Order order, String jwt) {
