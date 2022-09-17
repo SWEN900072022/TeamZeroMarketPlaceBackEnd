@@ -91,8 +91,8 @@ public class UserModel {
         // If the user is a seller, we include the seller group in the tokem
         if(user1.getRole() == UserRoles.SELLER.toString()) {
             param = new ArrayList<>();
-            param.add(user.getUserId());
-            GroupMembership gm =gmRepo.read(new FindIdInjector("groupmembership"), param);
+            param.add(user1.getUserId());
+            GroupMembership gm = gmRepo.read(new FindIdInjector("groupmembership"), param);
             claims.put("groupId", Integer.toString(gm.getGroupId()));
         }
 
