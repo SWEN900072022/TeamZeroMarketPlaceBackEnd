@@ -1,6 +1,8 @@
 package Injector.FindConditionInjector;
 
-public class FindIdInjector extends GeneralFindConditionInjector {
+import Injector.IInjector;
+
+public class FindIdInjector implements IInjector {
     private String tableName;
     public FindIdInjector(String tableName) {
         this.tableName = tableName;
@@ -15,8 +17,8 @@ public class FindIdInjector extends GeneralFindConditionInjector {
                 return getOrdersSQLQuery();
             case "listings":
                 return getListingSQLQuery();
-            case "fixed_price_listing":
-                return getFPListingSQLQuery();
+            case "groupmembership":
+                return getGroupMembershipQuery();
         }
         return "";
     }
@@ -26,14 +28,14 @@ public class FindIdInjector extends GeneralFindConditionInjector {
     }
 
     private String getOrdersSQLQuery() {
-        return "SELECT * FROM orders where orderid=?;";
+        return "SELECT * FROM orders where orderId=?;";
+    }
+
+    private String getGroupMembershipQuery() {
+        return "SELECT * FROM groupmembership where userid=?;";
     }
 
     private String getListingSQLQuery() {
-        return "SELECT * FROM listing where id=?;";
-    }
-
-    private String getFPListingSQLQuery() {
-        return "SELECT * FROM fixed_price_listing where id=?;";
+        return "SELECT * FROM listing where listingId=?;";
     }
 }
