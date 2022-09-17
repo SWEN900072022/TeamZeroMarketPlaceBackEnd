@@ -12,13 +12,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ListingModelTest {
-    private MockListingRepository listingRepository;
+    private MockListingRepository mockListingRepository;
     private ListingModel listingModel;
     private String jwt;
 
     public ListingModelTest() {
-        listingRepository = new MockListingRepository();
-        listingModel = new ListingModel(listingRepository);
+        this.mockListingRepository = new MockListingRepository();
+        listingModel = new ListingModel(mockListingRepository);
         jwt = JWTUtil.generateToken("1", new HashMap<>());
     }
 
@@ -59,6 +59,12 @@ public class ListingModelTest {
     }
 
     @Test
+    public void InvalidJWTWhenCreatingListing() {
+        boolean isSuccessful = listingModel.createListing(new Listing(), "");
+        assertFalse(isSuccessful);
+    }
+
+    @Test
     /**
      * Test for the behaviour when an incorrect JWT Token is supplied
      */
@@ -86,5 +92,12 @@ public class ListingModelTest {
     public void searchWithNoFilterCondition() {
         List<Listing> list = listingModel.search(new ArrayList<>(), jwt);
         assertEquals(3, list.size());
+    }
+
+    @Test
+    public void IdealListingCreation() {
+        Listing listing = new Listing();
+        boolean isSuccessful = listingModel.createListing(listing, jwt);
+        assertTrue(isSuccessful);
     }
 }

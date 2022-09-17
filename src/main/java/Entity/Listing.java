@@ -35,6 +35,35 @@ public class Listing {
         this.endTime = null;
     }
 
+    public boolean isEmptyFixedPrice() {
+        if(
+            this.groupId == 0 ||
+            this.type == null ||
+            this.title == "" ||
+            this.description == "" ||
+            this.quantity < 0 ||
+            this.price.isEqualTo(Money.of(0, Monetary.getCurrency("AUD")))
+        ) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isEmptyAuction() {
+        if(
+            this.groupId == 0 ||
+            this.type == null ||
+            this.title == "" ||
+            this.description == "" ||
+            this.quantity < 0 ||
+            this.startTime == null ||
+            this.endTime == null
+        ) {
+            return false;
+        }
+        return true;
+    }
+
     public Listing(int listingId, int groupId, ListingTypes type, String title, String description, int quantity, Money price, LocalDateTime startTime, LocalDateTime endTime) {
         this.listingId = listingId;
         this.groupId = groupId;

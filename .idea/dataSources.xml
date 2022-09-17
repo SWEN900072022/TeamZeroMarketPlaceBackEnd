@@ -8,14 +8,14 @@
       <jdbc-url>jdbc:postgresql://localhost:5432/teamzero</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="marketPlaceDB@localhost" uuid="8d196b00-992b-4db5-a9fc-05d2c321e3cc">
+    <data-source source="LOCAL" name="marketPlaceDB@localhost" uuid="efa77c22-eefa-40fe-8b69-eb1fbc60b425">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://localhost:5432/marketPlaceDB</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="postgres@localhost" uuid="6168a21d-7065-4dfe-83c7-1255c6a143b4">
+    <data-source source="LOCAL" name="postgres@localhost" uuid="f377bbd2-e6bd-40c9-b95b-3cbfab792d42">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
