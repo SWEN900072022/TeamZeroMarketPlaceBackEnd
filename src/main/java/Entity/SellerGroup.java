@@ -12,6 +12,11 @@ public class SellerGroup extends EntityObject{
         this.groupName = groupName;
     }
 
+    public SellerGroup(String groupName) {
+        this.groupName = groupName;
+        this.groupId = 0;
+    }
+
     public int getGroupId() {
         return groupId;
     }
@@ -26,5 +31,12 @@ public class SellerGroup extends EntityObject{
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public boolean isEmpty() {
+        if(groupId == 0) {
+            return true;
+        }
+        return false;
     }
 }

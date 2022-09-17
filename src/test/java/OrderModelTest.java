@@ -1,3 +1,12 @@
+import Entity.Listing;
+import Entity.Order;
+import Entity.OrderItem;
+import MockClasses.MockListingRepository;
+import MockClasses.MockOrderItemRepository;
+import MockClasses.MockOrderRepository;
+import MockClasses.MockUserRepository;
+import Model.OrderModel;
+import UnitofWork.IUnitofWork;
 import Entity.Order;
 import Enums.UserRoles;
 import MockClasses.MockListingRepository;
@@ -18,11 +27,32 @@ public class OrderModelTest {
     private MockOrderRepository orderRepo;
     private MockListingRepository listingRepo;
     private OrderModel orderModel;
+    private MockOrderItemRepository orderItemRepo;
+    private MockUserRepository userRepo;
+    private String jwt;
+    private Order order;
+    private List<OrderItem> orderItemList;
 
     public OrderModelTest() {
         this.orderRepo = new MockOrderRepository();
         this.listingRepo = new MockListingRepository();
-        this.orderModel = new OrderModel(orderRepo, listingRepo);
+        this.orderItemRepo = new MockOrderItemRepository();
+        this.userRepo = new MockUserRepository();
+        this.orderModel = new OrderModel(orderRepo, listingRepo, orderItemRepo, userRepo);
+
+        // Generate a valid jwt for testing
+        jwt = JWTUtil.generateToken("1", new HashMap<>());
+
+        order = new Order();
+    }
+
+    @Test
+    /**
+     * Create order test
+     */
+    public void invalidJWTTokenDuringOrderCreation() {
+        boolean isSuccessful = orderModel.createOrderItem(new ArrayList<>(),new Order(), "");
+        assertFalse(isSuccessful);
     }
 
     @Test
@@ -124,6 +154,40 @@ public class OrderModelTest {
     }
 
     @Test
+    public void listingDoesNotExist() {
+        listingRepo.isNull = true;
+        orderItemList = new ArrayList<>();
+        OrderItem oi = new OrderItem();
+        oi.setQuantity(20);
+        orderItemList.add(oi);
+        boolean isSuccessful = orderModel.createOrderItem(orderItemList, new Order(), jwt);
+        assertFalse(isSuccessful);
+    }
+
+    @Test
+    public void inSufficientToSatisfyOrder() {
+        orderItemList = new ArrayList<>();
+        OrderItem oi = new OrderItem();
+        oi.setQuantity(20);
+        orderItemList.add(oi);
+
+        boolean isSuccessful = orderModel.createOrderItem(orderItemList, order, jwt);
+        assertFalse(isSuccessful);
+    }
+
+    @Test
+    public void correctDetailsForOneOrderItem() {
+        this.listingRepo.isGroup = true;
+        orderItemList = new ArrayList<>();
+        OrderItem oi = new OrderItem();
+        oi.setQuantity(1);
+        orderItemList.add(oi);
+
+        boolean isSuccessful = orderModel.createOrderItem(orderItemList, order, jwt);
+        assertTrue(isSuccessful);
+    }
+
+    @Test
     public void cancelOrderAdminCancelOrder() {
         Map<String, String> claimMap = new HashMap<>();
         claimMap.put("role", UserRoles.ADMIN.toString());
@@ -136,6 +200,20 @@ public class OrderModelTest {
         orderList.add(order);
 
         boolean isSuccessful = orderModel.cancelOrders(orderList, jwt);
+        assertTrue(isSuccessful);
+    }
+
+    @Test
+    public void correctDetailsForANumberOfOrderItems() {
+        this.listingRepo.isGroup = true;
+        orderItemList = new ArrayList<>();
+        OrderItem oi = new OrderItem();
+        oi.setQuantity(1);
+        OrderItem oi2 = new OrderItem();
+        oi.setQuantity(2);
+        orderItemList.add(oi);
+
+        boolean isSuccessful = orderModel.createOrderItem(orderItemList, order, jwt);
         assertTrue(isSuccessful);
     }
 

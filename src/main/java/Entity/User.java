@@ -45,6 +45,9 @@ public class User extends EntityObject{
     }
 
     public String getRole() { return this.role.toString(); }
+    public UserRoles getRoleEnum() {
+        return this.role;
+    }
 
     public void setUsername(String username) {
         this.username = username;
