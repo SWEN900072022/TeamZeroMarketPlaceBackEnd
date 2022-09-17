@@ -1,8 +1,11 @@
 package Servlets;
 
 import Entity.OrderItem;
+import JsonSerializer.MoneySerializer;
 import Model.OrderModel;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.javamoney.moneta.Money;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -18,7 +21,9 @@ public class GetAllPurchasesServlet extends HttpServlet {
         OrderModel om = new OrderModel();
         List<OrderItem> list = om.getAllOrderItem();
 
-        Gson gson = new Gson();
+        GsonBuilder gb = new GsonBuilder();
+        gb.registerTypeAdapter(Money.class, new MoneySerializer());
+        Gson gson = gb.create();
         String json = gson.toJson(list);
 
         PrintWriter out = response.getWriter();

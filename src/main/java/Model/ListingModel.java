@@ -4,6 +4,7 @@ import Entity.Filter;
 import Entity.Listing;
 import Injector.FindConditionInjector.FindAllInjector;
 import Injector.FindConditionInjector.FindGroupNameInListing;
+import Injector.FindConditionInjector.FindListingWithGroupIdInjector;
 import Injector.FindConditionInjector.FindTitleInjector;
 import Injector.IInjector;
 import Mapper.ListingMapper;
@@ -93,8 +94,8 @@ public class ListingModel {
         switch(key) {
             case "title":
                 return new FindTitleInjector();
-            case "groupName":
-                return new FindGroupNameInListing();
+            case "groupId":
+                return new FindListingWithGroupIdInjector();
         }
         return null;
     }

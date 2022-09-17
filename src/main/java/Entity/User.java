@@ -70,6 +70,9 @@ public class User extends EntityObject{
             case "seller":
                 this.role = UserRoles.SELLER;
                 break;
+            case "admin":
+                this.role = UserRoles.ADMIN;
+                break;
             case "customer":
             default:
                 this.role = UserRoles.CUSTOMER;
