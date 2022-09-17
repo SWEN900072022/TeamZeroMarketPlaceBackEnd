@@ -24,7 +24,17 @@ public class BidModel {
         bidRepo = new Repository<Bid>(new BidMapper());
     }
 
+    public BidModel(IUnitofWork<Listing> listingRepo, IUnitofWork<Bid> bidRepo) {
+        this.listingRepo = listingRepo;
+        this.bidRepo = bidRepo;
+    }
+
     public boolean createBid(Bid bid, String jwt) {
+        // Check if the bid is null or empty
+        if(bid == null || bid.isEmpty()) {
+            return false;
+        }
+
         // Validate jwt token, check the details of the listing, submit the bid
         // Check to see if the jwt token is valid
         try{
@@ -45,9 +55,7 @@ public class BidModel {
         param.add(bid.getListingId());
 
         Listing bidListing = listingRepo.read(new FindIdInjector("listings"), param);
-        if(Duration.between(bidListing.getStartTime(), LocalDateTime.now()).getSeconds()
-                > Duration.between(bidListing.getStartTime(), bidListing.getEndTime()).getSeconds()
-        ) {
+        if(bidListing.getEndTime().isBefore(LocalDateTime.now())) {
             // The deadline has passed, so we return false
             return false;
         }

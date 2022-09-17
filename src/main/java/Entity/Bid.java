@@ -45,4 +45,15 @@ public class Bid {
     public void setBidAmount(Money bidAmount) {
         this.bidAmount = bidAmount;
     }
+
+    public boolean isEmpty() {
+        // For bids, we need all three fields to be populated
+        if(this.bidAmount == Money.of(0, Monetary.getCurrency("AUD")) ||
+            this.listingId == 0 ||
+            this.userId == 0
+        ) {
+            return true;
+        }
+        return false;
+    }
 }
