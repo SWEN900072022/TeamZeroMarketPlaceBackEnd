@@ -1,7 +1,7 @@
 package MockClasses;
 
 import Entity.GroupMembership;
-import Injector.FindConditionInjector;
+import Injector.IInjector;
 import UnitofWork.IUnitofWork;
 
 import java.util.List;
@@ -15,22 +15,22 @@ public class MockGroupMembershipRepository implements IUnitofWork<GroupMembershi
     }
 
     @Override
-    public GroupMembership read(FindConditionInjector injector, List<Object> param, String key) {
+    public GroupMembership read(IInjector injector, List<Object> param, String key) {
         return null;
     }
 
     @Override
-    public List<GroupMembership> readMulti(FindConditionInjector injector, List<Object> param, String key) {
+    public List<GroupMembership> readMulti(IInjector injector, List<Object> param, String key) {
         return null;
     }
 
     @Override
-    public GroupMembership read(FindConditionInjector injector, List<Object> param) {
+    public GroupMembership read(IInjector injector, List<Object> param) {
         return gm;
     }
 
     @Override
-    public List<GroupMembership> readMulti(FindConditionInjector injector, List<Object> param) {
+    public List<GroupMembership> readMulti(IInjector injector, List<Object> param) {
         return null;
     }
 

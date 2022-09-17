@@ -2,7 +2,7 @@ package Entity;
 
 import Enums.UserRoles;
 
-public class User{
+public class User extends EntityObject{
     private String email;
     private String username;
     private String password;

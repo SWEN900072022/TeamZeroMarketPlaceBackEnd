@@ -1,6 +1,6 @@
 package Entity;
 
-public class ShoppingCartItem {
+public class ShoppingCartItem extends EntityObject{
     private int userId;
     private int listingId;
 

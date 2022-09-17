@@ -1,9 +1,9 @@
 package MockClasses;
 
 import Entity.Listing;
-import Injector.FindConditionInjector;
-import Injector.FindGroupNameInListing;
-import Injector.FindTitleInjector;
+import Injector.FindConditionInjector.FindGroupNameInListing;
+import Injector.FindConditionInjector.FindTitleInjector;
+import Injector.IInjector;
 import UnitofWork.IUnitofWork;
 
 import java.util.ArrayList;
@@ -13,6 +13,7 @@ public class MockListingRepository implements IUnitofWork<Listing> {
     private Listing listing = new Listing();
     public boolean isNull = false;
     public boolean commitException = false;
+    public boolean isGroup = false;
     private List<Listing>listingList = new ArrayList<>();
 
     public MockListingRepository() {
@@ -36,30 +37,38 @@ public class MockListingRepository implements IUnitofWork<Listing> {
     }
 
     @Override
-    public Listing read(FindConditionInjector injector, List<Object> param, String key) {
+    public Listing read(IInjector injector, List<Object> param, String key) {
         if(isNull) {
             return null;
+        }
+
+        if(!isGroup) {
+            return new Listing();
         }
 
         return listing;
     }
 
     @Override
-    public List<Listing> readMulti(FindConditionInjector injector, List<Object> param, String key) {
+    public List<Listing> readMulti(IInjector injector, List<Object> param, String key) {
         return null;
     }
 
     @Override
-    public Listing read(FindConditionInjector injector, List<Object> param) {
+    public Listing read(IInjector injector, List<Object> param) {
         if(isNull) {
             return null;
+        }
+
+        if(!isGroup) {
+            return new Listing();
         }
 
         return listing;
     }
 
     @Override
-    public List<Listing> readMulti(FindConditionInjector injector, List<Object> param) {
+    public List<Listing> readMulti(IInjector injector, List<Object> param) {
         if(param.size() == 0) {
             return this.listingList;
         }

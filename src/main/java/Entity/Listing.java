@@ -1,7 +1,6 @@
 package Entity;
 
 import Enums.ListingTypes;
-import Injector.FindIdInjector;
 import Mapper.Mapper;
 import Mapper.ListingMapper;
 import org.javamoney.moneta.Money;
@@ -12,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Listing {
+public class Listing extends EntityObject{
     private int listingId;
     private int groupId;
     private ListingTypes type;
@@ -154,21 +153,6 @@ public class Listing {
 
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
-    }
-
-    public void load() {
-        // Lazy Initialisation
-        // Create a mapper and load the values into the object
-        Mapper<Listing> mapper = new ListingMapper();
-        List<Object> param = new ArrayList<>();
-        param.add(listingId);
-
-        Listing listing = mapper.find(new FindIdInjector("listings"), param);
-
-        this.price = listing.getPrice();
-        this.quantity = listing.getQuantity();
-        this.startTime = listing.getStartTime();
-        this.endTime = listing.getEndTime();
     }
 
     @Override

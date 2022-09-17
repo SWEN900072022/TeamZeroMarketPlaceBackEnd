@@ -2,7 +2,7 @@ package MockClasses;
 
 import Entity.User;
 import Enums.UserRoles;
-import Injector.FindConditionInjector;
+import Injector.IInjector;
 import UnitofWork.IUnitofWork;
 
 import java.util.List;
@@ -23,17 +23,17 @@ public class MockUserRepository implements IUnitofWork<User> {
     }
 
     @Override
-    public User read(FindConditionInjector injector, List<Object> param, String key) {
+    public User read(IInjector injector, List<Object> param, String key) {
         return null;
     }
 
     @Override
-    public List<User> readMulti(FindConditionInjector injector, List<Object> param, String key) {
+    public List<User> readMulti(IInjector injector, List<Object> param, String key) {
         return null;
     }
 
     @Override
-    public User read(FindConditionInjector injector, List<Object> param) {
+    public User read(IInjector injector, List<Object> param) {
 //            if(!checkInjectorString(injector)) {
 //                // Incorrect SQL query
 //                return null;
@@ -51,7 +51,7 @@ public class MockUserRepository implements IUnitofWork<User> {
     }
 
     @Override
-    public List<User> readMulti(FindConditionInjector injector, List<Object> param) {
+    public List<User> readMulti(IInjector injector, List<Object> param) {
         return null;
     }
 
@@ -75,7 +75,7 @@ public class MockUserRepository implements IUnitofWork<User> {
 
     }
 
-    private boolean checkInjectorString(FindConditionInjector injector) {
+    private boolean checkInjectorString(IInjector injector) {
         if(Objects.equals(injector.toString(), "SELECT * FROM users where email=? and password=?;")) {
             // This is should be the string for finding duplicate emails
             return true;

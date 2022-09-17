@@ -2,10 +2,10 @@ package Model;
 
 import Entity.Filter;
 import Entity.Listing;
-import Injector.FindAllInjector;
-import Injector.FindConditionInjector;
-import Injector.FindGroupNameInListing;
-import Injector.FindTitleInjector;
+import Injector.FindConditionInjector.FindAllInjector;
+import Injector.FindConditionInjector.FindGroupNameInListing;
+import Injector.FindConditionInjector.FindTitleInjector;
+import Injector.IInjector;
 import Mapper.ListingMapper;
 import UnitofWork.IUnitofWork;
 import UnitofWork.Repository;
@@ -68,7 +68,7 @@ public class ListingModel {
 
         // Populate the custom findInjector
         for(Filter filter : filterConditions) {
-            FindConditionInjector inj = getInjector(filter.getFilterKey());
+            IInjector inj = getInjector(filter.getFilterKey());
 
             List<Object> param = new ArrayList<>();
             param.add(filter.getFilterVal());
@@ -89,7 +89,7 @@ public class ListingModel {
         return result;
     }
 
-    private FindConditionInjector getInjector(String key) {
+    private IInjector getInjector(String key) {
         switch(key) {
             case "title":
                 return new FindTitleInjector();

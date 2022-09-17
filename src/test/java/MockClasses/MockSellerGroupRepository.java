@@ -1,7 +1,7 @@
 package MockClasses;
 
 import Entity.SellerGroup;
-import Injector.FindConditionInjector;
+import Injector.IInjector;
 import UnitofWork.IUnitofWork;
 
 import java.util.List;
@@ -17,17 +17,17 @@ public class MockSellerGroupRepository implements IUnitofWork<SellerGroup> {
     }
 
     @Override
-    public SellerGroup read(FindConditionInjector injector, List<Object> param, String key) {
+    public SellerGroup read(IInjector injector, List<Object> param, String key) {
         return null;
     }
 
     @Override
-    public List<SellerGroup> readMulti(FindConditionInjector injector, List<Object> param, String key) {
+    public List<SellerGroup> readMulti(IInjector injector, List<Object> param, String key) {
         return null;
     }
 
     @Override
-    public SellerGroup read(FindConditionInjector injector, List<Object> param) {
+    public SellerGroup read(IInjector injector, List<Object> param) {
         if(isEmpty) {
             return new SellerGroup();
         } else {
@@ -36,7 +36,7 @@ public class MockSellerGroupRepository implements IUnitofWork<SellerGroup> {
     }
 
     @Override
-    public List<SellerGroup> readMulti(FindConditionInjector injector, List<Object> param) {
+    public List<SellerGroup> readMulti(IInjector injector, List<Object> param) {
         return null;
     }
 

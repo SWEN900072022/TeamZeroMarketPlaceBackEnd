@@ -1,7 +1,7 @@
 package Mapper;
 
 import Entity.GroupMembership;
-import Injector.FindConditionInjector;
+import Injector.IInjector;
 import Util.Util;
 
 import java.sql.PreparedStatement;
@@ -40,11 +40,6 @@ public class GroupMembershipMapper extends GeneralMapper<GroupMembership> {
     }
 
     @Override
-    public boolean delete(GroupMembership TEntity) {
-        return false;
-    }
-
-    @Override
     public boolean modify(GroupMembership TEntity) {
         try {
             if(conn == null) {
@@ -70,7 +65,7 @@ public class GroupMembershipMapper extends GeneralMapper<GroupMembership> {
     }
 
     @Override
-    public GroupMembership find(FindConditionInjector injector, List<Object> queryParam) {
+    public GroupMembership find(IInjector injector, List<Object> queryParam) {
         GroupMembership gm = new GroupMembership();
         try {
             ResultSet rs = getResultSet(injector, queryParam);
@@ -85,7 +80,7 @@ public class GroupMembershipMapper extends GeneralMapper<GroupMembership> {
     }
 
     @Override
-    public List<GroupMembership> findMulti(FindConditionInjector injector, List<Object> queryParam) {
+    public List<GroupMembership> findMulti(IInjector injector, List<Object> queryParam) {
         List<GroupMembership> gmList = new ArrayList<>();
         try {
             ResultSet rs = getResultSet(injector, queryParam);

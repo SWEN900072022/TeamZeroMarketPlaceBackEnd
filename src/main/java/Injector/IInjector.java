@@ -1,5 +1,5 @@
 package Injector;
 
-public interface FindConditionInjector {
+public interface IInjector {
     public String getSQLQuery();
 }

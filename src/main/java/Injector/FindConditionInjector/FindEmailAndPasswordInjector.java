@@ -1,4 +1,4 @@
-package Injector;
+package Injector.FindConditionInjector;
 
 public class FindEmailAndPasswordInjector extends GeneralFindConditionInjector{
     @Override

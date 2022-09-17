@@ -4,14 +4,13 @@ import Entity.Listing;
 import Entity.Order;
 import Entity.OrderItem;
 import Entity.User;
-import Entity.OrderItem;
-import Enums.ListingTypes;
 import Enums.UserRoles;
-import Injector.FindAllInjector;
-import Injector.FindIdInjector;
-import Injector.FindOrderForSellerGroupInjector;
-import Injector.FindOrderFromUserInjector;
-import Injector.FindIdInjector;
+import Injector.DeleteConditionInjector.DeleteIdInjector;
+import Injector.FindConditionInjector.FindAllInjector;
+import Injector.FindConditionInjector.FindOrderWIthGroupId;
+import Injector.FindConditionInjector.FindIdInjector;
+import Injector.FindConditionInjector.FindOrderForSellerGroupInjector;
+import Injector.FindConditionInjector.FindOrderFromUserInjector;
 import Mapper.ListingMapper;
 import Mapper.OrderItemMapper;
 import Mapper.OrderMapper;
@@ -22,7 +21,6 @@ import Util.JWTUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class OrderModel {
     private IUnitofWork<Order> orderRepo;
@@ -127,5 +125,107 @@ public class OrderModel {
             result = orderItemRepo.readMulti(new FindAllInjector("orderitems"), new ArrayList<>());
         }
         return result;
+    }
+
+    public boolean cancelOrders(List<Order> ordersToBeDeletedList, String jwt) {
+        // Check token, verify that the user can delete the order, delete order
+        String role;
+        try {
+            if (!JWTUtil.validateToken(jwt)) {
+                // if not valid, return false
+                return false;
+            }
+            role = JWTUtil.getClaim("role", jwt);
+        } catch (Exception e) {
+            // Something went wrong
+            return false;
+        }
+
+        // Users and sellers can only cancel orders that they control admin can remove any
+        if (role == null || role == "") {
+            return false;
+        }
+
+        if (role.equals(UserRoles.CUSTOMER.toString())) {
+            // Check to see if the user own the order
+            for (Order o : ordersToBeDeletedList) {
+                // If the order is null or empty, we skip it
+                if(o == null || o.isEmpty()) {
+                    continue; // Move on to the next one
+                }
+
+                List<Object> param = new ArrayList<>();
+                param.add(o.getOrderId());
+
+                Order o1 = orderRepo.read(
+                        new FindIdInjector("orders"),
+                        param,
+                        Integer.toString(o.getOrderId())
+                );
+
+                if (o.getUserId() != Integer.parseInt(JWTUtil.getSubject(jwt))) {
+                    return false;
+                } else {
+                    // Register the order to be changed
+                    param = new ArrayList<>();
+                    param.add(o.getOrderId());
+
+                    o.setInjector(new DeleteIdInjector("orders"));
+                    o.setParam(param);
+                    orderRepo.registerDeleted(o);
+                    // This should remove the ones n orderitems as well since they are foreign keys
+                }
+            }
+        } else if (role.equals(UserRoles.SELLER.toString())) {
+            // Check to see if the seller owns the order
+            for (Order o : ordersToBeDeletedList) {
+                // If the order is null or empty, we skip it
+                if(o == null || o.isEmpty()) {
+                    continue; // Move on to the next one
+                }
+
+                List<Object> param = new ArrayList<>();
+                param.add(o.getOrderId());
+
+                Listing l = listingRepo.read(
+                        new FindOrderWIthGroupId(),
+                        param,
+                        Integer.toString(o.getOrderId())
+                );
+
+                if (l.getGroupId() != Integer.parseInt(JWTUtil.getClaim("groupId", jwt))) {
+                    return false;
+                } else {
+                    // Register the order to be changed
+                    param = new ArrayList<>();
+                    param.add(o.getOrderId());
+
+                    o.setInjector(new DeleteIdInjector("orders"));
+                    o.setParam(param);
+                    orderRepo.registerDeleted(o);
+                    // This should remove the ones n orderitems as well since they are foreign keys
+                }
+
+            }
+        } else if (role.equals(UserRoles.ADMIN.toString())) {
+            // Admin can just remove any listing
+            for (Order o : ordersToBeDeletedList) {
+                // If the order is null or empty, we skip it
+                if(o == null || o.isEmpty()) {
+                    continue; // Move on to the next one
+                }
+
+                List<Object> param = new ArrayList<>();
+                param.add(o.getOrderId());
+
+                o.setInjector(new DeleteIdInjector("orders"));
+                o.setParam(param);
+                orderRepo.registerDeleted(o);
+            }
+        } else {
+            // Unknown role
+            return false;
+        }
+        return true;
     }
 }

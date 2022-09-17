@@ -2,7 +2,7 @@ package Model;
 
 import Entity.SellerGroup;
 import Enums.UserRoles;
-import Injector.FindGroupIdByNameInjector;
+import Injector.FindConditionInjector.FindGroupIdByNameInjector;
 import Mapper.SellerGroupMapper;
 import UnitofWork.IUnitofWork;
 import UnitofWork.Repository;

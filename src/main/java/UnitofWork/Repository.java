@@ -1,8 +1,7 @@
 package UnitofWork;
 
 import Enums.UnitActions;
-import Injector.FindConditionInjector;
-import Injector.FindIdInjector;
+import Injector.IInjector;
 import Mapper.Mapper;
 
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ public class Repository<T> implements IUnitofWork<T>{
     }
 
     @Override
-    public T read(FindConditionInjector injector, List<Object>param, String key) {
+    public T read(IInjector injector, List<Object>param, String key) {
         if(identityMap.containsKey(key)) {
             return identityMap.get(key);
         } else {
@@ -35,7 +34,7 @@ public class Repository<T> implements IUnitofWork<T>{
     }
 
     @Override
-    public List<T> readMulti(FindConditionInjector injector, List<Object>param, String key) {
+    public List<T> readMulti(IInjector injector, List<Object>param, String key) {
         if(identityMap.containsKey(key)) {
             return OneToManyIdentityMap.get(key);
         } else {
@@ -49,7 +48,7 @@ public class Repository<T> implements IUnitofWork<T>{
     * This is not cached by the identity mapper
     * */
     @Override
-    public T read(FindConditionInjector injector, List<Object>param) {
+    public T read(IInjector injector, List<Object>param) {
         return mapper.find(injector, param);
     }
 
@@ -57,7 +56,7 @@ public class Repository<T> implements IUnitofWork<T>{
     * This is not cached by the identity mapper
     * */
     @Override
-    public List<T> readMulti(FindConditionInjector injector, List<Object>param) {
+    public List<T> readMulti(IInjector injector, List<Object>param) {
         return mapper.findMulti(injector, param);
     }
 

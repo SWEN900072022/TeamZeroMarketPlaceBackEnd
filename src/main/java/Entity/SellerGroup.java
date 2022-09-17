@@ -1,6 +1,6 @@
 package Entity;
 
-public class SellerGroup {
+public class SellerGroup extends EntityObject{
     private int groupId;
     private String groupName;
 

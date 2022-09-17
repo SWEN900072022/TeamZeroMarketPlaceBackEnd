@@ -1,29 +1,41 @@
 package MockClasses;
 
 import Entity.Order;
-import Injector.FindConditionInjector;
+import Injector.IInjector;
 import UnitofWork.IUnitofWork;
 
 import java.util.List;
 
 public class MockOrderRepository implements IUnitofWork<Order> {
+    public boolean isUser = false;
+    private Order order;
+
+    public MockOrderRepository() {
+    }
+
     @Override
-    public Order read(FindConditionInjector injector, List<Object> param, String key) {
+    public Order read(IInjector injector, List<Object> param, String key) {
         return null;
     }
 
     @Override
-    public List<Order> readMulti(FindConditionInjector injector, List<Object> param, String key) {
+    public List<Order> readMulti(IInjector injector, List<Object> param, String key) {
         return null;
     }
 
     @Override
-    public Order read(FindConditionInjector injector, List<Object> param) {
-        return null;
+    public Order read(IInjector injector, List<Object> param) {
+        if(isUser) {
+            order = new Order();
+            order.setOrderId(1);
+            return order;
+        } else {
+            return new Order();
+        }
     }
 
     @Override
-    public List<Order> readMulti(FindConditionInjector injector, List<Object> param) {
+    public List<Order> readMulti(IInjector injector, List<Object> param) {
         return null;
     }
 

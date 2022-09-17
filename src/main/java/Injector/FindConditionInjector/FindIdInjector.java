@@ -1,6 +1,8 @@
-package Injector;
+package Injector.FindConditionInjector;
 
-public class FindIdInjector extends GeneralFindConditionInjector {
+import Injector.IInjector;
+
+public class FindIdInjector implements IInjector {
     private String tableName;
     public FindIdInjector(String tableName) {
         this.tableName = tableName;
@@ -13,7 +15,7 @@ public class FindIdInjector extends GeneralFindConditionInjector {
                 return getUserSQLQuery();
             case "orders":
                 return getOrdersSQLQuery();
-            case "listing":
+            case "listings":
                 return getListingSQLQuery();
             case "groupmembership":
                 return getGroupMembershipQuery();
