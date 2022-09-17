@@ -15,8 +15,8 @@ public class FindIdInjector extends GeneralFindConditionInjector {
                 return getOrdersSQLQuery();
             case "listing":
                 return getListingSQLQuery();
-            case "fixed_price_listing":
-                return getFPListingSQLQuery();
+            case "groupmembership":
+                return getGroupMembershipQuery();
         }
         return "";
     }
@@ -26,14 +26,14 @@ public class FindIdInjector extends GeneralFindConditionInjector {
     }
 
     private String getOrdersSQLQuery() {
-        return "SELECT * FROM orders where id=?;";
+        return "SELECT * FROM orders where orderId=?;";
+    }
+
+    private String getGroupMembershipQuery() {
+        return "SELECT * FROM groupmembership where userid=?;";
     }
 
     private String getListingSQLQuery() {
-        return "SELECT * FROM listing where id=?;";
-    }
-
-    private String getFPListingSQLQuery() {
-        return "SELECT * FROM fixed_price_listing where id=?;";
+        return "SELECT * FROM listing where listingId=?;";
     }
 }
