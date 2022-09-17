@@ -4,6 +4,7 @@ import Entity.OrderItem;
 import MockClasses.MockListingRepository;
 import MockClasses.MockOrderItemRepository;
 import MockClasses.MockOrderRepository;
+import MockClasses.MockUserRepository;
 import Model.OrderModel;
 import UnitofWork.IUnitofWork;
 import Util.JWTUtil;
@@ -20,6 +21,7 @@ public class OrderModelTest {
     private MockOrderRepository orderRepo;
     private MockListingRepository listingRepo;
     private MockOrderItemRepository orderItemRepo;
+    private MockUserRepository userRepo;
     private OrderModel orderModel;
     private String jwt;
     private Order order;
@@ -29,7 +31,8 @@ public class OrderModelTest {
         this.orderRepo = new MockOrderRepository();
         this.listingRepo = new MockListingRepository();
         this.orderItemRepo = new MockOrderItemRepository();
-        this.orderModel = new OrderModel(orderRepo, listingRepo, orderItemRepo);
+        this.userRepo = new MockUserRepository();
+        this.orderModel = new OrderModel(orderRepo, listingRepo, orderItemRepo, userRepo);
 
         // Generate a valid jwt for testing
         jwt = JWTUtil.generateToken("1", new HashMap<>());
