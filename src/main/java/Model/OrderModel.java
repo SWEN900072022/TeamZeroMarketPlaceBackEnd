@@ -3,16 +3,10 @@ package Model;
 import Entity.Listing;
 import Entity.Order;
 import Entity.OrderItem;
-import Enums.ListingTypes;
-import Entity.OrderItem;
 import Entity.User;
 import Enums.UserRoles;
 import Injector.DeleteConditionInjector.DeleteIdInjector;
-import Injector.FindConditionInjector.FindAllInjector;
-import Injector.FindConditionInjector.FindOrderWIthGroupId;
-import Injector.FindConditionInjector.FindIdInjector;
-import Injector.FindConditionInjector.FindOrderForSellerGroupInjector;
-import Injector.FindConditionInjector.FindOrderFromUserInjector;
+import Injector.FindConditionInjector.*;
 import Mapper.ListingMapper;
 import Mapper.OrderItemMapper;
 import Mapper.OrderMapper;
@@ -22,6 +16,7 @@ import UnitofWork.Repository;
 import Util.JWTUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,11 +59,16 @@ public class OrderModel {
             return false;
         }
 
+        orderRepo.registerNew(order);
+        orderRepo.commit();
+        //  Get the orderid before we start inserting the orderitems
+        int orderId = OrderMapper.latestKeyVal;
+
         // First we validate that the quantity is sufficient
         for (OrderItem oi : orderItemList) {
             List<Object> param = new ArrayList<>();
             param.add(oi.getListingId());
-            Listing l = listingRepo.read(new FindIdInjector("listing"), param, Integer.toString(oi.getListingId()));
+            Listing l = listingRepo.read(new FindIdInjector("listings"), param, Integer.toString(oi.getListingId()));
             if (l == null) {
                 // The listing does not exist
                 return false;
@@ -82,12 +82,11 @@ public class OrderModel {
             }
 
             listingRepo.registerModified(l);
+            oi.setOrderId(orderId);
             orderItemRepo.registerNew(oi);
         }
         // Push changes
         try {
-            orderRepo.registerNew(order);
-            orderRepo.commit();
             listingRepo.commit();
             orderItemRepo.commit();
         } catch (Exception e) {
@@ -235,6 +234,91 @@ public class OrderModel {
             // Unknown role
             return false;
         }
+
+        // Commit the changes to the database
+        try {
+            orderRepo.commit();
+        } catch (Exception e) {
+            return false;
+        }
         return true;
+    }
+
+    public boolean modifyOrders(List<OrderItem> ordersToBeModifiedList, String jwt) {
+        // Check token, verify that the user is able to modify the order
+        try {
+            if(!JWTUtil.validateToken(jwt)) {
+                return false;
+            } else {
+
+            }
+        } catch (Exception e) {
+            return false;
+        }
+
+        // First need to validate that the user has acccess to the order
+        // Once we validated that the user have access to the order, we see if apply the modification
+        // Increase/Decrease for users
+        // Decrease for sellers
+        // Register and commit the changes
+
+        String userId = JWTUtil.getSubject(jwt);
+
+        List<Object> param = new ArrayList<>();
+        param.add(Integer.parseInt(userId));
+
+        User user = userRepo.read(new FindIdInjector("users"), param);
+
+        try {
+            if(user.getRoleEnum() == UserRoles.CUSTOMER) {
+                // Customer
+                modifyCustomerOrders(ordersToBeModifiedList);
+            } else if(user.getRoleEnum() == UserRoles.SELLER) {
+                //Seller
+                modifySellerOrders(ordersToBeModifiedList);
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        // Admin shouldn't be able to modify
+
+        // All operations done
+        orderItemRepo.commit();
+        return true;
+    }
+
+    private void modifyCustomerOrders(List<OrderItem> ordersToBeModifiedList) throws Exception{
+        // We don't need to check the quantity here, just check if the order item is null
+        for(OrderItem oi : ordersToBeModifiedList) {
+            if(oi == null || oi.isEmpty()) {
+                throw new Exception();
+            }
+
+            // We should have a valid order item now, just register it as modify
+            orderItemRepo.registerModified(oi);
+        }
+    }
+
+    private void modifySellerOrders(List<OrderItem> ordersToBeModifiedList) throws Exception{
+        // We need to fetch from the order item table to verify that the quantity is not increased
+        for(OrderItem oi : ordersToBeModifiedList) {
+            if(oi == null || oi.isEmpty()) {
+                throw new Exception();
+            }
+
+            // Make sure that the quantity is only reduced
+            List<Object>param = new ArrayList<>();
+            param.add(oi.getOrderId());
+            param.add(oi.getListingId());
+            OrderItem oiDB = orderItemRepo.read(new FindOrderItemWithOrderIdAndListingIdInjector(), param);
+
+            if(oiDB.getQuantity() < oi.getQuantity()) {
+                // Seller increased the quantity
+                throw new Exception();
+            } else {
+                // We permit the modification
+                orderItemRepo.registerModified(oi);
+            }
+        }
     }
 }

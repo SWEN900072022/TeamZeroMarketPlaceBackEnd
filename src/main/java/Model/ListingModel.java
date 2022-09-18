@@ -3,10 +3,8 @@ package Model;
 import Entity.Filter;
 import Entity.Listing;
 import Enums.UserRoles;
-import Injector.FindConditionInjector.FindAllInjector;
-import Injector.FindConditionInjector.FindGroupNameInListing;
-import Injector.FindConditionInjector.FindListingWithGroupIdInjector;
-import Injector.FindConditionInjector.FindTitleInjector;
+import Injector.DeleteConditionInjector.DeleteIdInjector;
+import Injector.FindConditionInjector.*;
 import Injector.IInjector;
 import Mapper.ListingMapper;
 import UnitofWork.IUnitofWork;
@@ -28,26 +26,6 @@ public class ListingModel {
         this.repo = repo;
     }
 
-//    public boolean createListing(Listing listing, String jwt) {
-//        // Check to see if the jwt token is valid
-//        try{
-//            if(!JWTUtil.validateToken(jwt)) {
-//                // if not valid, return false
-//                return false;
-//            }
-//        } catch (Exception e) {
-//            // Something went wrong
-//            return false;
-//        }
-//
-//        repo.registerNew(listing);
-//        try{
-//            repo.commit();
-//        } catch (Exception e) {
-//            return false;
-//        }
-//        return true;
-//    }
     public boolean createListing(Listing listing, String jwt) {
         // Check the validity of the listing
         // Check to see if the token is from a seller
@@ -125,6 +103,81 @@ public class ListingModel {
             }
         }
         return result;
+    }
+
+    public boolean delete(Integer listingId, String jwt) {
+        // Check token, verify that the user can delete the listing and commit the change
+        String role;
+        try {
+            if(!JWTUtil.validateToken(jwt)) {
+                return false;
+            }
+            role = JWTUtil.getClaim("role", jwt);
+        } catch (Exception e) {
+            return false;
+        }
+
+        if(role == null || role == "") {
+            return false;
+        }
+
+        // Switch between different users
+        if(role.equals(UserRoles.SELLER.toString())) {
+            // check to see if the seller owns the listing
+            // delete if yes
+            List<Object> param = new ArrayList<>();
+            param.add(listingId);
+            Listing listing = repo.read(new FindIdInjector("listings"), param);
+
+            // Check to see if the listing is valid
+            if(listing == null || (listing.isEmptyAuction() && listing.isEmptyFixedPrice())) {
+                return false;
+            }
+
+            //Check to see if the jwt groupid is the same as the one in listings
+            int groupId = Integer.parseInt(JWTUtil.getClaim("groupId", jwt));
+            if(groupId != listing.getGroupId()) {
+                // listing is not the groups, reject
+                return false;
+            }
+
+            // We should have a valid listing and correctly owned listing
+            // Deletion
+
+            param = new ArrayList<>();
+            param.add(listing.getListingId());
+
+            listing.setInjector(new DeleteIdInjector("listings"));
+            listing.setParam(param);
+
+            repo.registerDeleted(listing);
+        }
+
+        if(role.equals(UserRoles.ADMIN.toString())) {
+            // just delete the listing
+            List<Object> param = new ArrayList<>();
+            param.add(listingId);
+            Listing listing = repo.read(new FindIdInjector("listings"), param);
+
+            // Check to see if the listing is valid
+            if(listing == null) {
+                return false;
+            }
+            param = new ArrayList<>();
+            param.add(listing.getListingId());
+
+            listing.setInjector(new DeleteIdInjector("listings"));
+            listing.setParam(param);
+            repo.registerDeleted(listing);
+        }
+
+        try {
+            repo.commit();
+        } catch (Exception e) {
+            System.out.println(e);
+            return false;
+        }
+        return true;
     }
 
     private IInjector getInjector(String key) {

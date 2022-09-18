@@ -21,6 +21,18 @@ public class OrderItem extends EntityObject{
         this.unitPrice = unitPrice;
     }
 
+    public boolean isEmpty() {
+        if(this.orderId == 0 ||
+            this.listingId == 0 ||
+            this.quantity == 0 ||
+            (this.priceInCents == 0 && unitPrice == null)
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public int getOrderId() {
         return orderId;
     }

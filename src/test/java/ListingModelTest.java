@@ -48,13 +48,13 @@ public class ListingModelTest {
      * Test for the behaviour when we search for listings based on the seller groups selling them
      */
     public void searchByGroupName() {
-        Filter filter = new Filter("groupName", "2");
+        Filter filter = new Filter("groupId", "2");
         List<Filter> filterList = new ArrayList<>();
         filterList.add(filter);
         List<Listing> list = listingModel.search(filterList, jwt);
         assertEquals(2, list.size());
 
-        filter = new Filter("groupName", "1");
+        filter = new Filter("groupId", "1");
         filterList = new ArrayList<>();
         filterList.add(filter);
         list = listingModel.search(filterList, jwt);
