@@ -2,6 +2,7 @@ package Model;
 
 import Entity.Filter;
 import Entity.Listing;
+import Enums.UserRoles;
 import Injector.FindConditionInjector.FindAllInjector;
 import Injector.FindConditionInjector.FindGroupNameInListing;
 import Injector.FindConditionInjector.FindListingWithGroupIdInjector;
@@ -27,23 +28,59 @@ public class ListingModel {
         this.repo = repo;
     }
 
+//    public boolean createListing(Listing listing, String jwt) {
+//        // Check to see if the jwt token is valid
+//        try{
+//            if(!JWTUtil.validateToken(jwt)) {
+//                // if not valid, return false
+//                return false;
+//            }
+//        } catch (Exception e) {
+//            // Something went wrong
+//            return false;
+//        }
+//
+//        repo.registerNew(listing);
+//        try{
+//            repo.commit();
+//        } catch (Exception e) {
+//            return false;
+//        }
+//        return true;
+//    }
     public boolean createListing(Listing listing, String jwt) {
-        // Check to see if the jwt token is valid
+        // Check the validity of the listing
+        // Check to see if the token is from a seller
+        // Get the group id and register the listing
+        String role;
         try{
             if(!JWTUtil.validateToken(jwt)) {
-                // if not valid, return false
                 return false;
             }
+            role = JWTUtil.getClaim("role", jwt);
         } catch (Exception e) {
-            // Something went wrong
             return false;
         }
 
-        repo.registerNew(listing);
-        try{
-            repo.commit();
-        } catch (Exception e) {
+        if(role == null || role.equals("")) {
             return false;
+        }
+
+        if(!role.equals(UserRoles.SELLER.toString())) {
+            // not a seller token
+            return false;
+        } else {
+            // is a seller token
+            int groupId = Integer.parseInt(JWTUtil.getClaim("groupId", jwt));
+            listing.setGroupId(groupId);
+
+            // register the listing and commit
+            repo.registerNew(listing);
+            try{
+                repo.commit();
+            } catch (Exception e) {
+                return false;
+            }
         }
         return true;
     }
