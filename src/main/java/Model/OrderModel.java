@@ -150,7 +150,7 @@ public class OrderModel {
         }
 
         // Users and sellers can only cancel orders that they control admin can remove any
-        if (role == null || role == "") {
+        if (role == null || role.equals("")) {
             return false;
         }
 
