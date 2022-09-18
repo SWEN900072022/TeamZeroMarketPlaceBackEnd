@@ -2,6 +2,7 @@ package MockClasses;
 
 import Entity.Listing;
 import Injector.FindConditionInjector.FindGroupNameInListing;
+import Injector.FindConditionInjector.FindListingWithGroupIdInjector;
 import Injector.FindConditionInjector.FindTitleInjector;
 import Injector.IInjector;
 import UnitofWork.IUnitofWork;
@@ -9,6 +10,7 @@ import UnitofWork.IUnitofWork;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MockListingRepository implements IUnitofWork<Listing> {
     private Listing listing = new Listing();
@@ -92,11 +94,11 @@ public class MockListingRepository implements IUnitofWork<Listing> {
         // Check the injector and depending on which injector it is return the corrsponding list
         if (injector instanceof FindTitleInjector) {
             for(Listing listing : listingList) {
-                if(listing.getTitle() == paramString) {
+                if(Objects.equals(listing.getTitle(), paramString)) {
                     result.add(listing);
                 }
             }
-        } else if (injector instanceof FindGroupNameInListing) {
+        } else if (injector instanceof FindListingWithGroupIdInjector) {
             for(Listing listing : listingList) {
                 if(listing.getGroupId() == Integer.parseInt(paramString)) {
                     result.add(listing);
