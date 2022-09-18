@@ -1,5 +1,7 @@
 import Entity.Filter;
 import Entity.Listing;
+import Entity.User;
+import Enums.UserRoles;
 import MockClasses.MockListingRepository;
 import Model.ListingModel;
 import Util.JWTUtil;
@@ -8,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -96,6 +99,11 @@ public class ListingModelTest {
 
     @Test
     public void IdealListingCreation() {
+        Map<String, String> claimMap = new HashMap<>();
+        claimMap.put("role", UserRoles.SELLER.toString());
+        claimMap.put("groupId", "1");
+        jwt = JWTUtil.generateToken("1", claimMap);
+
         Listing listing = new Listing();
         boolean isSuccessful = listingModel.createListing(listing, jwt);
         assertTrue(isSuccessful);
