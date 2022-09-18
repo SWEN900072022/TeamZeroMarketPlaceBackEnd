@@ -80,7 +80,7 @@ public class SellerGroupModel {
         param.add(user.getUserId());
         User userDB = userRepo.read(new FindIdInjector("users"), param);
 
-        if(userDB == null || user.isEmpty() || user.getRoleEnum() != UserRoles.SELLER) {
+        if(userDB == null || userDB.isEmpty() || userDB.getRoleEnum() != UserRoles.SELLER) {
             // Null user, non-existing user and non-seller user
             return false;
         }
@@ -134,7 +134,7 @@ public class SellerGroupModel {
         param.add(user.getUserId());
         User userDB = userRepo.read(new FindIdInjector("users"), param);
 
-        if(userDB == null || user.isEmpty() || user.getRoleEnum() != UserRoles.SELLER) {
+        if(userDB == null || userDB.isEmpty() || userDB.getRoleEnum() != UserRoles.SELLER) {
             // Null user, non-existing user and non-seller user
             return false;
         }
