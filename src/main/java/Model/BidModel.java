@@ -2,7 +2,7 @@ package Model;
 
 import Entity.Bid;
 import Entity.Listing;
-import Injector.FindBidFromListing;
+import Injector.FindConditionInjector.FindBidFromListing;
 import Injector.FindConditionInjector.FindIdInjector;
 import Mapper.BidMapper;
 import Mapper.ListingMapper;
@@ -10,7 +10,6 @@ import UnitofWork.IUnitofWork;
 import UnitofWork.Repository;
 import Util.JWTUtil;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
