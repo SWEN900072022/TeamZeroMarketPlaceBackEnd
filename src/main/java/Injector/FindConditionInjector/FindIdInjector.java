@@ -36,6 +36,6 @@ public class FindIdInjector implements IInjector {
     }
 
     private String getListingSQLQuery() {
-        return "SELECT * FROM listing where listingId=?;";
+        return "SELECT * FROM listings where listingId=?;";
     }
 }
