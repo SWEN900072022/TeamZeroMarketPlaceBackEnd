@@ -235,6 +235,13 @@ public class OrderModel {
             // Unknown role
             return false;
         }
+
+        // Commit the changes to the database
+        try {
+            orderRepo.commit();
+        } catch (Exception e) {
+            return false;
+        }
         return true;
     }
 }
