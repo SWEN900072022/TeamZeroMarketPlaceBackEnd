@@ -25,7 +25,7 @@ public class OrderItem extends EntityObject{
         if(this.orderId == 0 ||
             this.listingId == 0 ||
             this.quantity == 0 ||
-            (this.priceInCents == 0 || unitPrice == null)
+            (this.priceInCents == 0 && unitPrice == null)
         ) {
             return true;
         } else {

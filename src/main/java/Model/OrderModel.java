@@ -59,11 +59,16 @@ public class OrderModel {
             return false;
         }
 
+        orderRepo.registerNew(order);
+        orderRepo.commit();
+        //  Get the orderid before we start inserting the orderitems
+        int orderId = OrderMapper.latestKeyVal;
+
         // First we validate that the quantity is sufficient
         for (OrderItem oi : orderItemList) {
             List<Object> param = new ArrayList<>();
             param.add(oi.getListingId());
-            Listing l = listingRepo.read(new FindIdInjector("listing"), param, Integer.toString(oi.getListingId()));
+            Listing l = listingRepo.read(new FindIdInjector("listings"), param, Integer.toString(oi.getListingId()));
             if (l == null) {
                 // The listing does not exist
                 return false;
@@ -77,12 +82,11 @@ public class OrderModel {
             }
 
             listingRepo.registerModified(l);
+            oi.setOrderId(orderId);
             orderItemRepo.registerNew(oi);
         }
         // Push changes
         try {
-            orderRepo.registerNew(order);
-            orderRepo.commit();
             listingRepo.commit();
             orderItemRepo.commit();
         } catch (Exception e) {
