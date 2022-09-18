@@ -29,4 +29,12 @@ public class GroupMembership extends EntityObject{
     public void setUserId(int userId) {
         this.userId = userId;
     }
+
+    public boolean isEmpty() {
+        if(this.groupId == 0 || this.userId == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
