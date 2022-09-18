@@ -173,7 +173,7 @@ public class OrderModel {
                         Integer.toString(o.getOrderId())
                 );
 
-                if (o.getUserId() != Integer.parseInt(JWTUtil.getSubject(jwt))) {
+                if (o1.getUserId() != Integer.parseInt(JWTUtil.getSubject(jwt))) {
                     return false;
                 } else {
                     // Register the order to be changed
