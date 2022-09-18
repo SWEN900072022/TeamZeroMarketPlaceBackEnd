@@ -47,7 +47,7 @@ public class ListingModel {
         return true;
     }
 
-    public List<Listing> search(List<Filter> filterConditions, String jwt) {
+    public List<Listing> search(List<Filter> filterConditions, int limit, int offset, String jwt) {
         // Check to see if the jwt token is valid
         try{
             if(!JWTUtil.validateToken(jwt)) {
@@ -62,7 +62,10 @@ public class ListingModel {
         List<Listing> result = new ArrayList<>();
 
         if(filterConditions == null || filterConditions.isEmpty() ) {
-            result = repo.readMulti(new FindAllInjector("listing"), new ArrayList<>());
+            List<Object> param = new ArrayList<>();
+            param.add(limit);
+            param.add(offset);
+            result = repo.readMulti(new FindAllInjector("listings"), param);
             return result;
         }
 
@@ -72,7 +75,8 @@ public class ListingModel {
 
             List<Object> param = new ArrayList<>();
             param.add(filter.getFilterVal());
-
+            param.add(limit);
+            param.add(offset);
             List<Listing>temp = repo.readMulti(inj, param);
 
             if(result.size() == 0) {

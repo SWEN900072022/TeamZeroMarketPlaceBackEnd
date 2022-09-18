@@ -14,15 +14,21 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
+import static Util.Util.getVal;
+
 @WebServlet(name = "ViewOrderServlet", value = "/ViewOrderServlet")
 public class ViewOrderServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String jwt = request.getHeader("jwt");
 
+        // Result limits
+        int limit = getVal(request.getParameter("limit"), 50);
+        int offset = getVal(request.getParameter("offset"), 0);
+
         // Since in the jwt, we have the user id, that would determine how many orders will be retrieved
         OrderModel oModel = new OrderModel();
-        List<OrderItem> list = oModel.getOrderItems(jwt);
+        List<OrderItem> list = oModel.getOrderItems(limit, offset, jwt);
 
         GsonBuilder gb = new GsonBuilder();
         gb.registerTypeAdapter(Money.class, new MoneySerializer());

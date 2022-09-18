@@ -7,6 +7,6 @@ public class FindGroupNameInListing implements IInjector {
     public String getSQLQuery() {
         return "SELECT l.* FROM listings l " +
                 " JOIN sellergroups ON l.groupid = sellergroups.groupid " +
-                "WHERE groupname=?;";
+                "WHERE groupname=? LIMIT ? OFFSET ?;";
     }
 }

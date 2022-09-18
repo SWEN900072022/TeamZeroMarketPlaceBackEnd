@@ -1,8 +1,10 @@
 package Entity;
 
 import Enums.ListingTypes;
+import Injector.FindConditionInjector.FindIdInjector;
 import Mapper.Mapper;
 import Mapper.ListingMapper;
+import UnitofWork.Repository;
 import org.javamoney.moneta.Money;
 
 import javax.money.Monetary;
@@ -43,9 +45,11 @@ public class Listing extends EntityObject{
             this.quantity < 0 ||
             this.price.isEqualTo(Money.of(0, Monetary.getCurrency("AUD")))
         ) {
-            return false;
+            // Lazy load here, if id is not set, return true, false otherwise
+            boolean canLoad = load();
+            return !canLoad;
         }
-        return true;
+        return false;
     }
 
     public boolean isEmptyAuction() {
@@ -58,9 +62,11 @@ public class Listing extends EntityObject{
             this.startTime == null ||
             this.endTime == null
         ) {
-            return false;
+            // Lazy load here, if id not set, return true, false otherwise
+            boolean canLoad = load();
+            return !canLoad;
         }
-        return true;
+        return false;
     }
 
     public Listing(int listingId, int groupId, ListingTypes type, String title, String description, int quantity, Money price, LocalDateTime startTime, LocalDateTime endTime) {
@@ -166,5 +172,29 @@ public class Listing extends EntityObject{
     @Override
     public int hashCode() {
         return Objects.hash(getListingId(), getGroupId(), getType(), getTitle(), getDescription(), getQuantity(), getPrice(), getStartTime(), getEndTime());
+    }
+
+    public boolean load() {
+        // Check if the id is present, if not return false
+        if(listingId == 0) {
+            return false;
+        }
+
+        Repository<Listing> listingRepo = new Repository<Listing>(new ListingMapper());
+        List<Object> param = new ArrayList<>();
+        param.add(listingId);
+        Listing listing = listingRepo.read(new FindIdInjector("listings"), param);
+
+        // populate the object with the results
+        groupId = listing.getGroupId();
+        type = listing.getType();
+        title = listing.getTitle();
+        description = listing.getDescription();
+        quantity = listing.getQuantity();
+        price = listing.getPrice();
+        startTime = listing.getStartTime();
+        endTime = listing.getEndTime();
+
+        return true;
     }
 }

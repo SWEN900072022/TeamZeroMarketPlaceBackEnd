@@ -62,8 +62,10 @@ public class UserModel {
     }
 
 
-    public List<User> getAllUsers() {
+    public List<User> getAllUsers(int limit, int offset) {
         List<Object> param = new ArrayList<>();
+        param.add(limit);
+        param.add(offset);
         List<User> userList = userRepo.readMulti(new FindAllInjector("users"), param);
         return userList;
     }

@@ -24,6 +24,10 @@ public class Repository<T> implements IUnitofWork<T>{
 
     @Override
     public T read(IInjector injector, List<Object>param, String key) {
+        // This is to limit the reads to just one
+        param.add(1);
+        param.add(0);
+
         if(identityMap.containsKey(key)) {
             return identityMap.get(key);
         } else {
@@ -49,6 +53,9 @@ public class Repository<T> implements IUnitofWork<T>{
     * */
     @Override
     public T read(IInjector injector, List<Object>param) {
+        // This is to limit the reads to just one
+        param.add(1); // limit
+        param.add(0); // offset
         return mapper.find(injector, param);
     }
 

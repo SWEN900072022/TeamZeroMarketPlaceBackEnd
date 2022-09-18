@@ -1,6 +1,12 @@
 package Entity;
 
 import Enums.UserRoles;
+import Injector.FindConditionInjector.FindIdInjector;
+import Mapper.UserMapper;
+import UnitofWork.Repository;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class User extends EntityObject{
     private String email;
@@ -92,9 +98,35 @@ public class User extends EntityObject{
     }
 
     public boolean isEmpty() {
-        if(username == null && email == null && password == null) {
-            return true;
+        if(username == null ||
+                email == null ||
+                password == null ||
+                role == null
+        ) {
+            // Lazy load here.
+            boolean canLoad = load();
+            return !canLoad;
         }
         return false;
+    }
+
+    public boolean load() {
+        // Check if the id is present, if not return false
+        if(userId == 0) {
+            return false;
+        }
+
+        Repository<User> userRepo = new Repository<User>(new UserMapper());
+        List<Object> param = new ArrayList<>();
+        param.add(userId);
+        User user = userRepo.read(new FindIdInjector("users"), param);
+
+        // Populate the object with the results
+        username = user.getUsername();
+        password = user.getPassword();
+        email = user.getEmail();
+        role = user.getRoleEnum();
+
+        return true;
     }
 }

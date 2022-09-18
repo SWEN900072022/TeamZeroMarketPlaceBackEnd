@@ -62,8 +62,6 @@ public class OrderItem extends EntityObject{
             // Somewhat lazy loading
             Money unitPriceInCents = Money.of(getPriceInCents(), Monetary.getCurrency("AUD"));
             setUnitPrice(unitPriceInCents.divide(100));
-        } else if(unitPrice == null) {
-            // Retrieve it from the database with the load function
         }
         return unitPrice;
     }
