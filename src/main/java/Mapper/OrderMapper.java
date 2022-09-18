@@ -8,6 +8,7 @@ import java.sql.*;
 import java.util.*;
 
 public class OrderMapper extends GeneralMapper<Order> {
+    public static int latestKeyVal = 0;
     public OrderMapper() {
 
     }
@@ -23,10 +24,15 @@ public class OrderMapper extends GeneralMapper<Order> {
 
             statement = conn.prepareStatement(
                     "INSERT INTO orders (userId, address) " +
-                            "VALUES (?, ?, ?);", Statement.RETURN_GENERATED_KEYS);
+                            "VALUES (?, ?);", Statement.RETURN_GENERATED_KEYS);
             statement.setInt(1, order.getUserId());
             statement.setString(2, order.getAddress());
             statement.execute();
+
+            ResultSet generatedKeys = statement.getGeneratedKeys();
+            while(generatedKeys.next()) {
+                latestKeyVal = generatedKeys.getInt("orderId");
+            }
         } catch (SQLException e) {
             return false;
         }

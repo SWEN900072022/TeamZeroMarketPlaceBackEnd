@@ -1,6 +1,8 @@
-package Injector;
+package Injector.FindConditionInjector;
 
-public class FindBidFromListing implements IInjector{
+import Injector.IInjector;
+
+public class FindBidFromListing implements IInjector {
     @Override
     public String getSQLQuery() {
         return "SELECT * " +
