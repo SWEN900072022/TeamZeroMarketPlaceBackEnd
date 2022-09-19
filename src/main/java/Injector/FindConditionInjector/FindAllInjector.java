@@ -19,8 +19,14 @@ public class FindAllInjector implements IInjector {
                 return getAllListingSQLQuery();
             case "orderitems":
                 return getAllOrderItemsSQLQuery();
+            case "sellergroups":
+                return getAllSellerGroupSQLQuery();
         }
         return "";
+    }
+
+    private String getAllSellerGroupSQLQuery() {
+        return "SELECT * FROM sellergroups;";
     }
 
     private String getAllOrderItemsSQLQuery() {
