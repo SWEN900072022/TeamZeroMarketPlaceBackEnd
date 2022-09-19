@@ -38,29 +38,29 @@ public class Listing extends EntityObject{
         if(
             this.groupId == 0 ||
             this.type == null ||
-            this.title == "" ||
-            this.description == "" ||
+            Objects.equals(this.title, "") ||
+            Objects.equals(this.description, "") ||
             this.quantity < 0 ||
             this.price.isEqualTo(Money.of(0, Monetary.getCurrency("AUD")))
         ) {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     public boolean isEmptyAuction() {
         if(
             this.groupId == 0 ||
             this.type == null ||
-            this.title == "" ||
-            this.description == "" ||
+            Objects.equals(this.title, "") ||
+            Objects.equals(this.description, "") ||
             this.quantity < 0 ||
             this.startTime == null ||
             this.endTime == null
         ) {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     public Listing(int listingId, int groupId, ListingTypes type, String title, String description, int quantity, Money price, LocalDateTime startTime, LocalDateTime endTime) {
