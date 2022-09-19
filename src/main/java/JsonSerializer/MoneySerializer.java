@@ -11,6 +11,6 @@ import java.lang.reflect.Type;
 public class MoneySerializer implements JsonSerializer<Money> {
     @Override
     public JsonElement serialize(Money money, Type type, JsonSerializationContext jsonSerializationContext) {
-        return new JsonPrimitive(money.toString());
+        return new JsonPrimitive(money.getNumberStripped().toString());
     }
 }
