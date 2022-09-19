@@ -9,6 +9,7 @@ public class Bid extends EntityObject{
     private int listingId;
     private int userId;
     private Money bidAmount;
+    private int bidAmountInCents;
 
     public Bid() {
         this.bidAmount = Money.of(0, Monetary.getCurrency("AUD"));
@@ -44,6 +45,14 @@ public class Bid extends EntityObject{
 
     public void setBidAmount(Money bidAmount) {
         this.bidAmount = bidAmount;
+    }
+
+    public int getBidAmountInCents() {
+        return bidAmountInCents;
+    }
+
+    public void setBidAmountInCents(int bidAmountInCents) {
+        this.bidAmountInCents = bidAmountInCents;
     }
 
     public boolean isEmpty() {
