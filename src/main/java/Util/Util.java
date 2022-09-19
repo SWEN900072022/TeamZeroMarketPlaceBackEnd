@@ -38,4 +38,11 @@ public final class Util {
         }
         return conn;
     }
+
+    public static int getVal(String str, int defaultVal) {
+        if(str == null || str.equals("")) {
+            return defaultVal;
+        }
+        return Integer.parseInt(str);
+    }
 }

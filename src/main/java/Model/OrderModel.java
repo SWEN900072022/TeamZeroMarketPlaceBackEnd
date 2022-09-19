@@ -16,9 +16,7 @@ import UnitofWork.Repository;
 import Util.JWTUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class OrderModel {
     private IUnitofWork<Order> orderRepo;
@@ -40,8 +38,10 @@ public class OrderModel {
         this.orderItemRepo = orderItemRepo;
     }
 
-    public List<OrderItem> getAllOrderItem() {
+    public List<OrderItem> getAllOrderItem(int limit, int offset) {
         List<Object> param = new ArrayList<>();
+        param.add(limit);
+        param.add(offset);
         List<OrderItem> orderItemList = orderItemRepo.readMulti(new FindAllInjector("orderitems"), param);
         return orderItemList;
     }
@@ -96,7 +96,7 @@ public class OrderModel {
     }
 
 
-    public List<OrderItem> getOrderItems(String jwt) {
+    public List<OrderItem> getOrderItems(int limit, int offset, String jwt) {
         // Check to see if the jwt token is valid
         try {
             if (!JWTUtil.validateToken(jwt)) {
@@ -114,6 +114,8 @@ public class OrderModel {
         // Get the user based on the ID
         List<Object> param = new ArrayList<>();
         param.add(Integer.parseInt(userId));
+        param.add(limit);
+        param.add(offset);
 
         User user = userRepo.read(new FindIdInjector("users"), param);
         List<OrderItem> result;
@@ -171,7 +173,7 @@ public class OrderModel {
                         Integer.toString(o.getOrderId())
                 );
 
-                if (o.getUserId() != Integer.parseInt(JWTUtil.getSubject(jwt))) {
+                if (o1.getUserId() != Integer.parseInt(JWTUtil.getSubject(jwt))) {
                     return false;
                 } else {
                     // Register the order to be changed

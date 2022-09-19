@@ -19,6 +19,9 @@ public class ListingModelTest {
     private ListingModel listingModel;
     private String jwt;
 
+    final int limit = 50;
+    final int offset = 0;
+
     public ListingModelTest() {
         this.mockListingRepository = new MockListingRepository();
         listingModel = new ListingModel(mockListingRepository);
@@ -33,13 +36,13 @@ public class ListingModelTest {
         Filter filter = new Filter("title", "a");
         List<Filter> filterList = new ArrayList<>();
         filterList.add(filter);
-        List<Listing> list = listingModel.search(filterList, jwt);
+        List<Listing> list = listingModel.search(filterList, limit, offset, jwt);
         assertEquals(2, list.size());
 
         filter = new Filter("title", "b");
         filterList = new ArrayList<>();
         filterList.add(filter);
-        list = listingModel.search(filterList, jwt);
+        list = listingModel.search(filterList, limit, offset, jwt);
         assertEquals(1, list.size());
     }
 
@@ -51,13 +54,13 @@ public class ListingModelTest {
         Filter filter = new Filter("groupId", "2");
         List<Filter> filterList = new ArrayList<>();
         filterList.add(filter);
-        List<Listing> list = listingModel.search(filterList, jwt);
+        List<Listing> list = listingModel.search(filterList, limit, offset, jwt);
         assertEquals(2, list.size());
 
         filter = new Filter("groupId", "1");
         filterList = new ArrayList<>();
         filterList.add(filter);
-        list = listingModel.search(filterList, jwt);
+        list = listingModel.search(filterList, limit, offset, jwt);
         assertEquals(1, list.size());
     }
 
@@ -75,7 +78,7 @@ public class ListingModelTest {
         Filter filter = new Filter("groupName", "2");
         List<Filter> filterList = new ArrayList<>();
         filterList.add(filter);
-        List<Listing> list = listingModel.search(filterList, "");
+        List<Listing> list = listingModel.search(filterList, limit, offset, "");
         assertEquals(0, list.size());
     }
 
@@ -84,7 +87,7 @@ public class ListingModelTest {
      * Test the behaviour when a null filter condition list are provided
      */
     public void searchNullFilterCondition() {
-        List<Listing> list = listingModel.search(null, jwt);
+        List<Listing> list = listingModel.search(null, limit, offset, jwt);
         assertEquals(3, list.size());
     }
 
@@ -93,7 +96,7 @@ public class ListingModelTest {
      * Test the behaviour when an empty filter condition list is provided
      */
     public void searchWithNoFilterCondition() {
-        List<Listing> list = listingModel.search(new ArrayList<>(), jwt);
+        List<Listing> list = listingModel.search(new ArrayList<>(), limit, offset, jwt);
         assertEquals(3, list.size());
     }
 

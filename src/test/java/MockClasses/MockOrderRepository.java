@@ -15,7 +15,14 @@ public class MockOrderRepository implements IUnitofWork<Order> {
 
     @Override
     public Order read(IInjector injector, List<Object> param, String key) {
-        return null;
+        if(isUser) {
+            order = new Order();
+            order.setOrderId(1);
+            order.setUserId(1);
+            return order;
+        } else {
+            return new Order();
+        }
     }
 
     @Override

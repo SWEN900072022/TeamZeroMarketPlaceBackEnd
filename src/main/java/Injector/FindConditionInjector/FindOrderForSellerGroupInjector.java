@@ -8,6 +8,6 @@ public class FindOrderForSellerGroupInjector implements IInjector {
         return "SELECT oi.* FROM orderitems oi " +
                 " JOIN listings l on oi.listingid = l.listingid " +
                 " JOIN groupmembership g on l.groupid = g.groupid " +
-                " WHERE userid=?";
+                " WHERE userid=? LIMIT ? OFFSET ?;";
     }
 }

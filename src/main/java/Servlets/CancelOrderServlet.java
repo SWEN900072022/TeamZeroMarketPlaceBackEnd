@@ -9,8 +9,11 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet(name = "CancelOrderServlet", value = "/CancelOrderServlet")
 public class CancelOrderServlet extends HttpServlet {
@@ -26,6 +29,13 @@ public class CancelOrderServlet extends HttpServlet {
 
         // Now that we have the list we will proceed with deleting the order
         OrderModel om = new OrderModel();
-        om.cancelOrders(ordersToBeDeletedList, jwt);
+        boolean isSuccessful = om.cancelOrders(ordersToBeDeletedList, jwt);
+
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("result", isSuccessful);
+        String json = gson.toJson(result);
+
+        PrintWriter out = response.getWriter();
+        out.println(json);
     }
 }

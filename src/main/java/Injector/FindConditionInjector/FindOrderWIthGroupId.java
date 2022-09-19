@@ -7,6 +7,6 @@ public class FindOrderWIthGroupId implements IInjector {
     public String getSQLQuery() {
         return "SELECT oi.* FROM orderitems oi " +
                 "JOIN listings l on oi.listingid=l.listingid " +
-                "where orderid=?";
+                "where orderid=? LIMIT ? OFFSET ?;";
     }
 }

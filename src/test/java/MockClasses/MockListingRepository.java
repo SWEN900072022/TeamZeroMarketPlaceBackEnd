@@ -85,7 +85,7 @@ public class MockListingRepository implements IUnitofWork<Listing> {
 
     @Override
     public List<Listing> readMulti(IInjector injector, List<Object> param) {
-        if(param.size() == 0) {
+        if(param.size() <= 2) {
             return this.listingList;
         }
         // Get the title param

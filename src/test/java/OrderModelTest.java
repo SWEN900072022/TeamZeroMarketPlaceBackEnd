@@ -114,7 +114,7 @@ public class OrderModelTest {
         orderList.add(order);
 
         boolean isSuccessful = orderModel.cancelOrders(orderList, jwt);
-        assertTrue(isSuccessful);
+        assertFalse(isSuccessful);
     }
 
     @Test

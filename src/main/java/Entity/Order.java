@@ -1,5 +1,9 @@
 package Entity;
 
+import Injector.FindConditionInjector.FindIdInjector;
+import Mapper.OrderMapper;
+import UnitofWork.Repository;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -46,9 +50,28 @@ public class Order extends EntityObject{
     }
 
     public boolean isEmpty() {
-        if(orderId == 0) {
-            return true;
+        if(userId == 0 || address == null || address.equals("")) {
+            boolean canLoad = load();
+            return !canLoad;
         }
         return false;
+    }
+
+    public boolean load() {
+        // Check to see if the id is present, if not return false
+        if(orderId == 0) {
+            return false;
+        }
+
+        Repository<Order> orderRepository = new Repository<Order>(new OrderMapper());
+        List<Object> param = new ArrayList<>();
+        param.add(orderId);
+        Order order = orderRepository.read(new FindIdInjector("orders"), param);
+
+        //populate the object with the results
+        userId = order.getUserId();
+        address = order.getAddress();
+
+        return true;
     }
 }

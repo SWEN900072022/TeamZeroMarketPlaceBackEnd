@@ -12,14 +12,19 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
+import static Util.Util.getVal;
+
 @WebServlet(name = "GetAllUserServlet", value = "/getAllUsers")
 public class GetAllUsersServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Result limits
+        int limit = getVal(request.getParameter("limit"), 50);
+        int offset = getVal(request.getParameter("offset"), 0);
 
         UserModel uModel = new UserModel();
         List<User> list;
-        list = uModel.getAllUsers();
+        list = uModel.getAllUsers(limit, offset);
 
         Gson gson = new Gson();
         String json = gson.toJson(list);

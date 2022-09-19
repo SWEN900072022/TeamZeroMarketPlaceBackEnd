@@ -16,6 +16,8 @@ import java.io.PrintWriter;
 import java.lang.reflect.Type;
 import java.util.List;
 
+import static Util.Util.getVal;
+
 @WebServlet(name = "SearchServlet", value = "/search")
 public class SearchServlet extends HttpServlet {
     @Override
@@ -23,13 +25,17 @@ public class SearchServlet extends HttpServlet {
         String filterList = request.getParameter("filter");
         String jwt = request.getHeader("jwt");
 
+        // Result limits
+        int limit = getVal(request.getParameter("limit"), 50);
+        int offset = getVal(request.getParameter("offset"), 0);
+
         Type typeOfFilter = TypeToken.getParameterized(List.class, Entity.Filter.class).getType();
 
         Gson gson = new Gson();
         List<Entity.Filter> filterConditions = gson.fromJson(filterList, typeOfFilter);
 
         ListingModel lModel = new ListingModel();
-        List<Listing> list = lModel.search(filterConditions, jwt);
+        List<Listing> list = lModel.search(filterConditions, limit, offset, jwt);
 
         GsonBuilder gb = new GsonBuilder();
         gb.registerTypeAdapter(Money.class, new MoneySerializer());

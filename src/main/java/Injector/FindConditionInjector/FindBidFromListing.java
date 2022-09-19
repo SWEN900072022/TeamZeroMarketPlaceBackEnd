@@ -11,6 +11,6 @@ public class FindBidFromListing implements IInjector {
                 "      (SELECT MAX(bidamount) " +
                 "       FROM bids " +
                 "       WHERE listingid=?) " +
-                "AND listingid=?;";
+                "AND listingid=? LIMIT ? OFFSET ?;";
     }
 }
