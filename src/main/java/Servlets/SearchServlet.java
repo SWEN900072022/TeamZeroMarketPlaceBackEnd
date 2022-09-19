@@ -1,6 +1,7 @@
 package Servlets;
 
 import Entity.Listing;
+import JsonSerializer.LocalDateTimeSerializer;
 import JsonSerializer.MoneySerializer;
 import Model.ListingModel;
 import com.google.gson.Gson;
@@ -14,6 +15,7 @@ import javax.servlet.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @WebServlet(name = "SearchServlet", value = "/search")
@@ -33,6 +35,7 @@ public class SearchServlet extends HttpServlet {
 
         GsonBuilder gb = new GsonBuilder();
         gb.registerTypeAdapter(Money.class, new MoneySerializer());
+        gb.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer());
         gson = gb.create();
         String json = gson.toJson(list);
 
