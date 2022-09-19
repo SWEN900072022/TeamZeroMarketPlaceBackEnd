@@ -2,7 +2,7 @@ package Entity;
 
 public class Filter {
     private String filterKey;
-    private String filterVal;
+    private Object filterVal;
 
     public Filter(String filterKey, String filterVal) {
         this.filterKey = filterKey;
@@ -17,11 +17,11 @@ public class Filter {
         this.filterKey = filterKey;
     }
 
-    public String getFilterVal() {
+    public Object getFilterVal() {
         return filterVal;
     }
 
-    public void setFilterVal(String filterVal) {
+    public void setFilterVal(Object filterVal) {
         this.filterVal = filterVal;
     }
 }
