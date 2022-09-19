@@ -1,8 +1,10 @@
 package Servlets;
 
 import Entity.Bid;
+import JsonDeserializer.BidDeserializer;
 import Model.BidModel;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import javax.servlet.*;
@@ -23,10 +25,11 @@ public class BidServlet extends HttpServlet {
         String bid = request.getParameter("bid");
         String jwt = request.getHeader("jwt");
 
-        Type TypeOfBid = TypeToken.getParameterized(Bid.class).getType();
-
-        Gson gson = new Gson();
-        Bid bidObj = gson.fromJson(bid, TypeOfBid);
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        BidDeserializer bidDeserializer = new BidDeserializer();
+        gsonBuilder.registerTypeAdapter(Bid.class, bidDeserializer);
+        Gson gson = gsonBuilder.create();
+        Bid bidObj = gson.fromJson(bid, Bid.class);
 
         BidModel bm = new BidModel();
         boolean isSuccessful = bm.createBid(bidObj, jwt);
