@@ -62,7 +62,7 @@ public class ListingModel {
         List<Listing> result = new ArrayList<>();
 
         if(filterConditions == null || filterConditions.isEmpty() ) {
-            result = repo.readMulti(new FindAllInjector("listing"), new ArrayList<>());
+            result = repo.readMulti(new FindAllInjector("listings"), new ArrayList<>());
             return result;
         }
 

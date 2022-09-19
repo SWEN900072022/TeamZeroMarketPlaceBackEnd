@@ -15,7 +15,7 @@ public class FindAllInjector implements IInjector {
                 return getAllUserSQLQuery();
             case "orders":
                 return getAllOrdersSQLQuery();
-            case "listing":
+            case "listings":
                 return getAllListingSQLQuery();
             case "orderitems":
                 return getAllOrderItemsSQLQuery();
@@ -36,7 +36,7 @@ public class FindAllInjector implements IInjector {
     }
 
     private String getAllListingSQLQuery() {
-        return "SELECT * FROM listing;";
+        return "SELECT * FROM listings;";
     }
 }
 
