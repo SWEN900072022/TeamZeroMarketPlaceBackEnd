@@ -21,7 +21,6 @@ public class CancelOrderServlet extends HttpServlet {
         String jwt = request.getHeader("jwt");
 
         Type typeOfOrder = TypeToken.getParameterized(List.class, Order.class).getType();
-
         Gson gson = new Gson();
         List<Order>ordersToBeDeletedList = gson.fromJson(ordersToBeDeleted, typeOfOrder);
 
