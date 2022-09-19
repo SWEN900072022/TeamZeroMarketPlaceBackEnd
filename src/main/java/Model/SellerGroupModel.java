@@ -5,6 +5,7 @@ import Entity.SellerGroup;
 import Entity.User;
 import Enums.UserRoles;
 import Injector.DeleteConditionInjector.DeleteGroupMemberByUserIdInjector;
+import Injector.FindConditionInjector.FindAllInjector;
 import Injector.FindConditionInjector.FindGroupIdByNameInjector;
 import Injector.FindConditionInjector.FindIdInjector;
 import Mapper.GroupMembershipMapper;
@@ -164,5 +165,11 @@ public class SellerGroupModel {
             return false;
         }
         return true;
+    }
+
+    public List<SellerGroup> getAllSellerGroup() {
+        List<Object> param = new ArrayList<>();
+        List<SellerGroup> sellerGroupList = sellerGroupRepo.readMulti(new FindAllInjector("sellergroups"), param);
+        return sellerGroupList;
     }
 }
