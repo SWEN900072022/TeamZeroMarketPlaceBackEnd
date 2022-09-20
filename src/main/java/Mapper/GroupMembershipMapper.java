@@ -35,7 +35,7 @@ public class GroupMembershipMapper extends GeneralMapper<GroupMembership> {
                 Statement.RETURN_GENERATED_KEYS
         );
         statement.setInt(1, gm.getGroupId());
-        statement.setInt(2, gm.getGroupId());
+        statement.setInt(2, gm.getUserId());
         statement.execute();
     }
 
