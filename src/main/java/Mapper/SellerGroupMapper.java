@@ -45,6 +45,7 @@ public class SellerGroupMapper extends GeneralMapper<SellerGroup> {
         );
 
         statement.setString(1, TEntity.getGroupName());
+        statement.execute();
 
         if(!shouldReturn) {
             return null;
