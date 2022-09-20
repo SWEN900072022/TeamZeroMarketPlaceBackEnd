@@ -40,6 +40,15 @@ public class Bid extends EntityObject{
     }
 
     public Money getBidAmount() {
+        if(bidAmount == null && bidAmountInCents != 0) {
+            setBidAmount(
+                    Money
+                            .of(getBidAmountInCents(), Monetary.getCurrency("AUD"))
+                            .divide(100)
+            );
+        } else if(bidAmount == null) {
+            // Retrieve it from the database with the load function
+        }
         return bidAmount;
     }
 
