@@ -1,7 +1,7 @@
 package Injector.FindConditionInjector;
 
-import Injector.IInjector;
+import Injector.ISQLInjector;
 
-public abstract class GeneralFindConditionInjector implements IInjector {
+public abstract class GeneralFindConditionInjector implements ISQLInjector {
 
 }

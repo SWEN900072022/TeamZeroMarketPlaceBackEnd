@@ -4,40 +4,27 @@ import Entity.GroupMembership;
 import Entity.User;
 import Enums.UserRoles;
 import Injector.FindConditionInjector.FindIdInjector;
-import Mapper.GroupMembershipMapper;
 import Injector.FindConditionInjector.FindAllInjector;
 import Injector.FindConditionInjector.FindEmailAndPasswordInjector;
 import Injector.FindConditionInjector.FindUserOrEmailInjector;
-import Mapper.UserMapper;
 import UnitofWork.IUnitofWork;
 import UnitofWork.Repository;
+import Util.GeneralUtil;
 import Util.JWTUtil;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class UserModel {
-    private IUnitofWork<User> userRepo;
-    private IUnitofWork<GroupMembership> gmRepo;
+    private IUnitofWork repo;
 
     public UserModel() {
         // Create a mapper for the model to write data to
-        userRepo = new Repository<User>(new UserMapper());
-        gmRepo = new Repository<GroupMembership>(new GroupMembershipMapper());
+        repo = new Repository();
     }
 
-    public UserModel(IUnitofWork<User> userRepo) {
-        this.userRepo = userRepo;
-        gmRepo = new Repository<GroupMembership>(new GroupMembershipMapper());
+    public UserModel(IUnitofWork repo) {
+        this.repo = repo;
     }
-
-    public UserModel(IUnitofWork<User> userRepo, IUnitofWork<GroupMembership> gmRepo) {
-        this.userRepo = userRepo;
-        this.gmRepo = gmRepo;
-    }
-
 
     public boolean register(User user) {
         // We need to ensure that the user object is not null, if it is return null
@@ -51,11 +38,16 @@ public class UserModel {
         param.add(user.getUsername());
         param.add(user.getEmail());
 
-        User user1 = userRepo.read(new FindUserOrEmailInjector(), param);
+//        User user1 = userRepo.read(new FindUserOrEmailInjector(), param);
+        User user1 = (User) repo.read(
+                new FindUserOrEmailInjector(),
+                param,
+                User.class
+        );
 
         if(user1.isEmpty()) {
-            userRepo.registerNew(user);
-            userRepo.commit();
+            repo.registerNew(user);
+            repo.commit();
             return true;
         }
         return false;
@@ -64,7 +56,15 @@ public class UserModel {
 
     public List<User> getAllUsers() {
         List<Object> param = new ArrayList<>();
-        List<User> userList = userRepo.readMulti(new FindAllInjector("users"), param);
+//        List<User> userList = userRepo.readMulti(new FindAllInjector("users"), param);
+        List<User> userList = GeneralUtil.castObjectInList(
+                repo.readMulti(
+                        new FindAllInjector("users"),
+                        param,
+                        User.class
+                ),
+                User.class
+        );
         return userList;
     }
 
@@ -74,7 +74,12 @@ public class UserModel {
         param.add(user.getEmail());
         param.add(user.getPassword());
 
-        User user1 = userRepo.read(new FindEmailAndPasswordInjector(), param);
+//        User user1 = userRepo.read(new FindEmailAndPasswordInjector(), param);
+        User user1 = (User) repo.read(
+                new FindEmailAndPasswordInjector(),
+                param,
+                User.class
+        );
 
         if(user1 == null) {
             return "";
@@ -89,10 +94,15 @@ public class UserModel {
         claims.put("role", user1.getRole());
 
         // If the user is a seller, we include the seller group in the tokem
-        if(user1.getRole() == UserRoles.SELLER.toString()) {
+        if(Objects.equals(user1.getRole(), UserRoles.SELLER.toString())) {
             param = new ArrayList<>();
             param.add(user1.getUserId());
-            GroupMembership gm = gmRepo.read(new FindIdInjector("groupmembership"), param);
+//            GroupMembership gm = gmRepo.read(new FindIdInjector("groupmembership"), param);
+            GroupMembership gm = (GroupMembership) repo.read(
+                    new FindIdInjector("groupmembership"),
+                    param,
+                    GroupMembership.class
+            );
             claims.put("groupId", Integer.toString(gm.getGroupId()));
         }
 

@@ -3,6 +3,8 @@ package Servlets;
 import Entity.Bid;
 import JsonDeserializer.BidDeserializer;
 import Model.BidModel;
+import UnitofWork.IUnitofWork;
+import UnitofWork.Repository;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -25,12 +27,16 @@ public class BidServlet extends HttpServlet {
         String bid = request.getParameter("bid");
         String jwt = request.getHeader("jwt");
 
+        // Deserialisers for the json objects
         GsonBuilder gsonBuilder = new GsonBuilder();
         BidDeserializer bidDeserializer = new BidDeserializer();
         gsonBuilder.registerTypeAdapter(Bid.class, bidDeserializer);
         Gson gson = gsonBuilder.create();
         Bid bidObj = gson.fromJson(bid, Bid.class);
 
+        // Business logic initialisation
+        // Initialise unit of work and insert them on model initialisation
+        IUnitofWork repo = new Repository();
         BidModel bm = new BidModel();
         boolean isSuccessful = bm.createBid(bidObj, jwt);
 
@@ -41,6 +47,5 @@ public class BidServlet extends HttpServlet {
 
         PrintWriter out = response.getWriter();
         out.println(json);
-
     }
 }

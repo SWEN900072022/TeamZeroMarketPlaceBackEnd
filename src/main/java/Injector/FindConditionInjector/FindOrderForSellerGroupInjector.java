@@ -1,8 +1,8 @@
 package Injector.FindConditionInjector;
 
-import Injector.IInjector;
+import Injector.ISQLInjector;
 
-public class FindOrderForSellerGroupInjector implements IInjector {
+public class FindOrderForSellerGroupInjector implements ISQLInjector {
     @Override
     public String getSQLQuery() {
         return "SELECT oi.* FROM orderitems oi " +

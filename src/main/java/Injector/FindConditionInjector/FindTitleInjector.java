@@ -1,8 +1,8 @@
 package Injector.FindConditionInjector;
 
-import Injector.IInjector;
+import Injector.ISQLInjector;
 
-public class FindTitleInjector implements IInjector {
+public class FindTitleInjector implements ISQLInjector {
     @Override
     public String getSQLQuery() {
         return "SELECT * FROM listings WHERE title=?;";

@@ -1,8 +1,8 @@
 package Injector.DeleteConditionInjector;
 
-import Injector.IInjector;
+import Injector.ISQLInjector;
 
-public class DeleteGroupMemberByUserIdInjector implements IInjector {
+public class DeleteGroupMemberByUserIdInjector implements ISQLInjector {
     @Override
     public String getSQLQuery() {
         return "DELETE FROM groupmembership WHERE userid=?;";

@@ -7,7 +7,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public final class Util {
+public final class SQLUtil {
     private static Connection conn = null;
     public static String getEnvValue(String s) {
         try {

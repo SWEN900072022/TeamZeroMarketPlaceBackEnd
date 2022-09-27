@@ -1,8 +1,8 @@
 package Mapper;
 
 import Entity.ShoppingCartItem;
-import Injector.IInjector;
-import Util.Util;
+import Injector.ISQLInjector;
+import Util.SQLUtil;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,7 +25,7 @@ public class ShoppingCartItemsMapper extends GeneralMapper<ShoppingCartItem> {
         PreparedStatement statement;
 
         if(conn == null) {
-            conn = Util.getConnection();
+            conn = SQLUtil.getConnection();
         }
 
         statement = conn.prepareStatement(
@@ -41,7 +41,7 @@ public class ShoppingCartItemsMapper extends GeneralMapper<ShoppingCartItem> {
     public boolean modify(ShoppingCartItem TEntity) {
         try {
             if(conn == null) {
-                conn =Util.getConnection();
+                conn = SQLUtil.getConnection();
             }
 
             PreparedStatement statement = conn.prepareStatement(
@@ -63,7 +63,7 @@ public class ShoppingCartItemsMapper extends GeneralMapper<ShoppingCartItem> {
     }
 
     @Override
-    public ShoppingCartItem find(IInjector injector, List<Object> queryParam) {
+    public ShoppingCartItem find(ISQLInjector injector, List<Object> queryParam) {
         ShoppingCartItem sci = new ShoppingCartItem();
         try {
             ResultSet rs = getResultSet(injector, queryParam);
@@ -78,7 +78,7 @@ public class ShoppingCartItemsMapper extends GeneralMapper<ShoppingCartItem> {
     }
 
     @Override
-    public List<ShoppingCartItem> findMulti(IInjector injector, List<Object> queryParam) {
+    public List<ShoppingCartItem> findMulti(ISQLInjector injector, List<Object> queryParam) {
         List<ShoppingCartItem> sciList = new ArrayList<>();
         try {
             ResultSet rs = getResultSet(injector, queryParam);

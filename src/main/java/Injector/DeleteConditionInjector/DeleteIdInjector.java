@@ -1,8 +1,8 @@
 package Injector.DeleteConditionInjector;
 
-import Injector.IInjector;
+import Injector.ISQLInjector;
 
-public class DeleteIdInjector implements IInjector {
+public class DeleteIdInjector implements ISQLInjector {
     private String tableName;
     public DeleteIdInjector(String tableName) {
         this.tableName = tableName;

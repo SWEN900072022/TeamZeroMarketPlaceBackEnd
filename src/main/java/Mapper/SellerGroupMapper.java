@@ -1,8 +1,8 @@
 package Mapper;
 
 import Entity.SellerGroup;
-import Injector.IInjector;
-import Util.Util;
+import Injector.ISQLInjector;
+import Util.SQLUtil;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -35,7 +35,7 @@ public class SellerGroupMapper extends GeneralMapper<SellerGroup> {
         PreparedStatement statement;
 
         if(conn == null) {
-            conn = Util.getConnection();
+            conn = SQLUtil.getConnection();
         }
 
         statement = conn.prepareStatement(
@@ -62,7 +62,7 @@ public class SellerGroupMapper extends GeneralMapper<SellerGroup> {
     public boolean modify(SellerGroup TEntity) {
         try {
             if(conn == null) {
-                conn = Util.getConnection();
+                conn = SQLUtil.getConnection();
             }
 
             PreparedStatement statement = conn.prepareStatement(
@@ -84,7 +84,7 @@ public class SellerGroupMapper extends GeneralMapper<SellerGroup> {
     }
 
     @Override
-    public SellerGroup find(IInjector injector, List<Object> queryParam) {
+    public SellerGroup find(ISQLInjector injector, List<Object> queryParam) {
         SellerGroup sg = new SellerGroup();
         try {
             ResultSet rs = getResultSet(injector, queryParam);
@@ -99,7 +99,7 @@ public class SellerGroupMapper extends GeneralMapper<SellerGroup> {
     }
 
     @Override
-    public List<SellerGroup> findMulti(IInjector injector, List<Object> queryParam) {
+    public List<SellerGroup> findMulti(ISQLInjector injector, List<Object> queryParam) {
         List<SellerGroup> sgList = new ArrayList<>();
         try {
             ResultSet rs = getResultSet(injector, queryParam);

@@ -2,8 +2,8 @@ package Mapper;
 
 import Entity.Listing;
 import Enums.ListingTypes;
-import Injector.IInjector;
-import Util.Util;
+import Injector.ISQLInjector;
+import Util.SQLUtil;
 import org.javamoney.moneta.Money;
 
 import javax.money.Monetary;
@@ -38,7 +38,7 @@ public class ListingMapper extends GeneralMapper<Listing> {
         PreparedStatement statement;
 
         if(conn == null) {
-            conn = Util.getConnection();
+            conn = SQLUtil.getConnection();
         }
 
         statement = conn.prepareStatement(
@@ -70,7 +70,7 @@ public class ListingMapper extends GeneralMapper<Listing> {
     public boolean modify(Listing listing) {
         try {
             if(conn == null) {
-                conn = Util.getConnection();
+                conn = SQLUtil.getConnection();
             }
 
             PreparedStatement statement = conn.prepareStatement(
@@ -104,7 +104,7 @@ public class ListingMapper extends GeneralMapper<Listing> {
         return true;
     }
 
-    public Listing find(IInjector injector, List<Object> queryParam) {
+    public Listing find(ISQLInjector injector, List<Object> queryParam) {
         Listing listing = new Listing();
         try {
             ResultSet rs = getResultSet(injector, queryParam);
@@ -126,7 +126,7 @@ public class ListingMapper extends GeneralMapper<Listing> {
     }
 
     @Override
-    public List<Listing> findMulti(IInjector injector, List<Object> queryParam) {
+    public List<Listing> findMulti(ISQLInjector injector, List<Object> queryParam) {
         List<Listing> listingList = new ArrayList<>();
         try {
             ResultSet rs = getResultSet(injector, queryParam);

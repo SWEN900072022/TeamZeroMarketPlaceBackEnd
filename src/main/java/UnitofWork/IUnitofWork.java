@@ -1,16 +1,17 @@
 package UnitofWork;
 
-import Injector.IInjector;
+import Entity.EntityObject;
+import Injector.ISQLInjector;
 
 import java.util.List;
 
-public interface IUnitofWork<T>{
-    T read(IInjector injector, List<Object>param, String key);
-    List<T> readMulti(IInjector injector, List<Object>param, String key);
-    T read(IInjector injector, List<Object>param);
-    List<T> readMulti(IInjector injector, List<Object>param);
-    void registerNew(T entity);
-    void registerModified(T entity);
-    void registerDeleted(T entity);
+public interface IUnitofWork{
+    EntityObject read(ISQLInjector injector, List<Object>param, Class<?>serviceClass, String key);
+    List<EntityObject> readMulti(ISQLInjector injector, List<Object>param, Class<?>serviceClass, String key);
+    EntityObject read(ISQLInjector injector, List<Object>param, Class<?>serviceClass);
+    List<EntityObject> readMulti(ISQLInjector injector, List<Object>param, Class<?>serviceClass);
+    void registerNew(EntityObject entity);
+    void registerModified(EntityObject entity);
+    void registerDeleted(EntityObject entity);
     void commit();
 }
