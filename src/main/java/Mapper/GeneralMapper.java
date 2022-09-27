@@ -38,6 +38,10 @@ public abstract class GeneralMapper<T> implements Mapper<T> {
         return statement.getResultSet();
     }
 
+    public void setConnection(Connection conn) {
+        this.conn = conn;
+    }
+
     public boolean delete(T TEntity) {
         EntityObject TEntityObject;
         if(TEntity instanceof EntityObject) {

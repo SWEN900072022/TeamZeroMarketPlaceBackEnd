@@ -2,6 +2,8 @@ package Servlets;
 
 import Entity.User;
 import Model.SellerGroupModel;
+import UnitofWork.IUnitofWork;
+import UnitofWork.Repository;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -11,6 +13,7 @@ import javax.servlet.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,8 +30,20 @@ public class SellerOnboardServlet extends HttpServlet {
         Gson gson = new Gson();
         User user = gson.fromJson(userStr, typeOfUser);
 
-        SellerGroupModel sgModel = new SellerGroupModel();
+        IUnitofWork repo = new Repository();
+        SellerGroupModel sgModel = new SellerGroupModel(repo);
         boolean isSuccessful = sgModel.addSellerToSellerGroup(user, groupName);
+
+        // Check to see if the operations have been successful, if it is commit
+        if(isSuccessful) {
+            try {
+                repo.commit();
+            } catch (SQLException e) {
+                repo.rollback();
+            }
+        } else {
+            repo.rollback();
+        }
 
         Map<String, Boolean> result = new HashMap<>();
         result.put("result", isSuccessful);

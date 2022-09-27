@@ -5,7 +5,10 @@ import Entity.*;
 import Enums.UnitActions;
 import Injector.ISQLInjector;
 import Mapper.*;
+import Util.SQLUtil;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.*;
 
 public class Repository implements IUnitofWork{
@@ -13,8 +16,10 @@ public class Repository implements IUnitofWork{
     private Map<String, EntityObject> oneToOneIdentityMap;
     private Map<String, List<EntityObject>> oneToManyIdentityMap;
     private DIContainer<Mapper<EntityObject>> mapperContainer;
+    private Connection conn;
 
     public Repository() {
+        conn = SQLUtil.getConnection();
         context = new HashMap<>();
         oneToOneIdentityMap = new HashMap<>();
         oneToManyIdentityMap = new HashMap<>();
@@ -51,6 +56,8 @@ public class Repository implements IUnitofWork{
             // look up the database and return the object
             // First, we need to lookup for the correct mapper
             Mapper<EntityObject> mapper = mapperContainer.getInstance(objClass.getCanonicalName());
+            mapper.setConnection(conn);
+
             EntityObject entity = (EntityObject) mapper.find(injector, param);
             oneToOneIdentityMap.put(key, entity);
             return entity;
@@ -67,6 +74,8 @@ public class Repository implements IUnitofWork{
             // look up the database and return the relevant mapper
             // First, we need to lookup the correct mapper
             Mapper<EntityObject> mapper = mapperContainer.getInstance(objClass.getCanonicalName());
+            mapper.setConnection(conn);
+
             List<EntityObject> entity = mapper.findMulti(injector, param);
             oneToManyIdentityMap.put(key, entity);
             return entity;
@@ -77,6 +86,8 @@ public class Repository implements IUnitofWork{
     public EntityObject read(ISQLInjector injector, List<Object> param, Class<?>objClass) {
         // Look up the database and return the relevant mapper
         Mapper<EntityObject> mapper = mapperContainer.getInstance(objClass.getCanonicalName());
+        mapper.setConnection(conn);
+
         return mapper.find(injector, param);
     }
 
@@ -84,6 +95,8 @@ public class Repository implements IUnitofWork{
     public List<EntityObject> readMulti(ISQLInjector injector, List<Object> param, Class<?>objClass) {
         // Look up the database and return the relevant mappers
         Mapper<EntityObject> mapper = mapperContainer.getInstance(objClass.getCanonicalName());
+        mapper.setConnection(conn);
+
         return mapper.findMulti(injector, param);
     }
 
@@ -114,7 +127,7 @@ public class Repository implements IUnitofWork{
     }
 
     @Override
-    public void commit() {
+    public void commit() throws SQLException{
         // Check to see if there are anything to commit
         if(context.size() == 0) {
             return;
@@ -131,6 +144,15 @@ public class Repository implements IUnitofWork{
         if(context.containsKey(UnitActions.DELETE.toString())) {
             commitDelete();
         }
+
+        // Everything that needs to be commited should be commited at this point
+        try{
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback();
+        } finally {
+            conn.close();
+        }
     }
 
     private void commitNew() {
@@ -139,6 +161,8 @@ public class Repository implements IUnitofWork{
             // Get the object key to determine the mapper to be used
             // Once we have the mapper, we can start inserting it into the db
             Mapper<EntityObject> mapper = mapperContainer.getInstance(entity.getClass().getCanonicalName());
+            mapper.setConnection(conn);
+
             mapper.insert(entity);
         }
     }
@@ -147,6 +171,8 @@ public class Repository implements IUnitofWork{
         List<EntityObject> entityList = context.get(UnitActions.MODIFY.toString());
         for(EntityObject entity : entityList) {
             Mapper<EntityObject> mapper = mapperContainer.getInstance(entity.getClass().getCanonicalName());
+            mapper.setConnection(conn);
+
             mapper.modify(entity);
         }
     }
@@ -155,7 +181,18 @@ public class Repository implements IUnitofWork{
         List<EntityObject> entityList = context.get(UnitActions.DELETE.toString());
         for(EntityObject entity : entityList) {
             Mapper<EntityObject> mapper = mapperContainer.getInstance(entity.getClass().getCanonicalName());
+            mapper.setConnection(conn);
+
             mapper.modify(entity);
+        }
+    }
+
+    public void rollback() {
+        try {
+            conn.rollback();
+            conn.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }

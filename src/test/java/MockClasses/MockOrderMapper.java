@@ -3,6 +3,8 @@ package MockClasses;
 import Entity.Order;
 import Injector.ISQLInjector;
 import Mapper.Mapper;
+
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,5 +57,10 @@ public class MockOrderMapper implements Mapper<Order> {
     @Override
     public List<Order> findMulti(ISQLInjector injector, List<Object> queryParam) {
         return orders;
+    }
+
+    @Override
+    public void setConnection(Connection conn) {
+
     }
 }

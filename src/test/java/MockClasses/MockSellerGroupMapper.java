@@ -5,6 +5,7 @@ import Injector.FindConditionInjector.FindGroupIdByNameInjector;
 import Injector.ISQLInjector;
 import Mapper.Mapper;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -63,5 +64,10 @@ public class MockSellerGroupMapper implements Mapper<SellerGroup> {
     @Override
     public List<SellerGroup> findMulti(ISQLInjector injector, List<Object> queryParam) {
         return sgList;
+    }
+
+    @Override
+    public void setConnection(Connection conn) {
+
     }
 }

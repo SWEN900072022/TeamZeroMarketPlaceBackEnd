@@ -13,6 +13,7 @@ import UnitofWork.Repository;
 import Util.GeneralUtil;
 import Util.JWTUtil;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,7 +60,6 @@ public class SellerGroupModel {
         // At this point, we should be an admin, write to db
         if(sgTemp.isEmpty()) {
             repo.registerNew(sg);
-            repo.commit();
             return true;
         }
         return false;
@@ -112,18 +112,13 @@ public class SellerGroupModel {
             // User is in a pre existing group, cannot be added in
             return false;
         }
-        // Now, we have a user that exists and is not in any groups, we can commit the changes now
+        // Now, we have a user that exists and is not in any groups, we can register the changes now
         gm = new GroupMembership();
         gm.setGroupId(sg.getGroupId());
         gm.setUserId(userDB.getUserId());
 
         repo.registerNew(gm);
 
-        try{
-            repo.commit();
-        } catch(Exception e) {
-            return false;
-        }
         return true;
     }
 
@@ -160,7 +155,7 @@ public class SellerGroupModel {
             return false;
         }
 
-        // Existing user in a seller group, register and commit the deletion
+        // Existing user in a seller group, register the deletion
         param = new ArrayList<>();
         param.add(gm.getUserId());
 
@@ -168,12 +163,6 @@ public class SellerGroupModel {
         gm.setParam(param);
         repo.registerDeleted(gm);
 
-        // commit the changes
-        try {
-            repo.commit();
-        } catch (Exception e) {
-            return false;
-        }
         return true;
     }
 

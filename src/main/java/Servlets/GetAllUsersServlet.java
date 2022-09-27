@@ -3,6 +3,8 @@ package Servlets;
 import Entity.User;
 import Mapper.UserMapper;
 import Model.UserModel;
+import UnitofWork.IUnitofWork;
+import UnitofWork.Repository;
 import com.google.gson.Gson;
 
 import javax.servlet.*;
@@ -16,8 +18,8 @@ import java.util.List;
 public class GetAllUsersServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-        UserModel uModel = new UserModel();
+        IUnitofWork repo = new Repository();
+        UserModel uModel = new UserModel(repo);
         List<User> list;
         list = uModel.getAllUsers();
 

@@ -12,6 +12,7 @@ import UnitofWork.Repository;
 import Util.GeneralUtil;
 import Util.JWTUtil;
 
+import java.sql.SQLException;
 import java.util.*;
 
 public class UserModel {
@@ -47,7 +48,6 @@ public class UserModel {
 
         if(user1.isEmpty()) {
             repo.registerNew(user);
-            repo.commit();
             return true;
         }
         return false;

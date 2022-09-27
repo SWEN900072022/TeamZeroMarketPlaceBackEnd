@@ -6,6 +6,7 @@ import Mapper.Mapper;
 import org.javamoney.moneta.Money;
 
 import javax.money.Monetary;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,5 +62,10 @@ public class MockOrderItemMapper implements Mapper<OrderItem> {
     @Override
     public List<OrderItem> findMulti(ISQLInjector injector, List<Object> queryParam) {
         return orderItems;
+    }
+
+    @Override
+    public void setConnection(Connection conn) {
+
     }
 }

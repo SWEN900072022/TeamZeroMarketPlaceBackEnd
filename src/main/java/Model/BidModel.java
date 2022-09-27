@@ -73,13 +73,6 @@ public class BidModel {
         // Start writing to the database
 //        bidRepo.registerNew(bid);
         repo.registerNew(bid);
-
-        try {
-//            bidRepo.commit();
-            repo.commit();
-        } catch (Exception e) {
-            return false;
-        }
         return true;
     }
 }

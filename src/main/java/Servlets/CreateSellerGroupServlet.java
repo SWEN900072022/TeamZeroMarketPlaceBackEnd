@@ -2,6 +2,8 @@ package Servlets;
 
 import Entity.SellerGroup;
 import Model.SellerGroupModel;
+import UnitofWork.IUnitofWork;
+import UnitofWork.Repository;
 import com.google.gson.Gson;
 
 import javax.servlet.*;
@@ -9,6 +11,7 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,8 +24,20 @@ public class CreateSellerGroupServlet extends HttpServlet {
         String groupName = request.getParameter("groupName");
 
         SellerGroup sg = new SellerGroup(groupName);
-        SellerGroupModel sgModel = new SellerGroupModel();
+        IUnitofWork repo = new Repository();
+        SellerGroupModel sgModel = new SellerGroupModel(repo);
         boolean hasCreated = sgModel.createSellerGroup(sg, jwt);
+
+        // Check to see if the operations have been successful, if it is commit
+        if(hasCreated) {
+            try {
+                repo.commit();
+            } catch (SQLException e) {
+                repo.rollback();
+            }
+        } else {
+            repo.rollback();
+        }
 
         Map<String, Boolean> result = new HashMap<>();
         result.put("result", hasCreated);

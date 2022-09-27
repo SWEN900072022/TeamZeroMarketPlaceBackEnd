@@ -2,6 +2,8 @@ package Servlets;
 
 import Entity.User;
 import Model.UserModel;
+import UnitofWork.IUnitofWork;
+import UnitofWork.Repository;
 import com.google.gson.Gson;
 
 import javax.servlet.*;
@@ -21,7 +23,8 @@ public class LoginServlet extends HttpServlet {
         String role = request.getParameter("role");
 
         User user = new User(email, null, password, role);
-        UserModel uModel = new UserModel();
+        IUnitofWork repo = new Repository();
+        UserModel uModel = new UserModel(repo);
         String jwt = uModel.login(user);
 
         Map<String, String> result = new HashMap<>();

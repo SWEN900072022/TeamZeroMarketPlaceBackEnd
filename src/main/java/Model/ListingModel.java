@@ -52,13 +52,8 @@ public class ListingModel {
             int groupId = Integer.parseInt(JWTUtil.getClaim("groupId", jwt));
             listing.setGroupId(groupId);
 
-            // register the listing and commit
+            // register the listing
             repo.registerNew(listing);
-            try{
-                repo.commit();
-            } catch (Exception e) {
-                return false;
-            }
         }
         return true;
     }
@@ -112,7 +107,7 @@ public class ListingModel {
     }
 
     public boolean delete(Integer listingId, String jwt) {
-        // Check token, verify that the user can delete the listing and commit the change
+        // Check token, verify that the user can delete the listing
         String role;
         try {
             if(!JWTUtil.validateToken(jwt)) {
@@ -179,12 +174,6 @@ public class ListingModel {
             repo.registerDeleted(listing);
         }
 
-        try {
-            repo.commit();
-        } catch (Exception e) {
-            System.out.println(e);
-            return false;
-        }
         return true;
     }
 

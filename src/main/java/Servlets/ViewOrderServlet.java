@@ -3,6 +3,8 @@ package Servlets;
 import JsonSerializer.MoneySerializer;
 import Model.OrderModel;
 import Entity.OrderItem;
+import UnitofWork.IUnitofWork;
+import UnitofWork.Repository;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.javamoney.moneta.Money;
@@ -21,7 +23,8 @@ public class ViewOrderServlet extends HttpServlet {
         String jwt = request.getHeader("jwt");
 
         // Since in the jwt, we have the user id, that would determine how many orders will be retrieved
-        OrderModel oModel = new OrderModel();
+        IUnitofWork repo = new Repository();
+        OrderModel oModel = new OrderModel(repo);
         List<OrderItem> list = oModel.getOrderItems(jwt);
 
         GsonBuilder gb = new GsonBuilder();

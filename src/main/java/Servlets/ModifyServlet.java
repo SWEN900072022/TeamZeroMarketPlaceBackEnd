@@ -3,6 +3,8 @@ package Servlets;
 import Entity.Order;
 import Entity.OrderItem;
 import Model.OrderModel;
+import UnitofWork.IUnitofWork;
+import UnitofWork.Repository;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -12,6 +14,7 @@ import javax.servlet.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +32,21 @@ public class ModifyServlet extends HttpServlet {
         List<OrderItem>ordersToBeModifiedList = gson.fromJson(orderItemsToBeRefactored, typeOfOrderItem);
 
         // Perform the modification
-        OrderModel om = new OrderModel();
+        IUnitofWork repo = new Repository();
+        OrderModel om = new OrderModel(repo);
         boolean isSuccessful = om.modifyOrders(ordersToBeModifiedList, jwt);
+
+        // Check to see if the operations have been successful, if it is commit
+        if(isSuccessful) {
+            try {
+                repo.commit();
+            } catch (SQLException e) {
+                repo.rollback();
+            }
+        } else {
+            repo.rollback();
+        }
+
         Map<String, Boolean> result = new HashMap<>();
         result.put("result", isSuccessful);
         String json = gson.toJson(result);

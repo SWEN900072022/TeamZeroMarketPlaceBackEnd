@@ -13,6 +13,7 @@ import UnitofWork.Repository;
 import Util.GeneralUtil;
 import Util.JWTUtil;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +55,11 @@ public class OrderModel {
 
         // TODO: might need to create a custom id generator
         repo.registerNew(order);
-        repo.commit();
+        try{
+            repo.commit();
+        } catch(SQLException e) {
+            return false;
+        }
 
         //  Get the orderid before we start inserting the orderitems
         int orderId = OrderMapper.latestKeyVal;
@@ -83,12 +88,6 @@ public class OrderModel {
             repo.registerModified(l);
             oi.setOrderId(orderId);
             repo.registerNew(oi);
-        }
-        // Push changes
-        try {
-            repo.commit();
-        } catch (Exception e) {
-            return false;
         }
         return true;
     }
@@ -269,12 +268,6 @@ public class OrderModel {
             return false;
         }
 
-        // Commit the changes to the database
-        try {
-            repo.commit();
-        } catch (Exception e) {
-            return false;
-        }
         return true;
     }
 
@@ -294,7 +287,7 @@ public class OrderModel {
         // Once we validated that the user have access to the order, we see if apply the modification
         // Increase/Decrease for users
         // Decrease for sellers
-        // Register and commit the changes
+        // Register the changes
 
         String userId = JWTUtil.getSubject(jwt);
 
@@ -320,9 +313,6 @@ public class OrderModel {
             return false;
         }
         // Admin shouldn't be able to modify
-
-        // All operations done
-        repo.commit();
         return true;
     }
 

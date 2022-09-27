@@ -3,6 +3,7 @@ package UnitofWork;
 import Entity.EntityObject;
 import Injector.ISQLInjector;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public interface IUnitofWork{
@@ -13,5 +14,6 @@ public interface IUnitofWork{
     void registerNew(EntityObject entity);
     void registerModified(EntityObject entity);
     void registerDeleted(EntityObject entity);
-    void commit();
+    void commit() throws SQLException;
+    void rollback();
 }

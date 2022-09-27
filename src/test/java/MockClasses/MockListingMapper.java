@@ -11,6 +11,7 @@ import Mapper.Mapper;
 import org.javamoney.moneta.Money;
 
 import javax.money.Monetary;
+import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -125,5 +126,10 @@ public class MockListingMapper implements Mapper<Listing> {
         }
 
         return result;
+    }
+
+    @Override
+    public void setConnection(Connection conn) {
+
     }
 }

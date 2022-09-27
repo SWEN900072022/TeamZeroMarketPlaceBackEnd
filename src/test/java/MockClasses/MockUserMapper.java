@@ -7,6 +7,7 @@ import Injector.FindConditionInjector.FindUserOrEmailInjector;
 import Injector.ISQLInjector;
 import Mapper.Mapper;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,5 +80,10 @@ public class MockUserMapper implements Mapper<User> {
     @Override
     public List<User> findMulti(ISQLInjector injector, List<Object> queryParam) {
         return users;
+    }
+
+    @Override
+    public void setConnection(Connection conn) {
+
     }
 }
