@@ -1,18 +1,18 @@
 package Entity;
 
-import Injector.IInjector;
+import Injector.ISQLInjector;
 
 import java.util.List;
 
-public abstract class EntityObject {
-    private IInjector injector;
+public abstract class EntityObject implements IEntityObject {
+    private ISQLInjector injector;
     private List<Object> param;
 
-    public IInjector getInjector() {
+    public ISQLInjector getInjector() {
         return injector;
     }
 
-    public void setInjector(IInjector injector) {
+    public void setInjector(ISQLInjector injector) {
         this.injector = injector;
     }
 

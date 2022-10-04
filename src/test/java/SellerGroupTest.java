@@ -1,6 +1,6 @@
 import Entity.SellerGroup;
 import Enums.UserRoles;
-import MockClasses.MockSellerGroupRepository;
+import MockClasses.MockRepository;
 import Model.SellerGroupModel;
 import UnitofWork.IUnitofWork;
 import Util.JWTUtil;
@@ -12,21 +12,20 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SellerGroupTest {
-    private MockSellerGroupRepository sgRepo;
+    private MockRepository repo;
     private SellerGroupModel sgModel;
     private String jwt;
     private SellerGroup sg;
 
     public SellerGroupTest() {
-        sgRepo = new MockSellerGroupRepository();
-        sgModel = new SellerGroupModel(sgRepo);
+        this.repo = new MockRepository();
+        sgModel = new SellerGroupModel(repo);
         jwt = JWTUtil.generateToken("1", new HashMap<>());
         sg = new SellerGroup();
     }
 
     @Test
     public void userCreateSellerGroup() {
-        this.sgRepo.isEmpty = true;
         Map<String, String> claim = new HashMap<>();
         claim.put("role", UserRoles.CUSTOMER.toString());
 
@@ -37,7 +36,6 @@ public class SellerGroupTest {
 
     @Test
     public void sellerCreateSellerGroup() {
-        this.sgRepo.isEmpty = true;
         Map<String, String> claim = new HashMap<>();
         claim.put("role", UserRoles.SELLER.toString());
 
@@ -48,12 +46,16 @@ public class SellerGroupTest {
 
     @Test
     public void adminCreateSellerGroup() {
-        this.sgRepo.isEmpty = true;
         Map<String, String> claim = new HashMap<>();
         claim.put("role", UserRoles.ADMIN.toString());
 
         jwt = JWTUtil.generateToken("1", claim);
-        boolean hasCreated = sgModel.createSellerGroup(sg, jwt);
+
+        SellerGroup sg1 = new SellerGroup();
+        sg1.setGroupId(3);
+        sg1.setGroupName("c");
+
+        boolean hasCreated = sgModel.createSellerGroup(sg1, jwt);
         assertTrue(hasCreated);
     }
 
@@ -69,7 +71,12 @@ public class SellerGroupTest {
         claim.put("role", UserRoles.ADMIN.toString());
 
         jwt = JWTUtil.generateToken("1", claim);
-        boolean hasCreated = sgModel.createSellerGroup(sg, jwt);
+        SellerGroup sg1 = new SellerGroup();
+
+        sg1.setGroupName("a");
+        sg1.setGroupId(1);
+
+        boolean hasCreated = sgModel.createSellerGroup(sg1, jwt);
         assertFalse(hasCreated);
     }
 }

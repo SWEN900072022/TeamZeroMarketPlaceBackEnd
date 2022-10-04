@@ -1,8 +1,8 @@
 package Mapper;
 
 import Entity.Order;
-import Injector.IInjector;
-import Util.Util;
+import Injector.ISQLInjector;
+import Util.SQLUtil;
 
 import java.sql.*;
 import java.util.*;
@@ -19,7 +19,7 @@ public class OrderMapper extends GeneralMapper<Order> {
             PreparedStatement statement;
 
             if (conn == null) {
-                conn = Util.getConnection();
+                conn = SQLUtil.getConnection();
             }
 
             statement = conn.prepareStatement(
@@ -42,7 +42,7 @@ public class OrderMapper extends GeneralMapper<Order> {
     @Override
     public boolean modify(Order order) {
         if (conn == null) {
-            conn = Util.getConnection();
+            conn = SQLUtil.getConnection();
         }
         try {
             PreparedStatement statement = conn.prepareStatement(
@@ -65,7 +65,7 @@ public class OrderMapper extends GeneralMapper<Order> {
         return true;
     }
 
-    public Order find(IInjector injector, List<Object> queryParam) {
+    public Order find(ISQLInjector injector, List<Object> queryParam) {
         Order order = new Order();
         try {
             ResultSet rs = getResultSet(injector, queryParam);
@@ -81,7 +81,7 @@ public class OrderMapper extends GeneralMapper<Order> {
     }
 
     @Override
-    public List<Order> findMulti(IInjector injector, List<Object> queryParam) {
+    public List<Order> findMulti(ISQLInjector injector, List<Object> queryParam) {
         List<Order> orderList = new ArrayList<>();
         try {
             ResultSet rs = getResultSet(injector, queryParam);

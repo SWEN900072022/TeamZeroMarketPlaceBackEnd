@@ -4,8 +4,6 @@ import Entity.Bid;
 import Entity.Listing;
 import Injector.FindConditionInjector.FindBidFromListing;
 import Injector.FindConditionInjector.FindIdInjector;
-import Mapper.BidMapper;
-import Mapper.ListingMapper;
 import UnitofWork.IUnitofWork;
 import UnitofWork.Repository;
 import Util.JWTUtil;
@@ -15,17 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BidModel {
-    private IUnitofWork<Listing> listingRepo;
-    private IUnitofWork<Bid> bidRepo;
+    private IUnitofWork repo;
 
     public BidModel() {
-        listingRepo = new Repository<Listing>(new ListingMapper());
-        bidRepo = new Repository<Bid>(new BidMapper());
+        repo = new Repository();
     }
 
-    public BidModel(IUnitofWork<Listing> listingRepo, IUnitofWork<Bid> bidRepo) {
-        this.listingRepo = listingRepo;
-        this.bidRepo = bidRepo;
+    public BidModel(IUnitofWork repo) {
+        this.repo = repo;
     }
 
     public boolean createBid(Bid bid, String jwt) {
@@ -53,7 +48,9 @@ public class BidModel {
         List<Object> param = new ArrayList<>();
         param.add(bid.getListingId());
 
-        Listing bidListing = listingRepo.read(new FindIdInjector("listings"), param);
+//        Listing bidListing = listingRepo.read(new FindIdInjector("listings"), param);
+        Listing bidListing = (Listing)repo.read(new FindIdInjector("listings"), param, Listing.class);
+
         if(bidListing.getEndTime().isBefore(LocalDateTime.now())) {
             // The deadline has passed, so we return false
             return false;
@@ -64,7 +61,9 @@ public class BidModel {
         param.add(bid.getListingId());
         param.add(bid.getListingId());
 
-        Bid bid1 = bidRepo.read(new FindBidFromListing(), param);
+//        Bid bid1 = bidRepo.read(new FindBidFromListing(), param);
+        Bid bid1 = (Bid)repo.read(new FindBidFromListing(), param, Bid.class);
+
         if(bid1.getBidAmount().isGreaterThan(bid.getBidAmount())) {
             // The new bid is smaller and is overwritten
             return false;
@@ -72,13 +71,8 @@ public class BidModel {
 
         // Valid listing and sufficient bid
         // Start writing to the database
-        bidRepo.registerNew(bid);
-
-        try {
-            bidRepo.commit();
-        } catch (Exception e) {
-            return false;
-        }
+//        bidRepo.registerNew(bid);
+        repo.registerNew(bid);
         return true;
     }
 }

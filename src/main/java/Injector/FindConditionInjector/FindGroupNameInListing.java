@@ -1,8 +1,8 @@
 package Injector.FindConditionInjector;
 
-import Injector.IInjector;
+import Injector.ISQLInjector;
 
-public class FindGroupNameInListing implements IInjector {
+public class FindGroupNameInListing implements ISQLInjector {
     @Override
     public String getSQLQuery() {
         return "SELECT l.* FROM listings l " +

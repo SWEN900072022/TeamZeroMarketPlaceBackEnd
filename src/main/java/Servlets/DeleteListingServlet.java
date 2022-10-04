@@ -1,6 +1,8 @@
 package Servlets;
 
 import Model.ListingModel;
+import UnitofWork.IUnitofWork;
+import UnitofWork.Repository;
 import com.google.gson.Gson;
 
 import javax.servlet.*;
@@ -8,6 +10,7 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,8 +23,20 @@ public class DeleteListingServlet extends HttpServlet {
         String jwt = request.getHeader("jwt");
 
         // We have the listingId to identify the listing in question, now we will delete the listing
-        ListingModel listingModel = new ListingModel();
+        IUnitofWork repo = new Repository();
+        ListingModel listingModel = new ListingModel(repo);
         boolean isSuccessful = listingModel.delete(listingId, jwt);
+
+        // Check to see if the operations have been successful, if it is commit
+        if(isSuccessful) {
+            try {
+                repo.commit();
+            } catch (SQLException e) {
+                repo.rollback();
+            }
+        } else {
+            repo.rollback();
+        }
 
         Map<String, Boolean> result = new HashMap<>();
         result.put("result", isSuccessful);

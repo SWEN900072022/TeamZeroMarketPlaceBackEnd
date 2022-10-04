@@ -1,8 +1,8 @@
 package Mapper;
 
 import Entity.OrderItem;
-import Injector.IInjector;
-import Util.Util;
+import Injector.ISQLInjector;
+import Util.SQLUtil;
 import org.javamoney.moneta.Money;
 
 import javax.money.Monetary;
@@ -28,7 +28,7 @@ public class OrderItemMapper extends GeneralMapper<OrderItem> {
         PreparedStatement statement;
 
         if(conn == null) {
-            conn = Util.getConnection();
+            conn = SQLUtil.getConnection();
         }
 
         statement = conn.prepareStatement(
@@ -48,7 +48,7 @@ public class OrderItemMapper extends GeneralMapper<OrderItem> {
     public boolean modify(OrderItem TEntity) {
         try {
             if(conn == null) {
-                conn = Util.getConnection();
+                conn = SQLUtil.getConnection();
             }
 
             PreparedStatement statement = conn.prepareStatement(
@@ -74,7 +74,7 @@ public class OrderItemMapper extends GeneralMapper<OrderItem> {
     }
 
     @Override
-    public OrderItem find(IInjector injector, List<Object> queryParam) {
+    public OrderItem find(ISQLInjector injector, List<Object> queryParam) {
         OrderItem oi = new OrderItem();
         try {
             ResultSet rs = getResultSet(injector, queryParam);
@@ -91,7 +91,7 @@ public class OrderItemMapper extends GeneralMapper<OrderItem> {
     }
 
     @Override
-    public List<OrderItem> findMulti(IInjector injector, List<Object> queryParam) {
+    public List<OrderItem> findMulti(ISQLInjector injector, List<Object> queryParam) {
         List<OrderItem> oiList = new ArrayList<>();
         try {
             ResultSet rs = getResultSet(injector, queryParam);

@@ -1,8 +1,7 @@
 import Entity.Filter;
 import Entity.Listing;
-import Entity.User;
 import Enums.UserRoles;
-import MockClasses.MockListingRepository;
+import MockClasses.MockRepository;
 import Model.ListingModel;
 import Util.JWTUtil;
 import org.junit.jupiter.api.Test;
@@ -15,26 +14,23 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ListingModelTest {
-    private MockListingRepository mockListingRepository;
+    private MockRepository repo;
     private ListingModel listingModel;
     private String jwt;
 
     public ListingModelTest() {
-        this.mockListingRepository = new MockListingRepository();
-        listingModel = new ListingModel(mockListingRepository);
+        this.repo = new MockRepository();
+        listingModel = new ListingModel(repo);
         jwt = JWTUtil.generateToken("1", new HashMap<>());
     }
 
     @Test
-    /**
-     * Test for the behaviour when we search for listings based on titles
-     */
     public void searchByTitle() {
         Filter filter = new Filter("title", "a");
         List<Filter> filterList = new ArrayList<>();
         filterList.add(filter);
         List<Listing> list = listingModel.search(filterList, jwt);
-        assertEquals(2, list.size());
+        assertEquals(1, list.size());
 
         filter = new Filter("title", "b");
         filterList = new ArrayList<>();
@@ -48,13 +44,13 @@ public class ListingModelTest {
      * Test for the behaviour when we search for listings based on the seller groups selling them
      */
     public void searchByGroupName() {
-        Filter filter = new Filter("groupId", "2");
+        Filter filter = new Filter("groupId", 2);
         List<Filter> filterList = new ArrayList<>();
         filterList.add(filter);
         List<Listing> list = listingModel.search(filterList, jwt);
-        assertEquals(2, list.size());
+        assertEquals(1, list.size());
 
-        filter = new Filter("groupId", "1");
+        filter = new Filter("groupId", 1);
         filterList = new ArrayList<>();
         filterList.add(filter);
         list = listingModel.search(filterList, jwt);
@@ -85,7 +81,7 @@ public class ListingModelTest {
      */
     public void searchNullFilterCondition() {
         List<Listing> list = listingModel.search(null, jwt);
-        assertEquals(3, list.size());
+        assertEquals(2, list.size());
     }
 
     @Test
@@ -94,7 +90,7 @@ public class ListingModelTest {
      */
     public void searchWithNoFilterCondition() {
         List<Listing> list = listingModel.search(new ArrayList<>(), jwt);
-        assertEquals(3, list.size());
+        assertEquals(2, list.size());
     }
 
     @Test

@@ -7,42 +7,36 @@ import Entity.User;
 import Enums.UserRoles;
 import Injector.DeleteConditionInjector.DeleteIdInjector;
 import Injector.FindConditionInjector.*;
-import Mapper.ListingMapper;
-import Mapper.OrderItemMapper;
 import Mapper.OrderMapper;
-import Mapper.UserMapper;
 import UnitofWork.IUnitofWork;
 import UnitofWork.Repository;
+import Util.GeneralUtil;
 import Util.JWTUtil;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class OrderModel {
-    private IUnitofWork<Order> orderRepo;
-    private IUnitofWork<Listing> listingRepo;
-    private IUnitofWork<OrderItem> orderItemRepo;
-    private IUnitofWork<User> userRepo;
+    private IUnitofWork repo;
 
     public OrderModel() {
-        orderRepo = new Repository<Order>(new OrderMapper());
-        listingRepo = new Repository<Listing>(new ListingMapper());
-        userRepo = new Repository<User>(new UserMapper());
-        orderItemRepo = new Repository<OrderItem>(new OrderItemMapper());
+        repo = new Repository();
     }
 
-    public OrderModel(IUnitofWork<Order> orderRepo, IUnitofWork<Listing> listingRepo, IUnitofWork<OrderItem> orderItemRepo, IUnitofWork<User> userRepo) {
-        this.orderRepo = orderRepo;
-        this.listingRepo = listingRepo;
-        this.userRepo = userRepo;
-        this.orderItemRepo = orderItemRepo;
+    public OrderModel(IUnitofWork repo) {
+        this.repo = repo;
     }
 
     public List<OrderItem> getAllOrderItem() {
         List<Object> param = new ArrayList<>();
-        List<OrderItem> orderItemList = orderItemRepo.readMulti(new FindAllInjector("orderitems"), param);
+//        List<OrderItem> orderItemList = orderItemRepo.readMulti(new FindAllInjector("orderitems"), param);
+        List<OrderItem> orderItemList = GeneralUtil.castObjectInList(
+                repo.readMulti(
+                        new FindAllInjector("orderitems"),
+                        param,
+                        OrderItem.class),
+                OrderItem.class);
         return orderItemList;
     }
 
@@ -59,8 +53,14 @@ public class OrderModel {
             return false;
         }
 
-        orderRepo.registerNew(order);
-        orderRepo.commit();
+        // TODO: might need to create a custom id generator
+        repo.registerNew(order);
+        try{
+            repo.commit();
+        } catch(SQLException e) {
+            return false;
+        }
+
         //  Get the orderid before we start inserting the orderitems
         int orderId = OrderMapper.latestKeyVal;
 
@@ -68,7 +68,11 @@ public class OrderModel {
         for (OrderItem oi : orderItemList) {
             List<Object> param = new ArrayList<>();
             param.add(oi.getListingId());
-            Listing l = listingRepo.read(new FindIdInjector("listings"), param, Integer.toString(oi.getListingId()));
+            Listing l = (Listing) repo.read(
+                    new FindIdInjector("listings"),
+                    param,
+                    Listing.class,
+                    Integer.toString(oi.getListingId()));
             if (l == null) {
                 // The listing does not exist
                 return false;
@@ -81,16 +85,9 @@ public class OrderModel {
                 l.setQuantity(l.getQuantity() - oi.getQuantity());
             }
 
-            listingRepo.registerModified(l);
+            repo.registerModified(l);
             oi.setOrderId(orderId);
-            orderItemRepo.registerNew(oi);
-        }
-        // Push changes
-        try {
-            listingRepo.commit();
-            orderItemRepo.commit();
-        } catch (Exception e) {
-            return false;
+            repo.registerNew(oi);
         }
         return true;
     }
@@ -115,22 +112,46 @@ public class OrderModel {
         List<Object> param = new ArrayList<>();
         param.add(Integer.parseInt(userId));
 
-        User user = userRepo.read(new FindIdInjector("users"), param);
+//        User user = userRepo.read(new FindIdInjector("users"), param);
+        User user = (User) repo.read(new FindIdInjector("users"), param, User.class);
         List<OrderItem> result;
 
         if (user.getRoleEnum() == UserRoles.CUSTOMER) {
             // Customer
             // Only gets orders from the users
-            result = orderItemRepo.readMulti(new FindOrderFromUserInjector(), param);
+//            result = orderItemRepo.readMulti(new FindOrderFromUserInjector(), param);
+            result = GeneralUtil.castObjectInList(
+                    repo.readMulti(
+                            new FindOrderFromUserInjector(),
+                            param,
+                            OrderItem.class),
+                    OrderItem.class
+            );
 
         } else if (user.getRoleEnum() == UserRoles.SELLER) {
             // Seller
             // Only gets orders from its seller group
-            result = orderItemRepo.readMulti(new FindOrderForSellerGroupInjector(), param);
+//            result = orderItemRepo.readMulti(new FindOrderForSellerGroupInjector(), param);
+            result = GeneralUtil.castObjectInList(
+                    repo.readMulti(
+                            new FindOrderForSellerGroupInjector(),
+                            param,
+                            OrderItem.class
+                    ),
+                    OrderItem.class
+            );
         } else {
             // Admin
             // Gets everything
-            result = orderItemRepo.readMulti(new FindAllInjector("orderitems"), new ArrayList<>());
+//            result = orderItemRepo.readMulti(new FindAllInjector("orderitems"), new ArrayList<>());
+            result = GeneralUtil.castObjectInList(
+                    repo.readMulti(
+                            new FindAllInjector("orderitems"),
+                            new ArrayList<>(),
+                            OrderItem.class
+                    ),
+                    OrderItem.class
+            );
         }
         return result;
     }
@@ -165,9 +186,15 @@ public class OrderModel {
                 List<Object> param = new ArrayList<>();
                 param.add(o.getOrderId());
 
-                Order o1 = orderRepo.read(
+//                Order o1 = orderRepo.read(
+//                        new FindIdInjector("orders"),
+//                        param,
+//                        Integer.toString(o.getOrderId())
+//                );
+                Order o1 = (Order) repo.read(
                         new FindIdInjector("orders"),
                         param,
+                        Order.class,
                         Integer.toString(o.getOrderId())
                 );
 
@@ -180,7 +207,7 @@ public class OrderModel {
 
                     o.setInjector(new DeleteIdInjector("orders"));
                     o.setParam(param);
-                    orderRepo.registerDeleted(o);
+                    repo.registerDeleted(o);
                     // This should remove the ones n orderitems as well since they are foreign keys
                 }
             }
@@ -195,9 +222,15 @@ public class OrderModel {
                 List<Object> param = new ArrayList<>();
                 param.add(o.getOrderId());
 
-                Listing l = listingRepo.read(
+//                Listing l = listingRepo.read(
+//                        new FindOrderWIthGroupId(),
+//                        param,
+//                        Integer.toString(o.getOrderId())
+//                );
+                Listing l = (Listing) repo.read(
                         new FindOrderWIthGroupId(),
                         param,
+                        Listing.class,
                         Integer.toString(o.getOrderId())
                 );
 
@@ -210,7 +243,7 @@ public class OrderModel {
 
                     o.setInjector(new DeleteIdInjector("orders"));
                     o.setParam(param);
-                    orderRepo.registerDeleted(o);
+                    repo.registerDeleted(o);
                     // This should remove the ones n orderitems as well since they are foreign keys
                 }
 
@@ -228,19 +261,13 @@ public class OrderModel {
 
                 o.setInjector(new DeleteIdInjector("orders"));
                 o.setParam(param);
-                orderRepo.registerDeleted(o);
+                repo.registerDeleted(o);
             }
         } else {
             // Unknown role
             return false;
         }
 
-        // Commit the changes to the database
-        try {
-            orderRepo.commit();
-        } catch (Exception e) {
-            return false;
-        }
         return true;
     }
 
@@ -260,14 +287,19 @@ public class OrderModel {
         // Once we validated that the user have access to the order, we see if apply the modification
         // Increase/Decrease for users
         // Decrease for sellers
-        // Register and commit the changes
+        // Register the changes
 
         String userId = JWTUtil.getSubject(jwt);
 
         List<Object> param = new ArrayList<>();
         param.add(Integer.parseInt(userId));
 
-        User user = userRepo.read(new FindIdInjector("users"), param);
+//        User user = userRepo.read(new FindIdInjector("users"), param);
+        User user = (User) repo.read(
+                new FindIdInjector("users"),
+                param,
+                User.class
+        );
 
         try {
             if(user.getRoleEnum() == UserRoles.CUSTOMER) {
@@ -281,9 +313,6 @@ public class OrderModel {
             return false;
         }
         // Admin shouldn't be able to modify
-
-        // All operations done
-        orderItemRepo.commit();
         return true;
     }
 
@@ -295,7 +324,7 @@ public class OrderModel {
             }
 
             // We should have a valid order item now, just register it as modify
-            orderItemRepo.registerModified(oi);
+            repo.registerModified(oi);
         }
     }
 
@@ -310,14 +339,19 @@ public class OrderModel {
             List<Object>param = new ArrayList<>();
             param.add(oi.getOrderId());
             param.add(oi.getListingId());
-            OrderItem oiDB = orderItemRepo.read(new FindOrderItemWithOrderIdAndListingIdInjector(), param);
+//            OrderItem oiDB = orderItemRepo.read(new FindOrderItemWithOrderIdAndListingIdInjector(), param);
+            OrderItem oiDB = (OrderItem) repo.read(
+                    new FindOrderItemWithOrderIdAndListingIdInjector(),
+                    param,
+                    OrderItem.class
+            );
 
             if(oiDB.getQuantity() < oi.getQuantity()) {
                 // Seller increased the quantity
                 throw new Exception();
             } else {
                 // We permit the modification
-                orderItemRepo.registerModified(oi);
+                repo.registerModified(oi);
             }
         }
     }

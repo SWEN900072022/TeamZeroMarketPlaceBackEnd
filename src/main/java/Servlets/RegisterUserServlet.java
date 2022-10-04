@@ -2,6 +2,8 @@ package Servlets;
 
 import Entity.User;
 import Model.UserModel;
+import UnitofWork.IUnitofWork;
+import UnitofWork.Repository;
 import com.google.gson.Gson;
 
 import javax.servlet.*;
@@ -10,6 +12,7 @@ import javax.servlet.annotation.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,8 +27,20 @@ public class RegisterUserServlet extends HttpServlet {
         String role = request.getParameter("role");
 
         User user = new User(email, username, password, role);
-        UserModel uModel = new UserModel();
+        IUnitofWork repo = new Repository();
+        UserModel uModel = new UserModel(repo);
         boolean hasRegistered = uModel.register(user);
+
+        // Check to see if the operations have been successful, if it is commit
+        if(hasRegistered) {
+            try {
+                repo.commit();
+            } catch (SQLException e) {
+                repo.rollback();
+            }
+        } else {
+            repo.rollback();
+        }
 
         Map<String, Boolean>result = new HashMap<>();
         result.put("result", hasRegistered);

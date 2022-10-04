@@ -4,7 +4,7 @@ public class Filter {
     private String filterKey;
     private Object filterVal;
 
-    public Filter(String filterKey, String filterVal) {
+    public Filter(String filterKey, Object filterVal) {
         this.filterKey = filterKey;
         this.filterVal = filterVal;
     }

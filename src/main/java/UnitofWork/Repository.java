@@ -1,91 +1,134 @@
 package UnitofWork;
 
+import Container.DIContainer;
+import Entity.*;
 import Enums.UnitActions;
-import Injector.IInjector;
-import Mapper.Mapper;
+import Injector.ISQLInjector;
+import Mapper.*;
+import Util.SQLUtil;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.*;
 
-public class Repository<T> implements IUnitofWork<T>{
-    private final Map<String, List<T>> context;
-    private final Mapper<T> mapper;
-    private Map<String, T> identityMap;
-    private Map<String, List<T>> OneToManyIdentityMap;
+public class Repository implements IUnitofWork{
+    private final Map<String, List<EntityObject>> context;
+    private Map<String, EntityObject> oneToOneIdentityMap;
+    private Map<String, List<EntityObject>> oneToManyIdentityMap;
+    private DIContainer<Mapper<EntityObject>> mapperContainer;
+    private Connection conn;
 
-    public Repository(Mapper<T> mapper) {
+    public Repository() {
+        conn = SQLUtil.getConnection();
         context = new HashMap<>();
-        this.mapper = mapper;
-        identityMap = new HashMap<>();
-        OneToManyIdentityMap = new HashMap<>();
+        oneToOneIdentityMap = new HashMap<>();
+        oneToManyIdentityMap = new HashMap<>();
+        try {
+            mapperContainer = createContainer();
+        } catch (Exception e) {
+            mapperContainer = null;
+        }
+    }
+
+    private DIContainer<Mapper<EntityObject>> createContainer() throws Exception {
+        Map<Class<?>, Class<?>> mapperClasses = new HashMap();
+
+        // Register the mapper classes
+        mapperClasses.put(Bid.class, BidMapper.class);
+        mapperClasses.put(GroupMembership.class, GroupMembershipMapper.class);
+        mapperClasses.put(Listing.class, ListingMapper.class);
+        mapperClasses.put(OrderItem.class, OrderItemMapper.class);
+        mapperClasses.put(Order.class, OrderMapper.class);
+        mapperClasses.put(SellerGroup.class, SellerGroupMapper.class);
+        mapperClasses.put(User.class, UserMapper.class);
+        mapperClasses.put(ShoppingCartItem.class, ShoppingCartItemsMapper.class);
+
+        return new DIContainer(mapperClasses);
     }
 
     @Override
-    public T read(IInjector injector, List<Object>param, String key) {
-        if(identityMap.containsKey(key)) {
-            return identityMap.get(key);
+    public EntityObject read(ISQLInjector injector, List<Object> param, Class<?>objClass, String key) {
+        // First check to see if the entity object is in the identity map
+        if(oneToOneIdentityMap.containsKey(key)) {
+            // Return the object in the identity map
+            return oneToOneIdentityMap.get(key);
         } else {
-            T entity = mapper.find(injector, param);
-            identityMap.put(key, entity);
+            // look up the database and return the object
+            // First, we need to lookup for the correct mapper
+            Mapper<EntityObject> mapper = mapperContainer.getInstance(objClass.getCanonicalName());
+            mapper.setConnection(conn);
+
+            EntityObject entity = (EntityObject) mapper.find(injector, param);
+            oneToOneIdentityMap.put(key, entity);
             return entity;
         }
     }
 
     @Override
-    public List<T> readMulti(IInjector injector, List<Object>param, String key) {
-        if(identityMap.containsKey(key)) {
-            return OneToManyIdentityMap.get(key);
+    public List<EntityObject> readMulti(ISQLInjector injector, List<Object> param, Class<?>objClass, String key) {
+        // First check to see if the entity object is in the identity map
+        if(oneToManyIdentityMap.containsKey(key)) {
+            // Return the object in the identity map
+            return oneToManyIdentityMap.get(key);
         } else {
-            List<T> entity = mapper.findMulti(injector, param);
-            OneToManyIdentityMap.put(key, entity);
+            // look up the database and return the relevant mapper
+            // First, we need to lookup the correct mapper
+            Mapper<EntityObject> mapper = mapperContainer.getInstance(objClass.getCanonicalName());
+            mapper.setConnection(conn);
+
+            List<EntityObject> entity = mapper.findMulti(injector, param);
+            oneToManyIdentityMap.put(key, entity);
             return entity;
         }
     }
 
-    /*
-    * This is not cached by the identity mapper
-    * */
     @Override
-    public T read(IInjector injector, List<Object>param) {
+    public EntityObject read(ISQLInjector injector, List<Object> param, Class<?>objClass) {
+        // Look up the database and return the relevant mapper
+        Mapper<EntityObject> mapper = mapperContainer.getInstance(objClass.getCanonicalName());
+        mapper.setConnection(conn);
+
         return mapper.find(injector, param);
     }
 
-    /*
-    * This is not cached by the identity mapper
-    * */
     @Override
-    public List<T> readMulti(IInjector injector, List<Object>param) {
+    public List<EntityObject> readMulti(ISQLInjector injector, List<Object> param, Class<?>objClass) {
+        // Look up the database and return the relevant mappers
+        Mapper<EntityObject> mapper = mapperContainer.getInstance(objClass.getCanonicalName());
+        mapper.setConnection(conn);
+
         return mapper.findMulti(injector, param);
     }
 
     @Override
-    public void registerNew(T entity) {
+    public void registerNew(EntityObject entity) {
         register(entity, UnitActions.INSERT.toString());
     }
 
     @Override
-    public void registerModified(T entity) {
+    public void registerModified(EntityObject entity) {
         register(entity, UnitActions.MODIFY.toString());
     }
 
     @Override
-    public void registerDeleted(T entity) {
+    public void registerDeleted(EntityObject entity) {
         register(entity, UnitActions.DELETE.toString());
     }
 
-    private void register(T entity, String operation) {
-        List<T> entityToBeRegistered = context.get(operation);
+    private void register(EntityObject entity, String operation) {
+        List<EntityObject> entityToBeRegistered = context.get(operation);
+
         if(entityToBeRegistered == null) {
             entityToBeRegistered = new ArrayList<>();
         }
+
         entityToBeRegistered.add(entity);
         context.put(operation, entityToBeRegistered);
     }
 
     @Override
-    public void commit() {
+    public void commit() throws SQLException{
+        // Check to see if there are anything to commit
         if(context.size() == 0) {
             return;
         }
@@ -99,29 +142,54 @@ public class Repository<T> implements IUnitofWork<T>{
         }
 
         if(context.containsKey(UnitActions.DELETE.toString())) {
-            commitDel();
+            commitDelete();
+        }
+
+        // Everything that needs to be commited should be commited at this point
+        try{
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback();
+        } finally {
+            conn.close();
         }
     }
 
     private void commitNew() {
-        List<T> entityList = context.get(UnitActions.INSERT.toString());
-        for(T entity : entityList) {
+        List<EntityObject> entityList = context.get(UnitActions.INSERT.toString());
+        for(EntityObject entity : entityList) {
+            // Get the object key to determine the mapper to be used
+            // Once we have the mapper, we can start inserting it into the db
+            Mapper<EntityObject> mapper = mapperContainer.getInstance(entity.getClass().getCanonicalName());
+            mapper.setConnection(conn);
             mapper.insert(entity);
         }
     }
 
     private void commitModify() {
-        List<T> entityList = context.get(UnitActions.MODIFY.toString());
-        for(T entity : entityList) {
+        List<EntityObject> entityList = context.get(UnitActions.MODIFY.toString());
+        for(EntityObject entity : entityList) {
+            Mapper<EntityObject> mapper = mapperContainer.getInstance(entity.getClass().getCanonicalName());
+            mapper.setConnection(conn);
             mapper.modify(entity);
         }
     }
 
-    private void commitDel() {
-        List<T> entityList = context.get(UnitActions.DELETE.toString());
-        for(T entity : entityList) {
+    private void commitDelete() {
+        List<EntityObject> entityList = context.get(UnitActions.DELETE.toString());
+        for(EntityObject entity : entityList) {
+            Mapper<EntityObject> mapper = mapperContainer.getInstance(entity.getClass().getCanonicalName());
+            mapper.setConnection(conn);
             mapper.delete(entity);
         }
     }
 
+    public void rollback() {
+        try {
+            conn.rollback();
+            conn.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -8,31 +8,24 @@ import Injector.DeleteConditionInjector.DeleteGroupMemberByUserIdInjector;
 import Injector.FindConditionInjector.FindAllInjector;
 import Injector.FindConditionInjector.FindGroupIdByNameInjector;
 import Injector.FindConditionInjector.FindIdInjector;
-import Mapper.GroupMembershipMapper;
-import Mapper.SellerGroupMapper;
-import Mapper.UserMapper;
 import UnitofWork.IUnitofWork;
 import UnitofWork.Repository;
+import Util.GeneralUtil;
 import Util.JWTUtil;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SellerGroupModel {
-    private IUnitofWork<SellerGroup> sellerGroupRepo;
-    private IUnitofWork<User> userRepo;
-    private IUnitofWork<GroupMembership> gmRepo;
+    private IUnitofWork repo;
 
     public SellerGroupModel() {
-        sellerGroupRepo = new Repository<SellerGroup>(new SellerGroupMapper());
-        userRepo = new Repository<User>(new UserMapper());
-        gmRepo = new Repository<GroupMembership>(new GroupMembershipMapper());
+        repo = new Repository();
     }
 
-    public SellerGroupModel(IUnitofWork<SellerGroup> sellerGroupRepo) {
-        this.sellerGroupRepo = sellerGroupRepo;
-        userRepo = new Repository<User>(new UserMapper());
-        gmRepo = new Repository<GroupMembership>(new GroupMembershipMapper());
+    public SellerGroupModel(IUnitofWork repo) {
+        this.repo = repo;
     }
 
     public boolean createSellerGroup(SellerGroup sg, String jwt) {
@@ -59,12 +52,14 @@ public class SellerGroupModel {
         List<Object> param = new ArrayList<>();
         param.add(sg.getGroupName());
 
-        SellerGroup sgTemp = sellerGroupRepo.read(new FindGroupIdByNameInjector(), param);
+        SellerGroup sgTemp = (SellerGroup) repo.read(
+                new FindGroupIdByNameInjector(),
+                param,
+                SellerGroup.class);
 
         // At this point, we should be an admin, write to db
         if(sgTemp.isEmpty()) {
-            sellerGroupRepo.registerNew(sg);
-            sellerGroupRepo.commit();
+            repo.registerNew(sg);
             return true;
         }
         return false;
@@ -79,7 +74,10 @@ public class SellerGroupModel {
         // Check to see if the user exists
         List<Object> param = new ArrayList<>();
         param.add(user.getUserId());
-        User userDB = userRepo.read(new FindIdInjector("users"), param);
+        User userDB = (User) repo.read(
+                new FindIdInjector("users"),
+                param,
+                User.class);
 
         if(userDB == null || userDB.isEmpty() || userDB.getRoleEnum() != UserRoles.SELLER) {
             // Null user, non-existing user and non-seller user
@@ -90,7 +88,10 @@ public class SellerGroupModel {
         // Check to see if the seller group exists
         param = new ArrayList<>();
         param.add(groupName);
-        SellerGroup sg = sellerGroupRepo.read(new FindGroupIdByNameInjector(), param);
+        SellerGroup sg = (SellerGroup) repo.read(
+                new FindGroupIdByNameInjector(),
+                param,
+                SellerGroup.class);
 
         if(sg == null || sg.isEmpty()) {
             // Non-existent seller group and null sg
@@ -102,24 +103,22 @@ public class SellerGroupModel {
         // We have group id and user id, we can find it there is an extry in group membership or not
         param = new ArrayList<>();
         param.add(userDB.getUserId());
-        GroupMembership gm = gmRepo.read(new FindIdInjector("groupmembership"), param);
+        GroupMembership gm = (GroupMembership) repo.read(
+                new FindIdInjector("groupmembership"),
+                param,
+                GroupMembership.class);
 
         if(!gm.isEmpty()) {
             // User is in a pre existing group, cannot be added in
             return false;
         }
-        // Now, we have a user that exists and is not in any groups, we can commit the changes now
+        // Now, we have a user that exists and is not in any groups, we can register the changes now
         gm = new GroupMembership();
         gm.setGroupId(sg.getGroupId());
         gm.setUserId(userDB.getUserId());
 
-        gmRepo.registerNew(gm);
+        repo.registerNew(gm);
 
-        try{
-            gmRepo.commit();
-        } catch(Exception e) {
-            return false;
-        }
         return true;
     }
 
@@ -133,7 +132,10 @@ public class SellerGroupModel {
         // Check to see if the user exists
         List<Object> param = new ArrayList<>();
         param.add(user.getUserId());
-        User userDB = userRepo.read(new FindIdInjector("users"), param);
+        User userDB = (User) repo.read(
+                new FindIdInjector("users"),
+                param,
+                User.class);
 
         if(userDB == null || userDB.isEmpty() || userDB.getRoleEnum() != UserRoles.SELLER) {
             // Null user, non-existing user and non-seller user
@@ -143,33 +145,36 @@ public class SellerGroupModel {
         // Check to see if the user is currently in the seller group
         param = new ArrayList<>();
         param.add(userDB.getUserId());
-        GroupMembership gm = gmRepo.read(new FindIdInjector("groupmembership"), param);
+        GroupMembership gm = (GroupMembership) repo.read(
+                new FindIdInjector("groupmembership"),
+                param,
+                GroupMembership.class);
 
         if(gm == null || gm.isEmpty()) {
             // User is in a pre existing group, cannot be added in
             return false;
         }
 
-        // Existing user in a seller group, register and commit the deletion
+        // Existing user in a seller group, register the deletion
         param = new ArrayList<>();
         param.add(gm.getUserId());
 
         gm.setInjector(new DeleteGroupMemberByUserIdInjector());
         gm.setParam(param);
-        gmRepo.registerDeleted(gm);
+        repo.registerDeleted(gm);
 
-        // commit the changes
-        try {
-            gmRepo.commit();
-        } catch (Exception e) {
-            return false;
-        }
         return true;
     }
 
     public List<SellerGroup> getAllSellerGroup() {
         List<Object> param = new ArrayList<>();
-        List<SellerGroup> sellerGroupList = sellerGroupRepo.readMulti(new FindAllInjector("sellergroups"), param);
+        List<SellerGroup> sellerGroupList = GeneralUtil.castObjectInList(
+                repo.readMulti(
+                        new FindAllInjector("sellergroups"),
+                        param,
+                        SellerGroup.class),
+                SellerGroup.class
+        );
         return sellerGroupList;
     }
 }

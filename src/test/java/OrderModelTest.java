@@ -1,17 +1,8 @@
-import Entity.Listing;
 import Entity.Order;
 import Entity.OrderItem;
-import MockClasses.MockListingRepository;
-import MockClasses.MockOrderItemRepository;
-import MockClasses.MockOrderRepository;
-import MockClasses.MockUserRepository;
+import MockClasses.MockRepository;
 import Model.OrderModel;
-import UnitofWork.IUnitofWork;
-import Entity.Order;
 import Enums.UserRoles;
-import MockClasses.MockListingRepository;
-import MockClasses.MockOrderRepository;
-import Model.OrderModel;
 import Util.JWTUtil;
 import org.junit.jupiter.api.Test;
 
@@ -24,21 +15,15 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class OrderModelTest {
-    private MockOrderRepository orderRepo;
-    private MockListingRepository listingRepo;
+    private MockRepository repo;
     private OrderModel orderModel;
-    private MockOrderItemRepository orderItemRepo;
-    private MockUserRepository userRepo;
     private String jwt;
     private Order order;
     private List<OrderItem> orderItemList;
 
     public OrderModelTest() {
-        this.orderRepo = new MockOrderRepository();
-        this.listingRepo = new MockListingRepository();
-        this.orderItemRepo = new MockOrderItemRepository();
-        this.userRepo = new MockUserRepository();
-        this.orderModel = new OrderModel(orderRepo, listingRepo, orderItemRepo, userRepo);
+        this.repo = new MockRepository();
+        this.orderModel = new OrderModel(repo);
 
         // Generate a valid jwt for testing
         jwt = JWTUtil.generateToken("1", new HashMap<>());
@@ -85,7 +70,6 @@ public class OrderModelTest {
 
     @Test
     public void cancelOrderCustomerCancelOwnOrder() {
-        this.orderRepo.isUser = true;
         Map<String, String> claimMap = new HashMap<>();
         claimMap.put("role", UserRoles.CUSTOMER.toString());
         String jwt = JWTUtil.generateToken("1", claimMap);
@@ -102,7 +86,6 @@ public class OrderModelTest {
 
     @Test
     public void cancelOrderCustomerCancelOthersOrder() {
-        this.orderRepo.isUser = false;
         Map<String, String> claimMap = new HashMap<>();
         claimMap.put("role", UserRoles.CUSTOMER.toString());
         String jwt = JWTUtil.generateToken("1", claimMap);
@@ -119,7 +102,6 @@ public class OrderModelTest {
 
     @Test
     public void cancelOrderSellerCancelOwnOrder() {
-        this.listingRepo.isGroup = true;
         Map<String, String> claimMap = new HashMap<>();
         claimMap.put("role", UserRoles.SELLER.toString());
         claimMap.put("groupId", "1");
@@ -137,7 +119,6 @@ public class OrderModelTest {
 
     @Test
     public void cancelOrderSellerCancelOtherOrder() {
-        this.listingRepo.isGroup = false;
         Map<String, String> claimMap = new HashMap<>();
         claimMap.put("role", UserRoles.SELLER.toString());
         claimMap.put("groupId", "1");
@@ -145,8 +126,8 @@ public class OrderModelTest {
 
         List<Order> orderList = new ArrayList<>();
         Order order = new Order();
-        order.setOrderId(1);
-        order.setUserId(1);
+        order.setOrderId(2);
+        order.setUserId(2);
         orderList.add(order);
 
         boolean isSuccessful = orderModel.cancelOrders(orderList, jwt);
@@ -155,7 +136,6 @@ public class OrderModelTest {
 
     @Test
     public void listingDoesNotExist() {
-        listingRepo.isNull = true;
         orderItemList = new ArrayList<>();
         OrderItem oi = new OrderItem();
         oi.setQuantity(20);
@@ -177,7 +157,6 @@ public class OrderModelTest {
 
     @Test
     public void correctDetailsForOneOrderItem() {
-        this.listingRepo.isGroup = true;
         orderItemList = new ArrayList<>();
         OrderItem oi = new OrderItem();
         oi.setQuantity(1);
@@ -205,7 +184,6 @@ public class OrderModelTest {
 
     @Test
     public void correctDetailsForANumberOfOrderItems() {
-        this.listingRepo.isGroup = true;
         orderItemList = new ArrayList<>();
         OrderItem oi = new OrderItem();
         oi.setQuantity(1);
