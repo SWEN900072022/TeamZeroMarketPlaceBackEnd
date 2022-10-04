@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="marketPlaceDB@localhost" uuid="efa77c22-eefa-40fe-8b69-eb1fbc60b425">
+    <data-source source="LOCAL" name="teamzero@localhost" uuid="0d6fb1de-8beb-4816-b7ff-d8d5f1ec5df0">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/marketPlaceDB</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5432/teamzero</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>
