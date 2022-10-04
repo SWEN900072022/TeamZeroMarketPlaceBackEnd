@@ -118,6 +118,11 @@ public class MockRepository implements IUnitofWork {
         }
     }
 
+    @Override
+    public void rollback() {
+
+    }
+
     private void commitNew() {
         List<EntityObject> entityList = testContext.get(UnitActions.INSERT.toString());
         for(EntityObject entity : entityList) {

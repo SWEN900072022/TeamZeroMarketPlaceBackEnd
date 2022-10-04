@@ -162,7 +162,6 @@ public class Repository implements IUnitofWork{
             // Once we have the mapper, we can start inserting it into the db
             Mapper<EntityObject> mapper = mapperContainer.getInstance(entity.getClass().getCanonicalName());
             mapper.setConnection(conn);
-
             mapper.insert(entity);
         }
     }
@@ -172,7 +171,6 @@ public class Repository implements IUnitofWork{
         for(EntityObject entity : entityList) {
             Mapper<EntityObject> mapper = mapperContainer.getInstance(entity.getClass().getCanonicalName());
             mapper.setConnection(conn);
-
             mapper.modify(entity);
         }
     }
@@ -182,8 +180,7 @@ public class Repository implements IUnitofWork{
         for(EntityObject entity : entityList) {
             Mapper<EntityObject> mapper = mapperContainer.getInstance(entity.getClass().getCanonicalName());
             mapper.setConnection(conn);
-
-            mapper.modify(entity);
+            mapper.delete(entity);
         }
     }
 
