@@ -104,4 +104,41 @@ public class ListingModelTest {
         boolean isSuccessful = listingModel.createListing(listing, jwt);
         assertTrue(isSuccessful);
     }
+
+    @Test
+    public void IdealModifyListingBuyer() {
+        Map<String, String> claimMap = new HashMap<>();
+        claimMap.put("role", UserRoles.CUSTOMER.toString());
+        jwt = JWTUtil.generateToken("1", claimMap);
+
+        boolean isSuccessful = listingModel.modifyListing(1, 2, jwt);
+        assertTrue(isSuccessful);
+    }
+
+    @Test
+    public void IdealModifyListingSeller(){
+        Map<String, String> claimMap = new HashMap<>();
+        claimMap.put("role", UserRoles.SELLER.toString());
+        claimMap.put("groupId", "1");
+        jwt = JWTUtil.generateToken("1", claimMap);
+
+        boolean isSuccessful = listingModel.modifyListing(1, 3, jwt);
+        assertTrue(isSuccessful);
+    }
+
+    @Test
+    public void ModifyListingIncorrectListingId() {
+        Map<String, String> claimMap = new HashMap<>();
+        claimMap.put("role", UserRoles.CUSTOMER.toString());
+        jwt = JWTUtil.generateToken("1", claimMap);
+
+        boolean isSuccessful = listingModel.modifyListing(3, 3, jwt);
+        assertFalse(isSuccessful);
+    }
+
+    @Test
+    public void ModifyListingIncorrectJWT() {
+        boolean isSuccessful = listingModel.modifyListing(1, 2, "");
+        assertFalse(isSuccessful);
+    }
 }

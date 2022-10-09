@@ -95,7 +95,7 @@ public class MockListingMapper implements Mapper<Listing> {
                 }
             }
         }
-        return listings.get(0);
+        return null;
     }
 
     @Override
