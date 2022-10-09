@@ -2,6 +2,7 @@ package Servlets;
 
 import Entity.Order;
 import Entity.OrderItem;
+import Model.ListingModel;
 import Model.OrderModel;
 import UnitofWork.IUnitofWork;
 import UnitofWork.Repository;
@@ -31,10 +32,18 @@ public class ModifyServlet extends HttpServlet {
         Gson gson = new Gson();
         List<OrderItem>ordersToBeModifiedList = gson.fromJson(orderItemsToBeRefactored, typeOfOrderItem);
 
-        // Perform the modification
+        // Perform the modification on the orders
         IUnitofWork repo = new Repository();
         OrderModel om = new OrderModel(repo);
         boolean isSuccessful = om.modifyOrders(ordersToBeModifiedList, jwt);
+
+        if(isSuccessful) {
+            for (OrderItem oi : ordersToBeModifiedList) {
+                // Perform the modification on the lsiting to update the stock level
+                ListingModel lm = new ListingModel(repo);
+                isSuccessful = isSuccessful && (lm.modifyListing(oi.getListingId(), oi.getQuantity(), jwt));
+            }
+        }
 
         // Check to see if the operations have been successful, if it is commit
         if(isSuccessful) {
