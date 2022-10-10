@@ -160,6 +160,7 @@ public class OrderModelTest {
         orderItemList = new ArrayList<>();
         OrderItem oi = new OrderItem();
         oi.setQuantity(1);
+        oi.setListingId(1);
         orderItemList.add(oi);
 
         boolean isSuccessful = orderModel.createOrderItem(orderItemList, order, jwt);
@@ -186,10 +187,13 @@ public class OrderModelTest {
     public void correctDetailsForANumberOfOrderItems() {
         orderItemList = new ArrayList<>();
         OrderItem oi = new OrderItem();
+        oi.setListingId(1);
         oi.setQuantity(1);
         OrderItem oi2 = new OrderItem();
-        oi.setQuantity(2);
+        oi2.setQuantity(2);
+        oi2.setListingId(2);
         orderItemList.add(oi);
+        orderItemList.add(oi2);
 
         boolean isSuccessful = orderModel.createOrderItem(orderItemList, order, jwt);
         assertTrue(isSuccessful);

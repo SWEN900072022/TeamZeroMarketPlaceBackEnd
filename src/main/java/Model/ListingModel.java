@@ -73,7 +73,6 @@ public class ListingModel {
         List<Listing> result = new ArrayList<>();
 
         if(filterConditions == null || filterConditions.isEmpty() ) {
-//            result = repo.readMulti(new FindAllInjector("listings"), new ArrayList<>());
             result = GeneralUtil.castObjectInList(
                     repo.readMulti(
                             new FindAllInjector("listings"),
@@ -89,13 +88,12 @@ public class ListingModel {
             List<Object> param = new ArrayList<>();
             param.add(filter.getFilterVal());
 
-//            List<Listing>temp = repo.readMulti(inj, param);
             List<Listing> temp = GeneralUtil.castObjectInList(repo.readMulti(inj, param, Listing.class), Listing.class);
 
             if(result.size() == 0) {
                 result = temp;
             } else {
-                // This is an AND and we want to find the intersection
+                // This is an "AND" and we want to find the intersection
                 Set<Listing> resultSet = result.stream()
                         .distinct()
                         .filter(temp::contains)
@@ -106,6 +104,50 @@ public class ListingModel {
         return result;
     }
 
+    public boolean modifyListing(Integer listingId, Integer quantity, String jwt) {
+        // If the listing is modified by a seller, we need to check if the seller has access to it
+        // Otherwise if the listing is modified by a buyer as part of the order process, we simply allow it
+        String role;
+        try {
+            if(!JWTUtil.validateToken(jwt)) {
+                return false;
+            }
+            role = JWTUtil.getClaim("role", jwt);
+        } catch (Exception e) {
+            return false;
+        }
+
+        if(role == null || role.equals("")) {
+            return false;
+        }
+
+        // Modify the listing here
+        // Retrieve the listing, modify the object and send it back
+        List<Object> param = new ArrayList<>();
+        param.add(listingId);
+        Listing listing = (Listing) repo.read(new FindIdInjector("listings"), param, Listing.class);
+
+        // Check to see if the listing is valid
+        if(listing == null || (listing.isEmptyAuction() && listing.isEmptyFixedPrice())) {
+            return false;
+        }
+
+        // Check to see if the seller owns the listing
+        if(role.equals(UserRoles.SELLER.toString())) {
+            // Check the group id making sure that it matches
+            int groupId = Integer.parseInt(JWTUtil.getClaim("groupId", jwt));
+            if(groupId != listing.getGroupId()) {
+                return false;
+            }
+        }
+
+        // We have a valid listing with proper ownership
+        // Modification
+        listing.setQuantity(quantity);
+        repo.registerModified(listing);
+
+        return true;
+    }
     public boolean delete(Integer listingId, String jwt) {
         // Check token, verify that the user can delete the listing
         String role;
@@ -128,7 +170,6 @@ public class ListingModel {
             // delete if yes
             List<Object> param = new ArrayList<>();
             param.add(listingId);
-//            Listing listing = repo.read(new FindIdInjector("listings"), param);
             Listing listing = (Listing) repo.read(new FindIdInjector("listings"), param, Listing.class);
 
             // Check to see if the listing is valid

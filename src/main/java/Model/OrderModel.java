@@ -186,11 +186,6 @@ public class OrderModel {
                 List<Object> param = new ArrayList<>();
                 param.add(o.getOrderId());
 
-//                Order o1 = orderRepo.read(
-//                        new FindIdInjector("orders"),
-//                        param,
-//                        Integer.toString(o.getOrderId())
-//                );
                 Order o1 = (Order) repo.read(
                         new FindIdInjector("orders"),
                         param,
@@ -222,11 +217,6 @@ public class OrderModel {
                 List<Object> param = new ArrayList<>();
                 param.add(o.getOrderId());
 
-//                Listing l = listingRepo.read(
-//                        new FindOrderWIthGroupId(),
-//                        param,
-//                        Integer.toString(o.getOrderId())
-//                );
                 Listing l = (Listing) repo.read(
                         new FindOrderWIthGroupId(),
                         param,

@@ -27,6 +27,10 @@ public class MockRepository implements IUnitofWork {
         }
     }
 
+    public Map<String, List<EntityObject>> getContext() {
+        return testContext;
+    }
+
     private DIContainer<Mapper<EntityObject>> createContainer() throws Exception {
         Map<Class<?>, Class<?>> mapperClass = new HashMap<>();
 
