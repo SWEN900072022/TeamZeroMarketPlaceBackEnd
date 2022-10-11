@@ -1,13 +1,25 @@
 package Domain;
 
+import Entity.EntityObject;
+import Entity.Filter;
 import Enums.ListingTypes;
+import Injector.FindConditionInjector.FindAllInjector;
+import Injector.FindConditionInjector.FindIdInjector;
+import Injector.FindConditionInjector.FindListingWithGroupIdInjector;
+import Injector.FindConditionInjector.FindTitleInjector;
+import Injector.ISQLInjector;
+import UnitofWork.IUnitofWork;
+import Util.GeneralUtil;
 import org.javamoney.moneta.Money;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-public class Listing {
+public class Listing extends EntityObject {
     private int listingId;
     private int groupId;
     private ListingTypes type;
@@ -30,7 +42,12 @@ public class Listing {
         this.endTime = endTime;
     }
 
-    public static Listing create(Class<Listing> clazz, int listingId, int groupId, ListingTypes type, String title, String description, int quantity, Money price, LocalDateTime startTime, LocalDateTime endTime) {
+    // TODO: Replace with abstarct class later
+    public boolean isEmpty() {
+        return false;
+    }
+
+    public static Listing create(Class<?> clazz, int listingId, int groupId, ListingTypes type, String title, String description, int quantity, Money price, LocalDateTime startTime, LocalDateTime endTime) {
         if(FixedPriceListing.class.equals(clazz)) {
             return new FixedPriceListing(listingId, groupId, type, title, description, quantity, price, startTime, endTime);
         }
@@ -40,20 +57,71 @@ public class Listing {
         throw new IllegalArgumentException(clazz.getName());
     }
 
-    public void register() {
-
+    public static Listing getListingById(int listingId, IUnitofWork repo) {
+        List<Object> param = new ArrayList<>();
+        param.add(listingId);
+        return (Listing) repo.read(
+                new FindIdInjector("listings"),
+                param,
+                Listing.class);
     }
 
-    public void modify() {
+    public static List<Listing> getListingByFilterCondition(List<Filter> filterCondition, IUnitofWork repo) {
+        if(filterCondition == null || filterCondition.isEmpty()) {
+            return GeneralUtil.castObjectInList(
+                    repo.readMulti(
+                            new FindAllInjector("listings"),
+                            new ArrayList<>(), Listing.class),
+                    Listing.class);
+        }
 
+        List<Listing> result = new ArrayList<>();
+        // Populate the custom find injector
+        for(Filter filter : filterCondition) {
+            ISQLInjector inj = getInjector(filter.getFilterKey());
+
+            List<Object> param = new ArrayList<>();
+            param.add(filter.getFilterVal());
+
+            List<Listing> temp = GeneralUtil.castObjectInList(repo.readMulti(inj, param, Listing.class), Listing.class);
+            if(result.size() == 0) {
+                result = temp;
+            } else {
+                Set<Listing> resultSet = result.stream()
+                        .distinct()
+                        .filter(temp::contains)
+                        .collect(Collectors.toSet());
+                result = new ArrayList<>(resultSet);
+            }
+        }
+        return result;
     }
 
-    public void delete() {
-
+    private static ISQLInjector getInjector(String key) {
+        switch(key) {
+            case "title":
+                return new FindTitleInjector();
+            case "groupId":
+                return new FindListingWithGroupIdInjector();
+        }
+        return null;
     }
 
-    public boolean isEmpty() {
-        return true;
+    public ListingTypes getType() {
+        return type;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Listing listing = (Listing) o;
+        return getListingId() == listing.getListingId() && getGroupId() == listing.getGroupId() && getQuantity() == listing.getQuantity() && getType() == listing.getType() && Objects.equals(getTitle(), listing.getTitle()) && Objects.equals(getDescription(), listing.getDescription()) && Objects.equals(getPrice(), listing.getPrice()) && Objects.equals(getStartTime(), listing.getStartTime()) && Objects.equals(getEndTime(), listing.getEndTime());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getListingId(), getGroupId(), getType(), getTitle(), getDescription(), getQuantity(), getPrice(), getStartTime(), getEndTime());
     }
 
     public int getListingId() {
@@ -70,10 +138,6 @@ public class Listing {
 
     public void setGroupId(int groupId) {
         this.groupId = groupId;
-    }
-
-    public ListingTypes getType() {
-        return type;
     }
 
     public void setType(ListingTypes type) {
@@ -126,18 +190,5 @@ public class Listing {
 
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Listing listing = (Listing) o;
-        return getListingId() == listing.getListingId() && getGroupId() == listing.getGroupId() && getQuantity() == listing.getQuantity() && getType() == listing.getType() && Objects.equals(getTitle(), listing.getTitle()) && Objects.equals(getDescription(), listing.getDescription()) && Objects.equals(getPrice(), listing.getPrice()) && Objects.equals(getStartTime(), listing.getStartTime()) && Objects.equals(getEndTime(), listing.getEndTime());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getListingId(), getGroupId(), getType(), getTitle(), getDescription(), getQuantity(), getPrice(), getStartTime(), getEndTime());
     }
 }

@@ -1,10 +1,17 @@
 package Domain;
 
+import Entity.EntityObject;
+import Injector.FindConditionInjector.FindIdInjector;
+import Injector.FindConditionInjector.FindOrderFromUserInjector;
+import Injector.FindConditionInjector.FindOrderItemWithOrderId;
+import Injector.FindConditionInjector.FindOrderWithUser;
 import UnitofWork.IUnitofWork;
+import Util.GeneralUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class Order {
+public class Order extends EntityObject {
     private int orderId;
     private int userId;
     private String address;
@@ -26,29 +33,97 @@ public class Order {
         this.repo = repo;
     }
 
-//    public void setOrderItemList() {
-//        // We need a way to fetch the data
-//        // Maybe a static read from the repo
-//        orderItemList = repo.read();
-//    }
+    public static List<Order> getOrdersByUserId(int userId, IUnitofWork repo) {
+        List<Object> param = new ArrayList<>();
+        param.add(userId);
 
-    public OrderItem addOrderItem(Listing l, int quantity) {
-        if(l.getQuantity() - quantity < 0) {
-            return null;
+        // Get order details
+        List<Order> ordList = GeneralUtil.castObjectInList(repo.readMulti(
+                        new FindOrderWithUser(),
+                        param,
+                        Order.class), Order.class);
+
+        for(Order ord : ordList) {
+            param = new ArrayList<>();
+            param.add(ord.orderId);
+            // Get order items
+            List<OrderItem> oi = GeneralUtil.castObjectInList(
+                    repo.readMulti(
+                            new FindOrderItemWithOrderId(),
+                            param,
+                            OrderItem.class),
+                    OrderItem.class
+            );
+            ord.orderItemList = oi;
         }
-        OrderItem oi = OrderItem.create(orderId, l.getListingId(), quantity, l.getPrice());
-        orderItemList.add(oi);
+
+        return ordList;
+    }
+
+    public static List<OrderItem> getOrderItemList(int orderId, IUnitofWork repo) {
+        List<Object> param = new ArrayList<>();
+        param.add(orderId);
+        // Get order items
+        List<OrderItem> oi = GeneralUtil.castObjectInList(
+                repo.readMulti(
+                        new FindOrderItemWithOrderId(),
+                        param,
+                        OrderItem.class),
+                OrderItem.class
+        );
         return oi;
     }
 
-    public void modifyOrderItem(Listing l, int quantity) {
-        deleteOrderItem(l);
-        addOrderItem(l, quantity);
+    public OrderItem modifyOrderItem(int listingId, int quantity) {
+        // Lazy load if orderItemList is empty
+        if(orderItemList == null) {
+            getOrderItemList(orderId, repo);
+        }
+
+        for(OrderItem ord : orderItemList) {
+            if(ord.getListingId() == listingId) {
+                ord.setQuantity(quantity);
+                return ord;
+            }
+        }
+        throw new IllegalArgumentException();
     }
 
     public void deleteOrderItem(Listing l) {
         orderItemList.removeIf(t -> (
                 t.getListingId() == l.getListingId()
         ));
+    }
+
+    public int getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public List<OrderItem> getOrderItemList() {
+        return orderItemList;
+    }
+
+    public void setOrderItemList(List<OrderItem> orderItemList) {
+        this.orderItemList = orderItemList;
     }
 }

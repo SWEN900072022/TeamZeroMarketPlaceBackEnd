@@ -27,12 +27,12 @@ public class AuctionListing extends Listing{
         return false;
     }
 
-    public boolean bid(Money bid, LocalDateTime bidTime) {
+    public Bid bid(Money bid, LocalDateTime bidTime, int userId) {
         if(bidTime.isAfter(getEndTime()) || bid.isLessThanOrEqualTo(getPrice())) {
-            return false;
+            return null;
         }
 
         setPrice(bid);
-        return true;
+        return Bid.create(getListingId(), userId);
     }
 }

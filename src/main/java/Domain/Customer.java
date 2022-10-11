@@ -1,11 +1,87 @@
 package Domain;
 
+import Enums.ListingTypes;
 import Enums.UserRoles;
+import Service.Counter;
+import UnitofWork.IUnitofWork;
+import org.javamoney.moneta.Money;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-public class Customer {
+public class Customer extends User {
     private UserRoles userRoles = UserRoles.CUSTOMER;
     private List<Order> orderList;
+    private List<Listing> listingList;
+    private IUnitofWork repo;
 
+    public Customer(String email, String username, String password, int userId) {
+        super(email, username, password, userId);
+    }
+
+    public void setRepo(IUnitofWork repo) {
+        this.repo = repo;
+    }
+
+    public Order checkoutListing(String address, List<OrderItem> oiList) {
+        // Create an order object
+        // Generate order id
+        int orderId = Counter.increment(Order.class);
+        return Order.create(orderId, getUserId(), address, oiList);
+    }
+
+    public Listing bid(int listingId, Money bidAmount) {
+        Listing l = Listing.getListingById(listingId, repo);
+
+        // Check if it is an auction listing, if yes cast it
+        if(l.getType() == ListingTypes.AUCTION) {
+            AuctionListing al = (AuctionListing) l;
+            al.bid(bidAmount, LocalDateTime.now(), getUserId());
+            return al;
+        }
+        return l;
+    }
+
+    public List<Order> viewAllOrders() {
+        // Check to see if the order list is empty
+        // Lazy load if yes
+        if(orderList == null) {
+            orderList = Order.getOrdersByUserId(getUserId(), repo);
+        }
+
+        return orderList;
+    }
+
+    public Order modifyOrder(int orderId, int listingId, int quantity) {
+        // Given some order, change the order object
+        // Check to see if the order is in the orderList,if not load from
+        // db
+        if(orderList == null) {
+            orderList = Order.getOrdersByUserId(getUserId(), repo);
+        }
+
+        for(Order ord : orderList) {
+            if(ord.getOrderId() == orderId) {
+                ord.modifyOrderItem(listingId, quantity);
+                return ord;
+            }
+        }
+
+        throw new IllegalArgumentException();
+    }
+
+    public Order cancelOrder(int orderId) {
+        if(orderList == null) {
+            orderList = Order.getOrdersByUserId(getUserId(), repo);
+        }
+
+        for(int i = 0; i < orderList.size(); i++) {
+            Order ord = orderList.get(i);
+            if(ord.getOrderId() == orderId) {
+                orderList.remove(i);
+                return ord;
+            }
+        }
+        throw new IllegalArgumentException();
+    }
 }

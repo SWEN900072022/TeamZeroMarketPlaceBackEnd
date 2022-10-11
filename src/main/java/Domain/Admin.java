@@ -9,7 +9,7 @@ public class Admin extends User{
     private List<SellerGroup> sellerGroupList;
     private List<User> userGroupList;
 
-    public Admin(String email, String username, String password, int userId, UserRoles userRoles, List<Order> orderList, List<Listing> listingList) {
+    public Admin(String email, String username, String password, int userId, UserRoles userRoles) {
         super(email, username, password, userId);
         this.userRoles = userRoles;
     }

@@ -1,7 +1,8 @@
 package MockClasses;
 
 import Container.DIContainer;
-import Entity.*;
+import Domain.*;
+import Entity.EntityObject;
 import Enums.UnitActions;
 import Injector.ISQLInjector;
 import Mapper.Mapper;
