@@ -12,6 +12,7 @@ public class LockManager {
     private ConcurrentMap<LockKey, String> lockMap;
 
     public static synchronized LockManager getInstance() {
+        System.out.println("entering lock");
         if(instance == null) {
             instance = new LockManager();
         }
@@ -29,20 +30,19 @@ public class LockManager {
 
         while(lockMap.containsKey(compositeKey)) {
             try {
-                wait();
+                wait(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-        lockMap.put(compositeKey, owner);
 
-//        if(!lockMap.containsKey(compositeKey)) {
-//            //no lock on lockable, grant lock
-//            lockMap.put(compositeKey, owner);
-//            return true;
-//        } else {
-//            throw new RuntimeException("Concurrency exception, " + owner + " could not acquire lock for " + compositeKey.getKey()+compositeKey.getTableName());
-//        }
+        if(!lockMap.containsKey(compositeKey)){
+            lockMap.put(compositeKey, owner);
+            System.out.println("Lock successfully acquired for "+tableName);
+        }else{
+            System.out.println("Lock not acquired for " + tableName);
+            throw new RuntimeException("Concurrency exception, " + owner + " could not acquire lock for " + tableName);
+        }
     }
 
     public synchronized boolean releaseLock(String key,String tableName, String owner) {
@@ -51,8 +51,10 @@ public class LockManager {
         if(lockMap.get(compositeKey).equals(owner)){
             lockMap.remove(compositeKey);
             notifyAll();
+            System.out.println("Lock successfully released for "+tableName);
             return true;
         }
+        System.out.println("Lock not present for "+tableName);
         return false;
 
     }

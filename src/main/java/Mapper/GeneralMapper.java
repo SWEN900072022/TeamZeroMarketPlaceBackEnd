@@ -1,9 +1,8 @@
 package Mapper;
 
-import Entity.Bid;
 import Entity.EntityObject;
-import Injector.IInjector;
-import Util.Util;
+import Injector.ISQLInjector;
+import Util.SQLUtil;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -15,11 +14,11 @@ import java.util.List;
 public abstract class GeneralMapper<T> implements Mapper<T> {
     protected Connection conn = null;
 
-    public ResultSet getResultSet(IInjector injector, List<Object> queryParam) throws SQLException {
+    public ResultSet getResultSet(ISQLInjector injector, List<Object> queryParam) throws SQLException {
         PreparedStatement statement;
 
         if(conn == null) {
-            conn = Util.getConnection();
+            conn = SQLUtil.getConnection();
         }
 
         statement = conn.prepareStatement(injector.getSQLQuery());
@@ -37,6 +36,10 @@ public abstract class GeneralMapper<T> implements Mapper<T> {
         }
         statement.execute();
         return statement.getResultSet();
+    }
+
+    public void setConnection(Connection conn) {
+        this.conn = conn;
     }
 
     public boolean delete(T TEntity) {

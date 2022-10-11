@@ -2,7 +2,11 @@ package Servlets;
 
 import Entity.Order;
 import Entity.OrderItem;
+import Model.ListingModel;
 import Model.OrderModel;
+import PessimisticLock.LockManager;
+import UnitofWork.IUnitofWork;
+import UnitofWork.Repository;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -12,6 +16,7 @@ import javax.servlet.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,14 +33,57 @@ public class ModifyServlet extends HttpServlet {
         Gson gson = new Gson();
         List<OrderItem>ordersToBeModifiedList = gson.fromJson(orderItemsToBeRefactored, typeOfOrderItem);
 
-        // Perform the modification
-        OrderModel om = new OrderModel();
-        boolean isSuccessful = om.modifyOrders(ordersToBeModifiedList, jwt);
-        Map<String, Boolean> result = new HashMap<>();
-        result.put("result", isSuccessful);
-        String json = gson.toJson(result);
+        HttpSession httpSession = request.getSession();
+        String key = ""+ordersToBeModifiedList.get(0).getOrderId() + (ordersToBeModifiedList.get(0).getListingId());
 
-        PrintWriter out = response.getWriter();
-        out.println(json);
+        try{
+            // Attempting to acquire lock for table row
+            LockManager.getInstance().acquireLock(key, "orderitems", httpSession.getId());
+            IUnitofWork repo = new Repository();
+            OrderModel om = new OrderModel(repo);
+            boolean isSuccessful = om.modifyOrders(ordersToBeModifiedList, jwt);
+
+            if(isSuccessful) {
+                for (OrderItem oi : ordersToBeModifiedList) {
+                    // Perform the modification on the lsiting to update the stock level
+                    ListingModel lm = new ListingModel(repo);
+                    isSuccessful = isSuccessful && (lm.modifyListing(oi.getListingId(), oi.getQuantity(), jwt));
+                }
+            }
+
+            // Check to see if the operations have been successful, if it is commit
+            if(isSuccessful) {
+                try {
+                    repo.commit();
+                } catch (SQLException e) {
+                    repo.rollback();
+                }
+            } else {
+                repo.rollback();
+            }
+
+            //Releasing the lock
+            LockManager.getInstance().releaseLock(key, "orderitems", httpSession.getId());
+
+            Map<String, Boolean> result = new HashMap<>();
+            result.put("result", isSuccessful);
+            String json = gson.toJson(result);
+
+            PrintWriter out = response.getWriter();
+            out.println(json);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+//        out.print("output text");
+//        int orderID = ordersToBeModifiedList.orderId;
+//        LockManager.getInstance().acquireLock(httpSession.getId());
+        // Perform the modification on the orders
+
+//        for(OrderItem b:ordersToBeModifiedList){
+//            out.print(b.getOrderId()+" "+b.getListingId());
+//        }
+
     }
 }

@@ -1,5 +1,5 @@
 package Injector;
 
-public interface IInjector {
+public interface ISQLInjector {
     public String getSQLQuery();
 }

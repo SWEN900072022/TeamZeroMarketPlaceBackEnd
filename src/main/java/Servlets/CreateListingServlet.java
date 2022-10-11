@@ -3,6 +3,8 @@ package Servlets;
 import Entity.Listing;
 import Enums.ListingTypes;
 import Model.ListingModel;
+import UnitofWork.IUnitofWork;
+import UnitofWork.Repository;
 import Util.JWTUtil;
 import com.google.gson.Gson;
 import org.javamoney.moneta.Money;
@@ -14,6 +16,7 @@ import javax.servlet.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -30,6 +33,7 @@ public class CreateListingServlet extends HttpServlet {
         BigDecimal price = new BigDecimal(request.getParameter("price"));
         int quantity = Integer.parseInt(request.getParameter("quantity"));
         boolean isSuccessful = false;
+        IUnitofWork repo = new Repository();
 
         try {
             int groupId = Integer.parseInt(JWTUtil.getSubject(jwt));
@@ -47,11 +51,21 @@ public class CreateListingServlet extends HttpServlet {
                     startTime,
                     endTime
             );
-
-            ListingModel listingModel = new ListingModel();
+            ListingModel listingModel = new ListingModel(repo);
             isSuccessful = listingModel.createListing(listing, jwt);
         } catch (NumberFormatException e) {
             System.out.println("Number exception");
+        }
+
+        // Check to see if the operations have been successful, if it is commit
+        if(isSuccessful) {
+            try {
+                repo.commit();
+            } catch (SQLException e) {
+                repo.rollback();
+            }
+        } else {
+            repo.rollback();
         }
 
         Map<String, Boolean> result = new HashMap<>();

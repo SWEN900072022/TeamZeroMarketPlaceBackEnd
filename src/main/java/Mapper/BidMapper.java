@@ -1,8 +1,8 @@
 package Mapper;
 
 import Entity.Bid;
-import Injector.IInjector;
-import Util.Util;
+import Injector.ISQLInjector;
+import Util.SQLUtil;
 import org.javamoney.moneta.Money;
 
 import javax.money.Monetary;
@@ -28,7 +28,7 @@ public class BidMapper extends GeneralMapper<Bid>{
         PreparedStatement statement;
 
         if(conn == null) {
-            conn = Util.getConnection();
+            conn = SQLUtil.getConnection();
         }
 
         statement = conn.prepareStatement(
@@ -46,7 +46,7 @@ public class BidMapper extends GeneralMapper<Bid>{
     public boolean modify(Bid TEntity) {
         try {
             if(conn == null) {
-                conn = Util.getConnection();
+                conn = SQLUtil.getConnection();
             }
 
             PreparedStatement statement = conn.prepareStatement(
@@ -69,7 +69,7 @@ public class BidMapper extends GeneralMapper<Bid>{
     }
 
     @Override
-    public Bid find(IInjector injector, List<Object> queryParam) {
+    public Bid find(ISQLInjector injector, List<Object> queryParam) {
         Bid bid = new Bid();
         try {
             ResultSet rs = getResultSet(injector, queryParam);
@@ -85,7 +85,7 @@ public class BidMapper extends GeneralMapper<Bid>{
     }
 
     @Override
-    public List<Bid> findMulti(IInjector injector, List<Object> queryParam) {
+    public List<Bid> findMulti(ISQLInjector injector, List<Object> queryParam) {
         List<Bid> bidList = new ArrayList<>();
         try {
             ResultSet rs = getResultSet(injector, queryParam);

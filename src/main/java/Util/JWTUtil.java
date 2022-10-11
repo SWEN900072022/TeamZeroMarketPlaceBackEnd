@@ -9,7 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
-import static Util.Util.getEnvValue;
+import static Util.SQLUtil.getEnvValue;
 
 public final class JWTUtil {
     public static String generateToken(String subject, Map<String, String> claimMap) {

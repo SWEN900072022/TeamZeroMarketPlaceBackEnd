@@ -2,6 +2,8 @@ package Servlets;
 
 import Entity.SellerGroup;
 import Model.SellerGroupModel;
+import UnitofWork.IUnitofWork;
+import UnitofWork.Repository;
 import com.google.gson.Gson;
 
 import javax.servlet.*;
@@ -15,8 +17,8 @@ import java.util.List;
 public class GetAllSellerGroupServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-        SellerGroupModel sgModel = new SellerGroupModel();
+        IUnitofWork repo = new Repository();
+        SellerGroupModel sgModel = new SellerGroupModel(repo);
         List<SellerGroup> list;
         list = sgModel.getAllSellerGroup();
 

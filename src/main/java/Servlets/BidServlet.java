@@ -3,6 +3,9 @@ package Servlets;
 import Entity.Bid;
 import JsonDeserializer.BidDeserializer;
 import Model.BidModel;
+import UnitofWork.IUnitofWork;
+import UnitofWork.Repository;
+import Util.SQLUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -13,6 +16,7 @@ import javax.servlet.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,14 +29,29 @@ public class BidServlet extends HttpServlet {
         String bid = request.getParameter("bid");
         String jwt = request.getHeader("jwt");
 
+        // Deserialisers for the json objects
         GsonBuilder gsonBuilder = new GsonBuilder();
         BidDeserializer bidDeserializer = new BidDeserializer();
         gsonBuilder.registerTypeAdapter(Bid.class, bidDeserializer);
         Gson gson = gsonBuilder.create();
         Bid bidObj = gson.fromJson(bid, Bid.class);
 
-        BidModel bm = new BidModel();
+        // Business logic initialisation
+        // Initialise unit of work and insert them on model initialisation
+        IUnitofWork repo = new Repository();
+        BidModel bm = new BidModel(repo);
         boolean isSuccessful = bm.createBid(bidObj, jwt);
+
+        // Check to see if the operations have been successful, if it is commit
+        if(isSuccessful) {
+            try {
+                repo.commit();
+            } catch (SQLException e) {
+                repo.rollback();
+            }
+        } else {
+            repo.rollback();
+        }
 
         Map<String, Boolean>result = new HashMap<>();
         result.put("result", isSuccessful);
@@ -41,6 +60,5 @@ public class BidServlet extends HttpServlet {
 
         PrintWriter out = response.getWriter();
         out.println(json);
-
     }
 }

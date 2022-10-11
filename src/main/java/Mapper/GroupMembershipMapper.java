@@ -1,8 +1,8 @@
 package Mapper;
 
 import Entity.GroupMembership;
-import Injector.IInjector;
-import Util.Util;
+import Injector.ISQLInjector;
+import Util.SQLUtil;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,7 +26,7 @@ public class GroupMembershipMapper extends GeneralMapper<GroupMembership> {
         PreparedStatement statement;
 
         if(conn == null) {
-            conn = Util.getConnection();
+            conn = SQLUtil.getConnection();
         }
 
         statement = conn.prepareStatement(
@@ -43,7 +43,7 @@ public class GroupMembershipMapper extends GeneralMapper<GroupMembership> {
     public boolean modify(GroupMembership TEntity) {
         try {
             if(conn == null) {
-                conn = Util.getConnection();
+                conn = SQLUtil.getConnection();
             }
 
             PreparedStatement statement = conn.prepareStatement(
@@ -65,7 +65,7 @@ public class GroupMembershipMapper extends GeneralMapper<GroupMembership> {
     }
 
     @Override
-    public GroupMembership find(IInjector injector, List<Object> queryParam) {
+    public GroupMembership find(ISQLInjector injector, List<Object> queryParam) {
         GroupMembership gm = new GroupMembership();
         try {
             ResultSet rs = getResultSet(injector, queryParam);
@@ -80,7 +80,7 @@ public class GroupMembershipMapper extends GeneralMapper<GroupMembership> {
     }
 
     @Override
-    public List<GroupMembership> findMulti(IInjector injector, List<Object> queryParam) {
+    public List<GroupMembership> findMulti(ISQLInjector injector, List<Object> queryParam) {
         List<GroupMembership> gmList = new ArrayList<>();
         try {
             ResultSet rs = getResultSet(injector, queryParam);

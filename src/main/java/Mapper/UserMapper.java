@@ -1,8 +1,8 @@
 package Mapper;
 
 import Entity.User;
-import Injector.IInjector;
-import Util.Util;
+import Injector.ISQLInjector;
+import Util.SQLUtil;
 
 import java.sql.*;
 import java.util.*;
@@ -22,7 +22,7 @@ public class UserMapper extends GeneralMapper<User> {
         PreparedStatement statement;
 
         if(conn == null) {
-            conn = Util.getConnection();
+            conn = SQLUtil.getConnection();
         }
 
         statement = conn.prepareStatement(
@@ -51,7 +51,7 @@ public class UserMapper extends GeneralMapper<User> {
             PreparedStatement statement;
 
             if(conn == null) {
-                conn = Util.getConnection();
+                conn = SQLUtil.getConnection();
             }
 
             statement = conn.prepareStatement(
@@ -77,7 +77,7 @@ public class UserMapper extends GeneralMapper<User> {
         return true;
     }
 
-    public User find(IInjector injector, List<Object> queryParam) {
+    public User find(ISQLInjector injector, List<Object> queryParam) {
         User user = new User();
         try {
             ResultSet rs = getResultSet(injector, queryParam);
@@ -95,7 +95,7 @@ public class UserMapper extends GeneralMapper<User> {
     }
 
     @Override
-    public List<User> findMulti(IInjector injector, List<Object> queryParam) {
+    public List<User> findMulti(ISQLInjector injector, List<Object> queryParam) {
         List<User> userList = new ArrayList<User>();
         try {
             ResultSet rs = getResultSet(injector, queryParam);

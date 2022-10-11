@@ -1,7 +1,6 @@
 import Entity.User;
 import Enums.UserRoles;
-import MockClasses.MockGroupMembershipRepository;
-import MockClasses.MockUserRepository;
+import MockClasses.MockRepository;
 import Model.UserModel;
 import Util.JWTUtil;
 import org.junit.jupiter.api.Test;
@@ -13,12 +12,10 @@ public class UserModelTest {
      * Initialise the repositories needed for the test
      */
     private UserModel uModel;
-    private MockUserRepository uRepo;
-    private MockGroupMembershipRepository gmRepo;
+    private MockRepository repo;
     public UserModelTest() {
-        this.uRepo = new MockUserRepository();
-        this.gmRepo = new MockGroupMembershipRepository();
-        this.uModel = new UserModel(uRepo, gmRepo);
+        this.repo = new MockRepository();
+        this.uModel = new UserModel(repo);
     }
 
     @Test
@@ -27,7 +24,6 @@ public class UserModelTest {
      * not null
      */
     public void idealUserRegistration() {
-        this.uRepo.isNoneUser = true;
         User user = new User();
         user.setUsername("abc");
         user.setEmail("abc");
@@ -71,9 +67,6 @@ public class UserModelTest {
     @Test
     public void failedNullLogin() {
         User user = new User();
-
-        this.uRepo.isNull = true;
-
         String jwt = uModel.login(user);
         assertEquals("", jwt);
     }
@@ -81,13 +74,11 @@ public class UserModelTest {
     @Test
     public void idealSellerLogin() {
         User user = new User();
-        user.setEmail("a");
-        user.setPassword("ab");
-        user.setUsername("a");
+        user.setEmail("b");
+        user.setPassword("b");
+        user.setUsername("b");
         user.setRoles(UserRoles.SELLER.toString());
-        user.setUserId(1);
-
-        this.uRepo.isSeller = true;
+        user.setUserId(2);
 
         String jwt = uModel.login(user);
         assertNotNull(jwt);

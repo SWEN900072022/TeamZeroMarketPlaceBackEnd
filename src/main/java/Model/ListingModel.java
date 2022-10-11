@@ -5,10 +5,10 @@ import Entity.Listing;
 import Enums.UserRoles;
 import Injector.DeleteConditionInjector.DeleteIdInjector;
 import Injector.FindConditionInjector.*;
-import Injector.IInjector;
-import Mapper.ListingMapper;
+import Injector.ISQLInjector;
 import UnitofWork.IUnitofWork;
 import UnitofWork.Repository;
+import Util.GeneralUtil;
 import Util.JWTUtil;
 
 import java.util.ArrayList;
@@ -17,12 +17,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ListingModel {
-    private IUnitofWork<Listing> repo;
+    private final IUnitofWork repo;
     public ListingModel() {
-        repo = new Repository<Listing>(new ListingMapper());
+        repo = new Repository();
     }
 
-    public ListingModel(IUnitofWork<Listing> repo) {
+    public ListingModel(IUnitofWork repo) {
         this.repo = repo;
     }
 
@@ -52,13 +52,8 @@ public class ListingModel {
             int groupId = Integer.parseInt(JWTUtil.getClaim("groupId", jwt));
             listing.setGroupId(groupId);
 
-            // register the listing and commit
+            // register the listing
             repo.registerNew(listing);
-            try{
-                repo.commit();
-            } catch (Exception e) {
-                return false;
-            }
         }
         return true;
     }
@@ -78,23 +73,27 @@ public class ListingModel {
         List<Listing> result = new ArrayList<>();
 
         if(filterConditions == null || filterConditions.isEmpty() ) {
-            result = repo.readMulti(new FindAllInjector("listings"), new ArrayList<>());
+            result = GeneralUtil.castObjectInList(
+                    repo.readMulti(
+                            new FindAllInjector("listings"),
+                            new ArrayList<>(), Listing.class),
+                    Listing.class);
             return result;
         }
 
         // Populate the custom findInjector
         for(Filter filter : filterConditions) {
-            IInjector inj = getInjector(filter.getFilterKey());
+            ISQLInjector inj = getInjector(filter.getFilterKey());
 
             List<Object> param = new ArrayList<>();
             param.add(filter.getFilterVal());
 
-            List<Listing>temp = repo.readMulti(inj, param);
+            List<Listing> temp = GeneralUtil.castObjectInList(repo.readMulti(inj, param, Listing.class), Listing.class);
 
             if(result.size() == 0) {
                 result = temp;
             } else {
-                // This is an AND and we want to find the intersection
+                // This is an "AND" and we want to find the intersection
                 Set<Listing> resultSet = result.stream()
                         .distinct()
                         .filter(temp::contains)
@@ -105,8 +104,9 @@ public class ListingModel {
         return result;
     }
 
-    public boolean delete(Integer listingId, String jwt) {
-        // Check token, verify that the user can delete the listing and commit the change
+    public boolean modifyListing(Integer listingId, Integer quantity, String jwt) {
+        // If the listing is modified by a seller, we need to check if the seller has access to it
+        // Otherwise if the listing is modified by a buyer as part of the order process, we simply allow it
         String role;
         try {
             if(!JWTUtil.validateToken(jwt)) {
@@ -117,7 +117,50 @@ public class ListingModel {
             return false;
         }
 
-        if(role == null || role == "") {
+        if(role == null || role.equals("")) {
+            return false;
+        }
+
+        // Modify the listing here
+        // Retrieve the listing, modify the object and send it back
+        List<Object> param = new ArrayList<>();
+        param.add(listingId);
+        Listing listing = (Listing) repo.read(new FindIdInjector("listings"), param, Listing.class);
+
+        // Check to see if the listing is valid
+        if(listing == null || (listing.isEmptyAuction() && listing.isEmptyFixedPrice())) {
+            return false;
+        }
+
+        // Check to see if the seller owns the listing
+        if(role.equals(UserRoles.SELLER.toString())) {
+            // Check the group id making sure that it matches
+            int groupId = Integer.parseInt(JWTUtil.getClaim("groupId", jwt));
+            if(groupId != listing.getGroupId()) {
+                return false;
+            }
+        }
+
+        // We have a valid listing with proper ownership
+        // Modification
+        listing.setQuantity(quantity);
+        repo.registerModified(listing);
+
+        return true;
+    }
+    public boolean delete(Integer listingId, String jwt) {
+        // Check token, verify that the user can delete the listing
+        String role;
+        try {
+            if(!JWTUtil.validateToken(jwt)) {
+                return false;
+            }
+            role = JWTUtil.getClaim("role", jwt);
+        } catch (Exception e) {
+            return false;
+        }
+
+        if(role == null || role.equals("")) {
             return false;
         }
 
@@ -127,7 +170,7 @@ public class ListingModel {
             // delete if yes
             List<Object> param = new ArrayList<>();
             param.add(listingId);
-            Listing listing = repo.read(new FindIdInjector("listings"), param);
+            Listing listing = (Listing) repo.read(new FindIdInjector("listings"), param, Listing.class);
 
             // Check to see if the listing is valid
             if(listing == null || (listing.isEmptyAuction() && listing.isEmptyFixedPrice())) {
@@ -157,7 +200,8 @@ public class ListingModel {
             // just delete the listing
             List<Object> param = new ArrayList<>();
             param.add(listingId);
-            Listing listing = repo.read(new FindIdInjector("listings"), param);
+//            Listing listing = repo.read(new FindIdInjector("listings"), param);
+            Listing listing = (Listing)repo.read(new FindIdInjector("listings"), param, Listing.class);
 
             // Check to see if the listing is valid
             if(listing == null) {
@@ -171,16 +215,10 @@ public class ListingModel {
             repo.registerDeleted(listing);
         }
 
-        try {
-            repo.commit();
-        } catch (Exception e) {
-            System.out.println(e);
-            return false;
-        }
         return true;
     }
 
-    private IInjector getInjector(String key) {
+    private ISQLInjector getInjector(String key) {
         switch(key) {
             case "title":
                 return new FindTitleInjector();
