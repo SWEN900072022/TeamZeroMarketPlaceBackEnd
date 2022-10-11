@@ -1,11 +1,10 @@
 package Servlets;
 
-import Entity.Order;
 import Entity.OrderItem;
 import Model.ListingModel;
 import Model.OrderModel;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -33,7 +32,7 @@ public class ModifyServlet extends HttpServlet {
         List<OrderItem>ordersToBeModifiedList = gson.fromJson(orderItemsToBeRefactored, typeOfOrderItem);
 
         // Perform the modification on the orders
-        IUnitofWork repo = new Repository();
+        IUnitofWork repo = new UnitofWork();
         OrderModel om = new OrderModel(repo);
         boolean isSuccessful = om.modifyOrders(ordersToBeModifiedList, jwt);
 

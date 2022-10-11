@@ -11,14 +11,14 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
 
-public class Repository implements IUnitofWork{
+public class UnitofWork implements IUnitofWork{
     private final Map<String, List<EntityObject>> context;
     private Map<String, EntityObject> oneToOneIdentityMap;
     private Map<String, List<EntityObject>> oneToManyIdentityMap;
     private DIContainer<Mapper<EntityObject>> mapperContainer;
     private Connection conn;
 
-    public Repository() {
+    public UnitofWork() {
         conn = SQLUtil.getConnection();
         context = new HashMap<>();
         oneToOneIdentityMap = new HashMap<>();

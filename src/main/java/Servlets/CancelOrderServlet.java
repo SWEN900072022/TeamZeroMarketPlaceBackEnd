@@ -3,7 +3,7 @@ package Servlets;
 import Entity.Order;
 import Model.OrderModel;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -31,7 +31,7 @@ public class CancelOrderServlet extends HttpServlet {
         List<Order>ordersToBeDeletedList = gson.fromJson(ordersToBeDeleted, typeOfOrder);
 
         // Now that we have the list we will proceed with deleting the order
-        IUnitofWork repo = new Repository();
+        IUnitofWork repo = new UnitofWork();
         OrderModel om = new OrderModel(repo);
         boolean isSuccessful = om.cancelOrders(ordersToBeDeletedList, jwt);
 

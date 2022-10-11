@@ -4,7 +4,7 @@ import Entity.Listing;
 import Enums.ListingTypes;
 import Model.ListingModel;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
 import Util.JWTUtil;
 import com.google.gson.Gson;
 import org.javamoney.moneta.Money;
@@ -33,7 +33,7 @@ public class CreateListingServlet extends HttpServlet {
         BigDecimal price = new BigDecimal(request.getParameter("price"));
         int quantity = Integer.parseInt(request.getParameter("quantity"));
         boolean isSuccessful = false;
-        IUnitofWork repo = new Repository();
+        IUnitofWork repo = new UnitofWork();
 
         try {
             int groupId = Integer.parseInt(JWTUtil.getSubject(jwt));

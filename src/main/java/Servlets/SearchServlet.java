@@ -5,7 +5,7 @@ import JsonSerializer.LocalDateTimeSerializer;
 import JsonSerializer.MoneySerializer;
 import Model.ListingModel;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -32,7 +32,7 @@ public class SearchServlet extends HttpServlet {
         Gson gson = new Gson();
         List<Entity.Filter> filterConditions = gson.fromJson(filterList, typeOfFilter);
 
-        IUnitofWork repo = new Repository();
+        IUnitofWork repo = new UnitofWork();
         ListingModel lModel = new ListingModel(repo);
         List<Listing> list = lModel.search(filterConditions, jwt);
 

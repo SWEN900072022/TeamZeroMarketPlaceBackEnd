@@ -3,7 +3,7 @@ package Servlets;
 import Entity.User;
 import Model.SellerGroupModel;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -30,7 +30,7 @@ public class SellerOnboardServlet extends HttpServlet {
         Gson gson = new Gson();
         User user = gson.fromJson(userStr, typeOfUser);
 
-        IUnitofWork repo = new Repository();
+        IUnitofWork repo = new UnitofWork();
         SellerGroupModel sgModel = new SellerGroupModel(repo);
         boolean isSuccessful = sgModel.addSellerToSellerGroup(user, groupName);
 

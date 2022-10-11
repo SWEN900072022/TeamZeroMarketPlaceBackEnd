@@ -3,7 +3,7 @@ package Servlets;
 import Entity.User;
 import Model.UserModel;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
 import com.google.gson.Gson;
 
 import javax.servlet.*;
@@ -23,7 +23,7 @@ public class LoginServlet extends HttpServlet {
         String role = request.getParameter("role");
 
         User user = new User(email, null, password, role);
-        IUnitofWork repo = new Repository();
+        IUnitofWork repo = new UnitofWork();
         UserModel uModel = new UserModel(repo);
         String jwt = uModel.login(user);
 

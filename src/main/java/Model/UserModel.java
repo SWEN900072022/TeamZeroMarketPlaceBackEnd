@@ -8,11 +8,10 @@ import Injector.FindConditionInjector.FindAllInjector;
 import Injector.FindConditionInjector.FindEmailAndPasswordInjector;
 import Injector.FindConditionInjector.FindUserOrEmailInjector;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
 import Util.GeneralUtil;
 import Util.JWTUtil;
 
-import java.sql.SQLException;
 import java.util.*;
 
 public class UserModel {
@@ -20,7 +19,7 @@ public class UserModel {
 
     public UserModel() {
         // Create a mapper for the model to write data to
-        repo = new Repository();
+        repo = new UnitofWork();
     }
 
     public UserModel(IUnitofWork repo) {

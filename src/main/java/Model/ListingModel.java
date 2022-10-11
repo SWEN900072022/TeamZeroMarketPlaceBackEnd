@@ -7,7 +7,7 @@ import Injector.DeleteConditionInjector.DeleteIdInjector;
 import Injector.FindConditionInjector.*;
 import Injector.ISQLInjector;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
 import Util.GeneralUtil;
 import Util.JWTUtil;
 
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class ListingModel {
     private final IUnitofWork repo;
     public ListingModel() {
-        repo = new Repository();
+        repo = new UnitofWork();
     }
 
     public ListingModel(IUnitofWork repo) {

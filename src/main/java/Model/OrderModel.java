@@ -9,7 +9,7 @@ import Injector.DeleteConditionInjector.DeleteIdInjector;
 import Injector.FindConditionInjector.*;
 import Mapper.OrderMapper;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
 import Util.GeneralUtil;
 import Util.JWTUtil;
 
@@ -21,7 +21,7 @@ public class OrderModel {
     private IUnitofWork repo;
 
     public OrderModel() {
-        repo = new Repository();
+        repo = new UnitofWork();
     }
 
     public OrderModel(IUnitofWork repo) {

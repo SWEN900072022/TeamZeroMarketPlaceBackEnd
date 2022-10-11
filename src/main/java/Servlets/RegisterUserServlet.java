@@ -3,13 +3,12 @@ package Servlets;
 import Entity.User;
 import Model.UserModel;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
 import com.google.gson.Gson;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -27,7 +26,7 @@ public class RegisterUserServlet extends HttpServlet {
         String role = request.getParameter("role");
 
         User user = new User(email, username, password, role);
-        IUnitofWork repo = new Repository();
+        IUnitofWork repo = new UnitofWork();
         UserModel uModel = new UserModel(repo);
         boolean hasRegistered = uModel.register(user);
 

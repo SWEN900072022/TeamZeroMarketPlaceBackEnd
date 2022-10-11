@@ -5,7 +5,7 @@ import Entity.Listing;
 import Injector.FindConditionInjector.FindBidFromListing;
 import Injector.FindConditionInjector.FindIdInjector;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
 import Util.JWTUtil;
 
 import java.time.LocalDateTime;
@@ -16,7 +16,7 @@ public class BidModel {
     private IUnitofWork repo;
 
     public BidModel() {
-        repo = new Repository();
+        repo = new UnitofWork();
     }
 
     public BidModel(IUnitofWork repo) {

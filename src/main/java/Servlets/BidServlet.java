@@ -4,21 +4,17 @@ import Entity.Bid;
 import JsonDeserializer.BidDeserializer;
 import Model.BidModel;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
-import Util.SQLUtil;
+import UnitofWork.UnitofWork;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @WebServlet(name = "BidServlet", value = "/BidServlet")
@@ -38,7 +34,7 @@ public class BidServlet extends HttpServlet {
 
         // Business logic initialisation
         // Initialise unit of work and insert them on model initialisation
-        IUnitofWork repo = new Repository();
+        IUnitofWork repo = new UnitofWork();
         BidModel bm = new BidModel(repo);
         boolean isSuccessful = bm.createBid(bidObj, jwt);
 

@@ -2,7 +2,7 @@ package Servlets;
 
 import Model.ListingModel;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
 import com.google.gson.Gson;
 
 import javax.servlet.*;
@@ -23,7 +23,7 @@ public class DeleteListingServlet extends HttpServlet {
         String jwt = request.getHeader("jwt");
 
         // We have the listingId to identify the listing in question, now we will delete the listing
-        IUnitofWork repo = new Repository();
+        IUnitofWork repo = new UnitofWork();
         ListingModel listingModel = new ListingModel(repo);
         boolean isSuccessful = listingModel.delete(listingId, jwt);
 

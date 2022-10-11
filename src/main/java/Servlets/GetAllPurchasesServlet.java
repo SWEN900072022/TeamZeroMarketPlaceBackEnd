@@ -4,7 +4,7 @@ import Entity.OrderItem;
 import JsonSerializer.MoneySerializer;
 import Model.OrderModel;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.javamoney.moneta.Money;
@@ -20,7 +20,7 @@ import java.util.List;
 public class GetAllPurchasesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        IUnitofWork repo = new Repository();
+        IUnitofWork repo = new UnitofWork();
         OrderModel om = new OrderModel(repo);
         List<OrderItem> list = om.getAllOrderItem();
 

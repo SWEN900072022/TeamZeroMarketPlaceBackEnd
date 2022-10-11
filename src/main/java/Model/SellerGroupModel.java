@@ -9,11 +9,10 @@ import Injector.FindConditionInjector.FindAllInjector;
 import Injector.FindConditionInjector.FindGroupIdByNameInjector;
 import Injector.FindConditionInjector.FindIdInjector;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
 import Util.GeneralUtil;
 import Util.JWTUtil;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +20,7 @@ public class SellerGroupModel {
     private IUnitofWork repo;
 
     public SellerGroupModel() {
-        repo = new Repository();
+        repo = new UnitofWork();
     }
 
     public SellerGroupModel(IUnitofWork repo) {

@@ -4,7 +4,7 @@ import Entity.Order;
 import Entity.OrderItem;
 import Model.OrderModel;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +34,7 @@ public class CheckoutServlet extends HttpServlet {
         List<OrderItem>orderItemList = gson.fromJson(items, typeOfT);
         Order order = gson.fromJson(orderString, typeOfOrder);
 
-        IUnitofWork repo = new Repository();
+        IUnitofWork repo = new UnitofWork();
         OrderModel orderModel = new OrderModel(repo);
         boolean isSuccessful = orderModel.createOrderItem(orderItemList, order, jwt);
 

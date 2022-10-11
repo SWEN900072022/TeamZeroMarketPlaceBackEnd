@@ -3,7 +3,7 @@ package Servlets;
 import Entity.SellerGroup;
 import Model.SellerGroupModel;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
 import com.google.gson.Gson;
 
 import javax.servlet.*;
@@ -24,7 +24,7 @@ public class CreateSellerGroupServlet extends HttpServlet {
         String groupName = request.getParameter("groupName");
 
         SellerGroup sg = new SellerGroup(groupName);
-        IUnitofWork repo = new Repository();
+        IUnitofWork repo = new UnitofWork();
         SellerGroupModel sgModel = new SellerGroupModel(repo);
         boolean hasCreated = sgModel.createSellerGroup(sg, jwt);
 
