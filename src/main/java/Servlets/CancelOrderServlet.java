@@ -64,13 +64,13 @@ public class CancelOrderServlet extends HttpServlet {
 
                         // TODO: add seller cancel order
                         // Make sure to register the orderitems and order to be deleted
-                        List<OrderItem> cancOrd = seller.cancelOrder(ord.getOrderId());
+                        Order cancOrd = seller.cancelOrder(ord.getOrderId());
                         if(cancOrd != null){
-                            for(OrderItem item: cancOrd){
+                            for(OrderItem item: cancOrd.getOrderItemList()){
                                 repo.registerDeleted(item);
                             }
 
-//                            repo.registerDeleted(cancOrd);
+                            repo.registerDeleted(cancOrd);
                         }
                     }
                 }

@@ -56,28 +56,7 @@ public class SellerGroup {
         return new SellerGroup(groupId, groupName, sellerList, listingList, ordersList);
     }
 
-    public List<OrderItem> viewAllOrders(int userId) {
-        // Check to see if the order list is empty
-        // Lazy load if yes
-        if(ordersList == null) {
-            ordersList = Order.getOrdersByGroupId(userId, repo);
-        }
 
-        return ordersList;
-    }
-
-    public List<Listing> viewSellerListings() {
-        // Check to see if the order list is empty
-        // Lazy load if yes
-        Filter filter = new Filter("groupId",getGroupId());
-        List<Filter> filterCondition = new ArrayList<>();
-        filterCondition.add(filter);
-        if(listingList == null) {
-            listingList = Listing.getListingByFilterCondition(filterCondition, repo);
-        }
-
-        return listingList;
-    }
 
 
     public void removeSeller(Seller seller) {
@@ -86,70 +65,7 @@ public class SellerGroup {
                 ));
     }
 
-    public Listing addListing(int listingId, ListingTypes type, String title, String description, int quantity, Money price, LocalDateTime startTime, LocalDateTime endTime) {
-//        if(listing.getGroupId() != groupId) {
-//            return false;
-//        }
-        Listing l = Listing.create(listingId, getGroupId(), type, title, description, quantity, price, startTime, endTime);
-        listingList.add(l);
-        return l;
-    }
 
-//    public void modifyListing(Listing listing) {
-//        deleteListing(listing);
-//        addListing(listing);
-//    }
-
-    public void deleteListing(int listingId) {
-        if(listingList==null){
-            listingList = viewSellerListings();
-        }
-        for(int i = 0; i < ordersList.size(); i++){
-            Listing item = listingList.get(i);
-            if(item.getListingId()==listingId){
-                listingList.remove(i);
-            }
-        }
-    }
-
-//    public void addOrderItem(OrderItem oi) {
-//        ordersList.add(oi);
-//    }
-
-    public OrderItem modifyOrder(int orderId, int listingId,int userId, int quantity) {
-        // Lazy load if orderItemList is empty
-        if(ordersList == null) {
-            ordersList = Order.getOrdersByGroupId(userId, repo);
-        }
-
-        for(OrderItem item : ordersList) {
-            if(item.getListingId() == listingId) {
-                item.setQuantity(quantity);
-                return item;
-            }
-        }
-        return null;
-    }
-
-    public List<OrderItem> deleteOrderItem(int orderId, int userId) {
-        List<OrderItem> result = new ArrayList<OrderItem>();
-
-        if(ordersList == null) {
-            ordersList = Order.getOrdersByGroupId(userId, repo);
-        }
-        for(int i = 0; i < ordersList.size(); i++) {
-            OrderItem ord = ordersList.get(i);
-            if(ord.getOrderId() == orderId) {
-                ordersList.remove(i);
-                result.add(ord);
-            }
-        }
-        return result;
-    }
-
-//    public List<OrderItem> getOrdersList(){
-//        return ordersList;
-//    }
 
     public int getGroupId() {
         return groupId;

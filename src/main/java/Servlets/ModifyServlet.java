@@ -1,9 +1,6 @@
 package Servlets;
 
-import Domain.Customer;
-import Domain.Order;
-import Domain.OrderItem;
-import Domain.User;
+import Domain.*;
 import Enums.UserRoles;
 import UnitofWork.IUnitofWork;
 import UnitofWork.UnitofWork;
@@ -65,6 +62,27 @@ public class ModifyServlet extends HttpServlet {
 
                 if(Objects.equals(role, UserRoles.SELLER.toString())) {
                     // TODO: add the seller modifying the order
+                    int groupId = Integer.parseInt(JWTUtil.getClaim("groupId",jwt));
+                    Seller seller = (Seller) User.create("", "", "", uid, UserRoles.SELLER);
+                    seller.setGroupId(groupId);
+                    for(OrderItem orderItem : ordersToBeModifiedList) {
+                        Order modiOrder = seller.modifyOrder1(
+                                orderItem.getOrderId(),
+                                orderItem.getListingId(),
+                                orderItem.getQuantity());
+
+                        if(modiOrder != null) {
+                            modifiedOrder.add(modiOrder);
+                        }
+                    }
+
+                    for(Order order : modifiedOrder) {
+                        for(OrderItem ordItem : order.getOrderItemList()) {
+                            repo.registerModified(ordItem);
+                        }
+                    }
+                    isSuccessful = true;
+
                 }
 
             }
