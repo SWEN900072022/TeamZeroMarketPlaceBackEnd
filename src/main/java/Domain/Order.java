@@ -1,10 +1,7 @@
 package Domain;
 
 import Entity.EntityObject;
-import Injector.FindConditionInjector.FindIdInjector;
-import Injector.FindConditionInjector.FindOrderFromUserInjector;
-import Injector.FindConditionInjector.FindOrderItemWithOrderId;
-import Injector.FindConditionInjector.FindOrderWithUser;
+import Injector.FindConditionInjector.*;
 import UnitofWork.IUnitofWork;
 import Util.GeneralUtil;
 
@@ -31,6 +28,33 @@ public class Order extends EntityObject {
 
     public void setRepository(IUnitofWork repo) {
         this.repo = repo;
+    }
+
+    public static List<Order> getOrdersByGroupId(int groupId, IUnitofWork repo){
+        List<Object> param = new ArrayList<>();
+        param.add(groupId);
+
+        // Get order details by groupId
+        List<Order> ordList = GeneralUtil.castObjectInList(repo.readMulti(
+                new FindOrderForSellerGroupInjector(),
+                param,
+                Order.class), Order.class);
+
+        for(Order ord : ordList) {
+            param=new ArrayList<>();
+            param.add(ord.orderId);
+
+            List<OrderItem> oi = GeneralUtil.castObjectInList(
+                    repo.readMulti(
+                            new FindOrderItemWithOrderId(),
+                            param,
+                            OrderItem.class),
+                    OrderItem.class
+            );
+            ord.orderItemList = oi;
+        }
+
+        return ordList;
     }
 
     public static List<Order> getOrdersByUserId(int userId, IUnitofWork repo) {
