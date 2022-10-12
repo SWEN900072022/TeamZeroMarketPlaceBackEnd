@@ -22,7 +22,7 @@ public class MockUserMapper implements Mapper<User> {
                 "a",
                 "a",
                 1,
-                UserRoles.CUSTOMER
+                UserRoles.CUSTOMER.toString()
         );
 
         User user2 = User.create(
@@ -30,7 +30,7 @@ public class MockUserMapper implements Mapper<User> {
                 "b",
                 "b",
                 2,
-                UserRoles.SELLER
+                UserRoles.SELLER.toString()
         );
 
         users.add(user1);

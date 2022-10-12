@@ -87,7 +87,7 @@ public class UserMapper extends GeneralMapper<User> {
                         rs.getString("username"),
                         rs.getString("password"),
                         rs.getInt("userid"),
-                        UserRoles.valueOf(rs.getString("role"))
+                        rs.getString("role")
                 );
             }
         } catch (SQLException e) {
@@ -107,7 +107,7 @@ public class UserMapper extends GeneralMapper<User> {
                         rs.getString("username"),
                         rs.getString("password"),
                         rs.getInt("userid"),
-                        UserRoles.valueOf(rs.getString("role"))
+                        rs.getString("role")
                 );
                 userList.add(user);
             }

@@ -2,6 +2,7 @@ package Servlets;
 
 import Domain.*;
 import Enums.UserRoles;
+import Injector.DeleteConditionInjector.DeleteIdInjector;
 import UnitofWork.IUnitofWork;
 import UnitofWork.UnitofWork;
 import Util.JWTUtil;
@@ -15,10 +16,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @WebServlet(name = "CancelOrderServlet", value = "/CancelOrderServlet")
 public class CancelOrderServlet extends HttpServlet {
@@ -52,6 +50,10 @@ public class CancelOrderServlet extends HttpServlet {
                             }
 
                             // Register the order to be cancelled
+                            List<Object>param = new ArrayList<>();
+                            param.add(cancOrd.getOrderId());
+                            cancOrd.setInjector(new DeleteIdInjector("orders"));
+                            cancOrd.setParam(param);
                             repo.registerDeleted(cancOrd);
                         }
                     }

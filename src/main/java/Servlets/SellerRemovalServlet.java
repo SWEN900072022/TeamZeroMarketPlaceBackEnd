@@ -41,7 +41,7 @@ public class SellerRemovalServlet extends HttpServlet {
                 String role = JWTUtil.getClaim("role", jwt);
                 int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
                 if(Objects.equals(role, UserRoles.ADMIN.toString())) {
-                    Admin admin = (Admin) User.create("", "", "", uid, UserRoles.ADMIN);
+                    Admin admin = (Admin) User.create("", "", "", uid, UserRoles.ADMIN.toString());
 
                     // TODO: add behaviour to add seller to group
                     admin.removeSellerFromGroup();

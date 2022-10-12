@@ -7,6 +7,7 @@ import UnitofWork.IUnitofWork;
 import org.javamoney.moneta.Money;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Customer extends User {
@@ -61,7 +62,7 @@ public class Customer extends User {
         return orderList;
     }
 
-    public Order modifyOrder(int orderId, int listingId, int quantity) {
+    public List<EntityObject> modifyOrder(int orderId, int listingId, int quantity) {
         // Given some order, change the order object
         // Need to check the stock level as well
         // Check to see if the order is in the orderList,if not load from
@@ -74,9 +75,17 @@ public class Customer extends User {
 
         if(l != null && orderList != null) {
             for(Order ord : orderList) {
+                // Check the stock level
                 if(ord.getOrderId() == orderId) {
-                    ord.modifyOrderItem(listingId, quantity);
-                    return ord;
+                    int initialQuantity = ord.getOrderItem(listingId).getQuantity();
+                    OrderItem oi = ord.modifyOrderItem(listingId, quantity, l.getQuantity());
+                    l.setQuantity(l.getQuantity() - (initialQuantity - oi.getQuantity()));
+
+                    List<EntityObject> result = new ArrayList<>();
+                    result.add(ord);
+                    result.add(l);
+
+                    return result;
                 }
             }
         }
