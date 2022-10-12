@@ -25,7 +25,6 @@ public class MockListingMapper implements Mapper<Listing> {
     public MockListingMapper() {
         // Populate the listings with some dummy data
         Listing listing1 = Listing.create(
-                FixedPriceListing.class,
                 1,
                 1,
                 ListingTypes.FIXED_PRICE,
@@ -37,7 +36,6 @@ public class MockListingMapper implements Mapper<Listing> {
                 LocalDateTime.now());
 
         Listing listing2 = Listing.create(
-                AuctionListing.class,
                 2,
                 2,
                 ListingTypes.AUCTION,

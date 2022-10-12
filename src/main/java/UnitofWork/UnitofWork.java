@@ -1,7 +1,7 @@
 package UnitofWork;
 
 import Container.DIContainer;
-import Entity.*;
+import Domain.*;
 import Enums.UnitActions;
 import Injector.ISQLInjector;
 import Mapper.*;
@@ -41,7 +41,6 @@ public class UnitofWork implements IUnitofWork{
         mapperClasses.put(Order.class, OrderMapper.class);
         mapperClasses.put(SellerGroup.class, SellerGroupMapper.class);
         mapperClasses.put(User.class, UserMapper.class);
-        mapperClasses.put(ShoppingCartItem.class, ShoppingCartItemsMapper.class);
 
         return new DIContainer(mapperClasses);
     }

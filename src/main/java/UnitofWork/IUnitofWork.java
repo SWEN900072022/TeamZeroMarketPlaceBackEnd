@@ -1,6 +1,6 @@
 package UnitofWork;
 
-import Entity.EntityObject;
+import Domain.EntityObject;
 import Injector.ISQLInjector;
 
 import java.sql.SQLException;

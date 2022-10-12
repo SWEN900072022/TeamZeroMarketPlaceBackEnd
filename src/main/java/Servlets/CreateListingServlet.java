@@ -1,8 +1,11 @@
 package Servlets;
 
-import Entity.Listing;
+import Domain.Customer;
+import Domain.Listing;
+import Domain.Seller;
+import Domain.User;
 import Enums.ListingTypes;
-import Model.ListingModel;
+import Enums.UserRoles;
 import UnitofWork.IUnitofWork;
 import UnitofWork.UnitofWork;
 import Util.JWTUtil;
@@ -21,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @WebServlet(name = "CreateListingServlet", value = "/createListing")
 public class CreateListingServlet extends HttpServlet {
@@ -36,35 +40,32 @@ public class CreateListingServlet extends HttpServlet {
         IUnitofWork repo = new UnitofWork();
 
         try {
-            int groupId = Integer.parseInt(JWTUtil.getSubject(jwt));
+//            int groupId = Integer.parseInt(JWTUtil.getSubject(jwt));
             LocalDateTime startTime = LocalDateTime.parse(request.getParameter("startTime"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             LocalDateTime endTime = LocalDateTime.parse(request.getParameter("endTime"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
-            Listing listing = new Listing(
-                    0,
-                    groupId,
-                    ListingTypes.fromString(type),
-                    title,
-                    description,
-                    quantity,
-                    Money.of(price, Monetary.getCurrency("AUD")),
-                    startTime,
-                    endTime
-            );
-            ListingModel listingModel = new ListingModel(repo);
-            isSuccessful = listingModel.createListing(listing, jwt);
+            if(JWTUtil.validateToken(jwt)) {
+                String role = JWTUtil.getClaim("role", jwt);
+                int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
+                String groupId = Integer.parseInt(JWTUtil.getClaim("groupId"));
+                if(Objects.equals(role, UserRoles.SELLER.toString())) {
+                    Seller seller = (Seller) User.create("", "", "", uid, UserRoles.SELLER);
+
+                    // TODO: add seller create listing
+                    // seller.createListing();
+
+                        Listing newListing = seller.createListing(ListingTypes.fromString(type), title, description, quantity, Money.of(price, Monetary.getCurrency("AUD")), startTime, endTime);
+                        repo.registerNew(newListing);
+                }
+            }
         } catch (NumberFormatException e) {
             System.out.println("Number exception");
         }
 
         // Check to see if the operations have been successful, if it is commit
-        if(isSuccessful) {
-            try {
-                repo.commit();
-            } catch (SQLException e) {
-                repo.rollback();
-            }
-        } else {
+        try {
+            repo.commit();
+        } catch (SQLException e) {
             repo.rollback();
         }
 

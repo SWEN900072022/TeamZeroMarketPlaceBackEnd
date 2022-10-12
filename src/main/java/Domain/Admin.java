@@ -9,9 +9,13 @@ public class Admin extends User{
     private List<SellerGroup> sellerGroupList;
     private List<User> userGroupList;
 
-    public Admin(String email, String username, String password, int userId, UserRoles userRoles) {
+    public Admin(String email, String username, String password, int userId) {
         super(email, username, password, userId);
-        this.userRoles = userRoles;
+    }
+
+    @Override
+    public String getRole() {
+        return UserRoles.ADMIN.toString();
     }
 
     public void onboardSeller() {

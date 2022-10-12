@@ -1,6 +1,6 @@
 package Mapper;
 
-import Entity.OrderItem;
+import Domain.OrderItem;
 import Injector.ISQLInjector;
 import Util.SQLUtil;
 import org.javamoney.moneta.Money;
@@ -75,19 +75,20 @@ public class OrderItemMapper extends GeneralMapper<OrderItem> {
 
     @Override
     public OrderItem find(ISQLInjector injector, List<Object> queryParam) {
-        OrderItem oi = new OrderItem();
         try {
             ResultSet rs = getResultSet(injector, queryParam);
             if(rs.next()) {
-                oi.setOrderId(rs.getInt("orderId"));
-                oi.setListingId(rs.getInt("listingId"));
-                oi.setQuantity(rs.getInt("quantity"));
-                oi.setUnitPrice(Money.of(rs.getBigDecimal("unitPrice"), Monetary.getCurrency("AUD")));
+                return OrderItem.create(
+                        rs.getInt("orderId"),
+                        rs.getInt("listingId"),
+                        rs.getInt("quantity"),
+                        Money.of(rs.getBigDecimal("unitPrice"), Monetary.getCurrency("AUD"))
+                );
             }
         } catch (SQLException e) {
             return null;
         }
-        return oi;
+        return null;
     }
 
     @Override
@@ -96,11 +97,12 @@ public class OrderItemMapper extends GeneralMapper<OrderItem> {
         try {
             ResultSet rs = getResultSet(injector, queryParam);
             while(rs.next()) {
-                OrderItem oi = new OrderItem();
-                oi.setOrderId(rs.getInt("orderId"));
-                oi.setListingId(rs.getInt("listingId"));
-                oi.setQuantity(rs.getInt("quantity"));
-                oi.setUnitPrice(Money.of(rs.getBigDecimal("unitPrice"), Monetary.getCurrency("AUD")));
+                OrderItem oi = OrderItem.create(
+                        rs.getInt("orderId"),
+                        rs.getInt("listingId"),
+                        rs.getInt("quantity"),
+                        Money.of(rs.getBigDecimal("unitPrice"), Monetary.getCurrency("AUD"))
+                );
                 oiList.add(oi);
             }
         } catch (SQLException e) {

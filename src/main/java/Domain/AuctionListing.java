@@ -33,6 +33,6 @@ public class AuctionListing extends Listing{
         }
 
         setPrice(bid);
-        return Bid.create(getListingId(), userId);
+        return Bid.create(getListingId(), userId, bid);
     }
 }

@@ -1,10 +1,13 @@
 package Servlets;
 
-import Entity.OrderItem;
-import Model.ListingModel;
-import Model.OrderModel;
+import Domain.Customer;
+import Domain.Order;
+import Domain.OrderItem;
+import Domain.User;
+import Enums.UserRoles;
 import UnitofWork.IUnitofWork;
 import UnitofWork.UnitofWork;
+import Util.JWTUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -15,9 +18,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @WebServlet(name = "ModifyServlet", value = "/ModifyServlet")
 public class ModifyServlet extends HttpServlet {
@@ -33,25 +34,48 @@ public class ModifyServlet extends HttpServlet {
 
         // Perform the modification on the orders
         IUnitofWork repo = new UnitofWork();
-        OrderModel om = new OrderModel(repo);
-        boolean isSuccessful = om.modifyOrders(ordersToBeModifiedList, jwt);
+        boolean isSuccessful = false;
 
-        if(isSuccessful) {
-            for (OrderItem oi : ordersToBeModifiedList) {
-                // Perform the modification on the lsiting to update the stock level
-                ListingModel lm = new ListingModel(repo);
-                isSuccessful = isSuccessful && (lm.modifyListing(oi.getListingId(), oi.getQuantity(), jwt));
+        try {
+            if(JWTUtil.validateToken(jwt)) {
+                String role = JWTUtil.getClaim("role", jwt);
+                int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
+                List<Order> modifiedOrder = new ArrayList<>();
+
+                if (Objects.equals(role, UserRoles.CUSTOMER.toString())) {
+                    Customer customer = (Customer) User.create("", "", "", uid, UserRoles.CUSTOMER);
+                    for(OrderItem orderItem : ordersToBeModifiedList) {
+                        Order modiOrder = customer.modifyOrder(
+                                orderItem.getOrderId(),
+                                orderItem.getListingId(),
+                                orderItem.getQuantity());
+
+                        if(modiOrder != null) {
+                            modifiedOrder.add(modiOrder);
+                        }
+                    }
+
+                    for(Order order : modifiedOrder) {
+                        for(OrderItem ordItem : order.getOrderItemList()) {
+                            repo.registerModified(ordItem);
+                        }
+                    }
+                    isSuccessful = true;
+                }
+
+                if(Objects.equals(role, UserRoles.SELLER.toString())) {
+                    // TODO: add the seller modifying the order
+                }
+
             }
+        } catch (Exception e) {
+            System.out.print("Something went wrong");
         }
 
         // Check to see if the operations have been successful, if it is commit
-        if(isSuccessful) {
-            try {
-                repo.commit();
-            } catch (SQLException e) {
-                repo.rollback();
-            }
-        } else {
+        try {
+            repo.commit();
+        } catch (SQLException e) {
             repo.rollback();
         }
 

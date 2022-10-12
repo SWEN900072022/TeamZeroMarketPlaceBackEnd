@@ -17,38 +17,22 @@ public class SellerGroup {
     private String groupName;
     private List<Seller> sellerList;
     private List<Listing> listingList;
-    private List<Order> ordersList;
+    private List<OrderItem> ordersList;
     private IUnitofWork repo;
 
     public void setRepo(IUnitofWork repo){
         this.repo = repo;
     }
 
-    protected SellerGroup(int groupId, String groupName) {
+
+    protected SellerGroup(int groupId, String groupName, List<Seller> sellerList, List<Listing> listingList, List<OrderItem> ordersList) {
         this.groupId = groupId;
         this.groupName = groupName;
-//        this.sellerList = sellerList;
-//        this.listingList = listingList;
-//        this.ordersList = ordersList;
+        this.sellerList = sellerList;
+        this.listingList = listingList;
+        this.ordersList = ordersList;
     }
 
-    public static SellerGroup create(int groupId, String groupName) {
-//        List<Object> param = new ArrayList<>();
-//        param.add(sg.getGroupName());
-//
-//        Entity.SellerGroup sgTemp = (Entity.SellerGroup) repo.read(
-//                new FindGroupIdByNameInjector(),
-//                param,
-//                Entity.SellerGroup.class);
-//
-////        // At this point, we should be an admin, write to db
-////        if(sgTemp.isEmpty()) {
-////            repo.registerNew(sg);
-////            return true;
-////        }
-//        return false;
-//        return new SellerGroup(groupId, groupName);
-    }
 
 
 
@@ -64,15 +48,37 @@ public class SellerGroup {
         return false;
     }
 
-    public List<Order> viewAllOrders() {
+    public static SellerGroup create(int groupId, String groupName) {
+        return new SellerGroup(groupId, groupName, null, null, null);
+    }
+
+    public static SellerGroup create(int groupId, String groupName, List<Seller>sellerList, List<Listing> listingList, List<OrderItem> ordersList) {
+        return new SellerGroup(groupId, groupName, sellerList, listingList, ordersList);
+    }
+
+    public List<OrderItem> viewAllOrders(int userId) {
         // Check to see if the order list is empty
         // Lazy load if yes
         if(ordersList == null) {
-            ordersList = Order.getOrdersByGroupId(getGroupId(), repo);
+            ordersList = Order.getOrdersByGroupId(userId, repo);
         }
 
         return ordersList;
     }
+
+    public List<Listing> viewSellerListings() {
+        // Check to see if the order list is empty
+        // Lazy load if yes
+        Filter filter = new Filter("groupId",getGroupId());
+        List<Filter> filterCondition = new ArrayList<>();
+        filterCondition.add(filter);
+        if(listingList == null) {
+            listingList = Listing.getListingByFilterCondition(filterCondition, repo);
+        }
+
+        return listingList;
+    }
+
 
     public void removeSeller(Seller seller) {
         sellerList.removeIf(t -> (
@@ -80,12 +86,11 @@ public class SellerGroup {
                 ));
     }
 
-    public Listing addListing(Class<?> clazz, int listingId, ListingTypes type, String title,String description, int quantity, Money price,Listing listing, LocalDateTime
-            startTime, LocalDateTime endTime) {
+    public Listing addListing(int listingId, ListingTypes type, String title, String description, int quantity, Money price, LocalDateTime startTime, LocalDateTime endTime) {
 //        if(listing.getGroupId() != groupId) {
 //            return false;
 //        }
-        Listing l = Listing.create(clazz, listingId, getGroupId(), type, title, description, quantity, price, startTime, endTime);
+        Listing l = Listing.create(listingId, getGroupId(), type, title, description, quantity, price, startTime, endTime);
         listingList.add(l);
         return l;
     }
@@ -95,43 +100,51 @@ public class SellerGroup {
 //        addListing(listing);
 //    }
 
-    public void deleteListing() {
-        listingList.removeIf(t -> (
-                listing.getListingId() == t.getListingId()
-        ));
+    public void deleteListing(int listingId) {
+        if(listingList==null){
+            listingList = viewSellerListings();
+        }
+        for(int i = 0; i < ordersList.size(); i++){
+            Listing item = listingList.get(i);
+            if(item.getListingId()==listingId){
+                listingList.remove(i);
+            }
+        }
     }
 
 //    public void addOrderItem(OrderItem oi) {
 //        ordersList.add(oi);
 //    }
 
-    public Order modifyOrder(int orderId, int listingId, int quantity) {
+    public OrderItem modifyOrder(int orderId, int listingId,int userId, int quantity) {
         // Lazy load if orderItemList is empty
         if(ordersList == null) {
-            ordersList = Order.getOrdersByGroupId(getGroupId(), repo);
+            ordersList = Order.getOrdersByGroupId(userId, repo);
         }
 
-        for(Order ord : ordersList) {
-            if(ord.getOrderId() == orderId) {
-                ord.modifyOrderItem(listingId, quantity);
-                return ord;
+        for(OrderItem item : ordersList) {
+            if(item.getListingId() == listingId) {
+                item.setQuantity(quantity);
+                return item;
             }
         }
-        throw new IllegalArgumentException();
+        return null;
     }
 
-    public Order deleteOrderItem(int orderId) {
+    public List<OrderItem> deleteOrderItem(int orderId, int userId) {
+        List<OrderItem> result = new ArrayList<OrderItem>();
+
         if(ordersList == null) {
-            ordersList = Order.getOrdersByGroupId(getGroupId(), repo);
+            ordersList = Order.getOrdersByGroupId(userId, repo);
         }
         for(int i = 0; i < ordersList.size(); i++) {
-            Order ord = ordersList.get(i);
+            OrderItem ord = ordersList.get(i);
             if(ord.getOrderId() == orderId) {
                 ordersList.remove(i);
-                return ord;
+                result.add(ord);
             }
         }
-        throw new IllegalArgumentException();
+        return result;
     }
 
 //    public List<OrderItem> getOrdersList(){

@@ -1,6 +1,6 @@
 package MockClasses;
 
-import Entity.SellerGroup;
+import Domain.SellerGroup;
 import Injector.FindConditionInjector.FindGroupIdByNameInjector;
 import Injector.ISQLInjector;
 import Mapper.Mapper;
@@ -16,13 +16,15 @@ public class MockSellerGroupMapper implements Mapper<SellerGroup> {
 
     public MockSellerGroupMapper() {
         // Populate the sgList with some dummy data
-        SellerGroup sg1 = new SellerGroup();
-        sg1.setGroupId(1);
-        sg1.setGroupName("a");
+        SellerGroup sg1 = SellerGroup.create(
+                1,
+                "a"
+        );
 
-        SellerGroup sg2 = new SellerGroup();
-        sg2.setGroupId(2);
-        sg2.setGroupName("b");
+        SellerGroup sg2 = SellerGroup.create(
+                2,
+                "b"
+        );
 
         sgList.add(sg1);
         sgList.add(sg2);
@@ -58,7 +60,7 @@ public class MockSellerGroupMapper implements Mapper<SellerGroup> {
                 }
             }
         }
-        return new SellerGroup();
+        return null;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package Mapper;
 
-import Entity.User;
+import Domain.User;
+import Enums.UserRoles;
 import Injector.ISQLInjector;
 import Util.SQLUtil;
 
@@ -78,20 +79,21 @@ public class UserMapper extends GeneralMapper<User> {
     }
 
     public User find(ISQLInjector injector, List<Object> queryParam) {
-        User user = new User();
         try {
             ResultSet rs = getResultSet(injector, queryParam);
             if(rs.next()) {
-                user.setEmail(rs.getString("email"));
-                user.setUsername(rs.getString("username"));
-                user.setRoles(rs.getString("role"));
-                user.setPassword(rs.getString("password"));
-                user.setUserId(rs.getInt("userid"));
+                return User.create(
+                        rs.getString("email"),
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        rs.getInt("userid"),
+                        UserRoles.valueOf(rs.getString("role"))
+                );
             }
         } catch (SQLException e) {
             return null;
         }
-        return user;
+        return null;
     }
 
     @Override
@@ -100,12 +102,13 @@ public class UserMapper extends GeneralMapper<User> {
         try {
             ResultSet rs = getResultSet(injector, queryParam);
             while(rs.next()) {
-                User user = new User();
-                user.setEmail(rs.getString("email"));
-                user.setUsername(rs.getString("username"));
-                user.setRoles(rs.getString("role"));
-                user.setPassword(rs.getString("password"));
-                user.setUserId(rs.getInt("userid"));
+                User user = User.create(
+                        rs.getString("email"),
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        rs.getInt("userid"),
+                        UserRoles.valueOf(rs.getString("role"))
+                );
                 userList.add(user);
             }
         } catch (SQLException e) {

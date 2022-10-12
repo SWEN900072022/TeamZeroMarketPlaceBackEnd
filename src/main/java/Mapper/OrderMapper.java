@@ -1,6 +1,6 @@
 package Mapper;
 
-import Entity.Order;
+import Domain.Order;
 import Injector.ISQLInjector;
 import Util.SQLUtil;
 
@@ -66,18 +66,19 @@ public class OrderMapper extends GeneralMapper<Order> {
     }
 
     public Order find(ISQLInjector injector, List<Object> queryParam) {
-        Order order = new Order();
         try {
             ResultSet rs = getResultSet(injector, queryParam);
             if (rs.next()) {
-                order.setOrderId(rs.getInt("orderId"));
-                order.setUserId(rs.getInt("userId"));
-                order.setAddress(rs.getString("address"));
+                return Order.create(
+                        rs.getInt("orderId"),
+                        rs.getInt("userId"),
+                        rs.getString("address")
+                );
             }
         } catch (SQLException e) {
             return null;
         }
-        return order;
+        return null;
     }
 
     @Override
@@ -86,10 +87,11 @@ public class OrderMapper extends GeneralMapper<Order> {
         try {
             ResultSet rs = getResultSet(injector, queryParam);
             while(rs.next()) {
-                Order order = new Order();
-                order.setOrderId(rs.getInt("orderId"));
-                order.setUserId(rs.getInt("userId"));
-                order.setAddress(rs.getString("address"));
+                Order order = Order.create(
+                        rs.getInt("orderId"),
+                        rs.getInt("userId"),
+                        rs.getString("address")
+                );
                 orderList.add(order);
             }
         } catch (SQLException e) {

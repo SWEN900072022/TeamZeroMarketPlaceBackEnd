@@ -19,6 +19,11 @@ public class Customer extends User {
         super(email, username, password, userId);
     }
 
+    @Override
+    public String getRole() {
+        return UserRoles.CUSTOMER.toString();
+    }
+
     public void setRepo(IUnitofWork repo) {
         this.repo = repo;
     }
@@ -30,16 +35,20 @@ public class Customer extends User {
         return Order.create(orderId, getUserId(), address, oiList);
     }
 
-    public Listing bid(int listingId, Money bidAmount) {
+    public Bid bid(int listingId, Money bidAmount) {
         Listing l = Listing.getListingById(listingId, repo);
+
+        if(l == null) {
+            return null;
+        }
 
         // Check if it is an auction listing, if yes cast it
         if(l.getType() == ListingTypes.AUCTION) {
             AuctionListing al = (AuctionListing) l;
-            al.bid(bidAmount, LocalDateTime.now(), getUserId());
-            return al;
+            Bid bid = al.bid(bidAmount, LocalDateTime.now(), getUserId());
+            return bid;
         }
-        return l;
+        return null;
     }
 
     public List<Order> viewAllOrders() {
@@ -54,16 +63,21 @@ public class Customer extends User {
 
     public Order modifyOrder(int orderId, int listingId, int quantity) {
         // Given some order, change the order object
+        // Need to check the stock level as well
         // Check to see if the order is in the orderList,if not load from
         // db
         if(orderList == null) {
             orderList = Order.getOrdersByUserId(getUserId(), repo);
         }
 
-        for(Order ord : orderList) {
-            if(ord.getOrderId() == orderId) {
-                ord.modifyOrderItem(listingId, quantity);
-                return ord;
+        Listing l = Listing.getListingById(listingId, repo);
+
+        if(l != null && orderList != null) {
+            for(Order ord : orderList) {
+                if(ord.getOrderId() == orderId) {
+                    ord.modifyOrderItem(listingId, quantity);
+                    return ord;
+                }
             }
         }
 
@@ -82,6 +96,6 @@ public class Customer extends User {
                 return ord;
             }
         }
-        throw new IllegalArgumentException();
+        return null;
     }
 }

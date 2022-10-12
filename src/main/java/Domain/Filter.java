@@ -1,4 +1,4 @@
-package Entity;
+package Domain;
 
 public class Filter {
     private String filterKey;

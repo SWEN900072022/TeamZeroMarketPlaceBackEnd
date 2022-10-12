@@ -1,9 +1,11 @@
 package Servlets;
 
-import Entity.User;
-import Model.SellerGroupModel;
+import Domain.Admin;
+import Domain.User;
+import Enums.UserRoles;
 import UnitofWork.IUnitofWork;
 import UnitofWork.UnitofWork;
+import Util.JWTUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -16,6 +18,7 @@ import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @WebServlet(name = "SellerRemovalServlet", value = "/SellerRemovalServlet")
 public class SellerRemovalServlet extends HttpServlet {
@@ -31,17 +34,30 @@ public class SellerRemovalServlet extends HttpServlet {
         User user = gson.fromJson(userStr, typeOfUser);
 
         IUnitofWork repo = new UnitofWork();
-        SellerGroupModel sgModel = new SellerGroupModel(repo);
-        boolean isSuccessful = sgModel.removeSellerFromSellerGroup(user, groupName);
+        boolean isSuccessful = false;
+
+        try {
+            if(JWTUtil.validateToken(jwt)) {
+                String role = JWTUtil.getClaim("role", jwt);
+                int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
+                if(Objects.equals(role, UserRoles.ADMIN.toString())) {
+                    Admin admin = (Admin) User.create("", "", "", uid, UserRoles.ADMIN);
+
+                    // TODO: add behaviour to add seller to group
+                    admin.removeSellerFromGroup();
+
+                    // TODO: register the changes to unit of work
+                    isSuccessful = true;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Something went wrong");
+        }
 
         // Check to see if the operations have been successful, if it is commit
-        if(isSuccessful) {
-            try {
-                repo.commit();
-            } catch (SQLException e) {
-                repo.rollback();
-            }
-        } else {
+        try {
+            repo.commit();
+        } catch (SQLException e) {
             repo.rollback();
         }
 

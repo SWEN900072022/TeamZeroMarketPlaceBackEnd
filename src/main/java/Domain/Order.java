@@ -1,7 +1,8 @@
 package Domain;
 
-import Entity.EntityObject;
-import Injector.FindConditionInjector.*;
+import Injector.FindConditionInjector.FindOrderItemWithOrderId;
+import Injector.FindConditionInjector.FindOrderWithUser;
+import Injector.FindConditionInjector.FindOrderForSellerGroupInjector;
 import UnitofWork.IUnitofWork;
 import Util.GeneralUtil;
 
@@ -22,6 +23,10 @@ public class Order extends EntityObject {
         this.orderItemList = orderItemList;
     }
 
+    public static Order create(int orderId, int userId, String address) {
+        return new Order(orderId, userId, address, null);
+    }
+
     public static Order create(int orderId, int userId, String address, List<OrderItem> orderItemList) {
         return new Order(orderId, userId, address, orderItemList);
     }
@@ -30,29 +35,15 @@ public class Order extends EntityObject {
         this.repo = repo;
     }
 
-    public static List<Order> getOrdersByGroupId(int groupId, IUnitofWork repo){
+    public static List<OrderItem> getOrdersByGroupId(int userId, IUnitofWork repo){
         List<Object> param = new ArrayList<>();
-        param.add(groupId);
+        param.add(userId);
 
         // Get order details by groupId
-        List<Order> ordList = GeneralUtil.castObjectInList(repo.readMulti(
+        List<OrderItem> ordList = GeneralUtil.castObjectInList(repo.readMulti(
                 new FindOrderForSellerGroupInjector(),
                 param,
-                Order.class), Order.class);
-
-        for(Order ord : ordList) {
-            param=new ArrayList<>();
-            param.add(ord.orderId);
-
-            List<OrderItem> oi = GeneralUtil.castObjectInList(
-                    repo.readMulti(
-                            new FindOrderItemWithOrderId(),
-                            param,
-                            OrderItem.class),
-                    OrderItem.class
-            );
-            ord.orderItemList = oi;
-        }
+                OrderItem.class), OrderItem.class);
 
         return ordList;
     }
@@ -113,11 +104,11 @@ public class Order extends EntityObject {
         throw new IllegalArgumentException();
     }
 
-    public void deleteOrderItem(Listing l) {
-        orderItemList.removeIf(t -> (
-                t.getListingId() == l.getListingId()
-        ));
-    }
+//    public void deleteOrderItem(Listing l) {
+//        orderItemList.removeIf(t -> (
+//                t.getListingId() == l.getListingId()
+//        ));
+//    }
 
     public int getOrderId() {
         return orderId;

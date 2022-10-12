@@ -1,8 +1,9 @@
 package Servlets;
 
-import Entity.OrderItem;
+import Domain.Customer;
+import Domain.User;
+import Enums.UserRoles;
 import JsonSerializer.MoneySerializer;
-import Model.OrderModel;
 import UnitofWork.IUnitofWork;
 import UnitofWork.UnitofWork;
 import com.google.gson.Gson;
@@ -21,20 +22,24 @@ public class GetAllPurchasesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         IUnitofWork repo = new UnitofWork();
-        OrderModel om = new OrderModel(repo);
-        List<OrderItem> list = om.getAllOrderItem();
+        // TODO: pass jwt for all purchases
 
-        GsonBuilder gb = new GsonBuilder();
-        gb.registerTypeAdapter(Money.class, new MoneySerializer());
-        Gson gson = gb.create();
-        String json = gson.toJson(list);
+        // TODO: admin add all purchases function here
 
-        PrintWriter out = response.getWriter();
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        System.out.println(json);
-        out.print(json);
-        out.flush();
+//        OrderModel om = new OrderModel(repo);
+//        List<OrderItem> list = om.getAllOrderItem();
+
+//        GsonBuilder gb = new GsonBuilder();
+//        gb.registerTypeAdapter(Money.class, new MoneySerializer());
+//        Gson gson = gb.create();
+//        String json = gson.toJson(list);
+//
+//        PrintWriter out = response.getWriter();
+//        response.setContentType("application/json");
+//        response.setCharacterEncoding("UTF-8");
+//        System.out.println(json);
+//        out.print(json);
+//        out.flush();
 
     }
 }
