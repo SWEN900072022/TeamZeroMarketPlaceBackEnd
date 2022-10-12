@@ -1,5 +1,7 @@
 package Servlets;
 
+import Domain.User;
+import Enums.UserRoles;
 import UnitofWork.IUnitofWork;
 import UnitofWork.UnitofWork;
 import com.google.gson.Gson;
@@ -20,18 +22,28 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
         String role = request.getParameter("role");
 
-        // TODO: login not implemented
-//        User user = new User(email, null, password, role);
-//        IUnitofWork repo = new UnitofWork();
-//        UserModel uModel = new UserModel(repo);
-//        String jwt = uModel.login(user);
-//
-//        Map<String, String> result = new HashMap<>();
-//        result.put("jwt", jwt);
-//        Gson gson = new Gson();
-//        String json = gson.toJson(result);
-//
-//        PrintWriter out = response.getWriter();
-//        out.println(json);
+        IUnitofWork repo = new UnitofWork();
+        String jwt = "";
+
+        try {
+            User user = User.create(
+                    email,
+                    "",
+                    password,
+                    0,
+                    role
+            );
+            jwt = user.login();
+        } catch (Exception e) {
+            System.out.println("Something went wrong");
+        }
+
+        Map<String, String> result = new HashMap<>();
+        result.put("jwt", jwt);
+        Gson gson = new Gson();
+        String json = gson.toJson(result);
+
+        PrintWriter out = response.getWriter();
+        out.println(json);
     }
 }

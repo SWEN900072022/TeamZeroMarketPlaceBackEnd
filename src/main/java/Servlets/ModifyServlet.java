@@ -40,15 +40,16 @@ public class ModifyServlet extends HttpServlet {
                 List<Order> modifiedOrder = new ArrayList<>();
 
                 if (Objects.equals(role, UserRoles.CUSTOMER.toString())) {
-                    Customer customer = (Customer) User.create("", "", "", uid, UserRoles.CUSTOMER);
+                    Customer customer = (Customer) User.create("", "", "", uid, UserRoles.CUSTOMER.toString());
                     for(OrderItem orderItem : ordersToBeModifiedList) {
-                        Order modiOrder = customer.modifyOrder(
+                        List<EntityObject> modiOrderListing = customer.modifyOrder(
                                 orderItem.getOrderId(),
                                 orderItem.getListingId(),
                                 orderItem.getQuantity());
 
-                        if(modiOrder != null) {
-                            modifiedOrder.add(modiOrder);
+                        if(modiOrderListing != null) {
+                            modifiedOrder.add((Order)modiOrderListing.get(0));
+                            repo.registerModified(modiOrderListing.get(1));
                         }
                     }
 
@@ -63,16 +64,17 @@ public class ModifyServlet extends HttpServlet {
                 if(Objects.equals(role, UserRoles.SELLER.toString())) {
                     // TODO: add the seller modifying the order
                     int groupId = Integer.parseInt(JWTUtil.getClaim("groupId",jwt));
-                    Seller seller = (Seller) User.create("", "", "", uid, UserRoles.SELLER);
+                    Seller seller = (Seller) User.create("", "", "", uid, UserRoles.SELLER.toString());
                     seller.setGroupId(groupId);
                     for(OrderItem orderItem : ordersToBeModifiedList) {
-                        Order modiOrder = seller.modifyOrder1(
+                        List<EntityObject> modiOrder = seller.modifyOrder1(
                                 orderItem.getOrderId(),
                                 orderItem.getListingId(),
                                 orderItem.getQuantity());
 
                         if(modiOrder != null) {
-                            modifiedOrder.add(modiOrder);
+                            modifiedOrder.add((Order) modiOrder.get(0));
+                            repo.registerModified(modiOrder.get(1));
                         }
                     }
 

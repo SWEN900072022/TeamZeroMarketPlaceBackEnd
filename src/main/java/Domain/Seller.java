@@ -134,7 +134,7 @@ public class Seller extends User{
         return null;
     }
 
-    public Order modifyOrder1(int orderId, int listingId, int quantity) {
+    public List<EntityObject> modifyOrder1(int orderId, int listingId, int quantity) {
         // Given some order, change the order object
         // Need to check the stock level as well
         // Check to see if the order is in the orderList,if not load from
@@ -148,8 +148,16 @@ public class Seller extends User{
         if(l != null && fullOrderList != null) {
             for(Order ord : fullOrderList) {
                 if(ord.getOrderId() == orderId) {
-                    ord.modifyOrderItem(listingId, quantity);
-                    return ord;
+                    int initialQuantity = ord.getOrderItem(listingId).getQuantity();
+                    OrderItem oi = ord.modifyOrderItem(listingId, quantity, l.getQuantity());
+                    l.setQuantity(l.getQuantity() - (initialQuantity - oi.getQuantity()));
+
+                    List<EntityObject> result = new ArrayList<>();
+                    result.add(ord);
+                    result.add(l);
+
+                    return result;
+
                 }
             }
         }

@@ -55,7 +55,6 @@ public class Listing extends EntityObject {
         throw new IllegalArgumentException();
     }
 
-
     public static Listing getListingById(int listingId, IUnitofWork repo) {
         List<Object> param = new ArrayList<>();
         param.add(listingId);

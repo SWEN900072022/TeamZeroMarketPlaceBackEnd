@@ -33,7 +33,7 @@ public class CreateSellerGroupServlet extends HttpServlet {
                 String role = JWTUtil.getClaim("role", jwt);
                 int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
                 if (Objects.equals(role, UserRoles.ADMIN.toString())) {
-                    Admin admin = (Admin) User.create("", "", "", uid, UserRoles.ADMIN);
+                    Admin admin = (Admin) User.create("", "", "", uid, UserRoles.ADMIN.toString());
 
                     // TODO: create seller groups
 //                    SellerGroup newSellerGroup = admin.createSellerGroup();

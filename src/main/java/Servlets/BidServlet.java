@@ -45,7 +45,7 @@ public class BidServlet extends HttpServlet {
             if(JWTUtil.validateToken(jwt)) {
                 if(Objects.equals(JWTUtil.getClaim("role", jwt), UserRoles.CUSTOMER.toString())) {
                     int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
-                    Customer customer = (Customer) User.create("", "", "", uid, UserRoles.CUSTOMER);
+                    Customer customer = (Customer) User.create("", "", "", uid, UserRoles.CUSTOMER.toString());
                     resultBid = customer.bid(bidObj.getListingId(), bidObj.getBidAmount());
                     if(resultBid != null) {
                         repo.registerNew(resultBid);

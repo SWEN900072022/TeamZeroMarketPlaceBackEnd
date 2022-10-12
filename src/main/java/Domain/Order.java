@@ -89,7 +89,22 @@ public class Order extends EntityObject {
         return oi;
     }
 
-    public OrderItem modifyOrderItem(int listingId, int quantity) {
+    public OrderItem modifyOrderItem(int listingId, int quantity, int stockLevel) {
+        // Lazy load if orderItemList is empty
+        if(orderItemList == null) {
+            getOrderItemList(orderId, repo);
+        }
+
+        for(OrderItem ord : orderItemList) {
+            if(ord.getListingId() == listingId && (quantity - ord.getQuantity() <= stockLevel)) {
+                ord.setQuantity(quantity);
+                return ord;
+            }
+        }
+        throw new IllegalArgumentException();
+    }
+
+    public OrderItem getOrderItem(int listingId) {
         // Lazy load if orderItemList is empty
         if(orderItemList == null) {
             getOrderItemList(orderId, repo);
@@ -97,7 +112,6 @@ public class Order extends EntityObject {
 
         for(OrderItem ord : orderItemList) {
             if(ord.getListingId() == listingId) {
-                ord.setQuantity(quantity);
                 return ord;
             }
         }

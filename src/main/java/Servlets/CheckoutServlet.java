@@ -46,7 +46,7 @@ public class CheckoutServlet extends HttpServlet {
             if(JWTUtil.validateToken(jwt)) {
                 int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
                 if(Objects.equals(JWTUtil.getClaim("role", jwt), UserRoles.CUSTOMER.toString())) {
-                    Customer customer = (Customer) User.create("", "", "", uid, UserRoles.CUSTOMER);
+                    Customer customer = (Customer) User.create("", "", "", uid, UserRoles.CUSTOMER.toString());
                     Order newOrder = customer.checkoutListing(order.getAddress(), orderItemList);
 
                     if(newOrder != null) {
