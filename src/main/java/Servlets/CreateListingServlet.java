@@ -51,12 +51,10 @@ public class CreateListingServlet extends HttpServlet {
                 int groupId = Integer.parseInt(JWTUtil.getClaim("groupId",jwt));
                 if(Objects.equals(role, UserRoles.SELLER.toString())) {
                     Seller seller = (Seller) User.create("", "", "", uid, UserRoles.SELLER.toString());
-                    seller.setGroupId(groupId);
-
-                    // TODO: add seller create listing
-                    // seller.createListing();
-                    Listing newListing = seller.createListing(ListingTypes.fromString(type), title, description, quantity, Money.of(price, Monetary.getCurrency("AUD")), startTime, endTime);
+                    seller.setRepo(repo);
+                    Listing newListing = seller.createListing(groupId, ListingTypes.fromString(type), title, description, quantity, Money.of(price, Monetary.getCurrency("AUD")), startTime, endTime);
                     repo.registerNew(newListing);
+                    isSuccessful = true;
                 }
             }
         } catch (NumberFormatException e) {

@@ -1,6 +1,7 @@
 package Domain;
 
 import Enums.ListingTypes;
+import Injector.DeleteConditionInjector.DeleteIdInjector;
 import Injector.FindConditionInjector.FindAllInjector;
 import Injector.FindConditionInjector.FindIdInjector;
 import Injector.FindConditionInjector.FindListingWithGroupIdInjector;
@@ -188,5 +189,12 @@ public class Listing extends EntityObject {
 
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
+    }
+
+    public void markForDelete() {
+        List<Object>param = new ArrayList<>();
+        param.add(getListingId());
+        setInjector(new DeleteIdInjector("listings"));
+        setParam(param);
     }
 }

@@ -31,7 +31,7 @@ public class OrderMapper extends GeneralMapper<Order> {
 
             ResultSet generatedKeys = statement.getGeneratedKeys();
             while(generatedKeys.next()) {
-                latestKeyVal = generatedKeys.getInt("orderId");
+                order.setOrderId(generatedKeys.getInt("orderId"));
             }
         } catch (SQLException e) {
             return false;

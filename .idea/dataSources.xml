@@ -15,11 +15,11 @@
       <jdbc-url>jdbc:postgresql://localhost:5432/postgres</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="marketPlaceDB@localhost" uuid="35caf539-d958-4d5b-8455-2eda47633f2f">
+    <data-source source="LOCAL" name="marketPlaceDB@localhost" uuid="b8fd69df-d281-496a-92b1-24f16ff5f49c">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/postgres</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5432/marketPlaceDB</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

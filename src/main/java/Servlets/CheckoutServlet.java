@@ -1,9 +1,6 @@
 package Servlets;
 
-import Domain.Customer;
-import Domain.Order;
-import Domain.OrderItem;
-import Domain.User;
+import Domain.*;
 import Enums.UserRoles;
 import UnitofWork.IUnitofWork;
 import UnitofWork.UnitofWork;
@@ -47,16 +44,24 @@ public class CheckoutServlet extends HttpServlet {
                 int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
                 if(Objects.equals(JWTUtil.getClaim("role", jwt), UserRoles.CUSTOMER.toString())) {
                     Customer customer = (Customer) User.create("", "", "", uid, UserRoles.CUSTOMER.toString());
+                    customer.setRepo(repo);
                     Order newOrder = customer.checkoutListing(order.getAddress(), orderItemList);
+
+                    IUnitofWork repo2 = new UnitofWork();
+                    repo2.registerNew(newOrder);
+                    repo2.commit();
 
                     if(newOrder != null) {
                         // We want to register the order items
                         for(OrderItem orderItem : newOrder.getOrderItemList()) {
-                            repo.registerDeleted(orderItem);
+                            Listing l = Listing.getListingById(orderItem.getListingId(), repo);
+                            if(l.getQuantity() > orderItem.getQuantity()) {
+                                orderItem.setOrderId(newOrder.getOrderId());
+                                l.setQuantity(l.getQuantity() - orderItem.getQuantity());
+                                repo.registerNew(orderItem);
+                                repo.registerModified(l);
+                            }
                         }
-
-                        // Register the order
-                        repo.registerDeleted(newOrder);
                     }
                 }
             }

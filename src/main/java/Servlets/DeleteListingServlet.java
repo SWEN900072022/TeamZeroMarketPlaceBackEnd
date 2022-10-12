@@ -37,14 +37,13 @@ public class DeleteListingServlet extends HttpServlet {
                 int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
                 // Admin and seller can remove listings
                 if(Objects.equals(role, UserRoles.SELLER.toString())) {
-                    // TODO: add seller remove listing function here
 
                     int groupId = Integer.parseInt(JWTUtil.getClaim("groupId", jwt));
                     Seller seller = (Seller) User.create("", "", "", uid, UserRoles.SELLER.toString());
-                    seller.setGroupId(groupId);
-                    Listing listing = seller.deleteListing(listingId);
+                    seller.setRepo(repo);
+                    Listing listing = seller.deleteListing(listingId, groupId);
+                    listing.markForDelete();
                     repo.registerDeleted(listing);
-
                 }
 
                 if(Objects.equals(role, UserRoles.ADMIN.toString())) {

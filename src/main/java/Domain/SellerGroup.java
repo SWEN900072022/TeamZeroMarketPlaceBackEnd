@@ -33,9 +33,6 @@ public class SellerGroup {
         this.ordersList = ordersList;
     }
 
-
-
-
     public boolean addSeller(Seller seller) {
         // Check to see if the object is valid
         if(seller == null) {
@@ -56,16 +53,11 @@ public class SellerGroup {
         return new SellerGroup(groupId, groupName, sellerList, listingList, ordersList);
     }
 
-
-
-
     public void removeSeller(Seller seller) {
         sellerList.removeIf(t -> (
                 seller.getUserId() == t.getUserId()
                 ));
     }
-
-
 
     public int getGroupId() {
         return groupId;

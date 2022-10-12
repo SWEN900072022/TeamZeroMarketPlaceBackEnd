@@ -33,6 +33,7 @@ public class LoginServlet extends HttpServlet {
                     0,
                     role
             );
+            user.setRepository(repo);
             jwt = user.login();
         } catch (Exception e) {
             System.out.println("Something went wrong");

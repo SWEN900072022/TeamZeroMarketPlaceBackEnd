@@ -160,6 +160,10 @@ public class UnitofWork implements IUnitofWork{
             // Get the object key to determine the mapper to be used
             // Once we have the mapper, we can start inserting it into the db
             Mapper<EntityObject> mapper = mapperContainer.getInstance(entity.getClass().getCanonicalName());
+            if(mapper == null) {
+                // Get super class name instead
+                mapper = mapperContainer.getInstance(entity.getClass().getSuperclass().getCanonicalName());
+            }
             mapper.setConnection(conn);
             mapper.insert(entity);
         }
@@ -169,6 +173,10 @@ public class UnitofWork implements IUnitofWork{
         List<EntityObject> entityList = context.get(UnitActions.MODIFY.toString());
         for(EntityObject entity : entityList) {
             Mapper<EntityObject> mapper = mapperContainer.getInstance(entity.getClass().getCanonicalName());
+            if(mapper == null) {
+                // Get super class name instead
+                mapper = mapperContainer.getInstance(entity.getClass().getSuperclass().getCanonicalName());
+            }
             mapper.setConnection(conn);
             mapper.modify(entity);
         }
@@ -178,6 +186,10 @@ public class UnitofWork implements IUnitofWork{
         List<EntityObject> entityList = context.get(UnitActions.DELETE.toString());
         for(EntityObject entity : entityList) {
             Mapper<EntityObject> mapper = mapperContainer.getInstance(entity.getClass().getCanonicalName());
+            if(mapper == null) {
+                // Get super class name instead
+                mapper = mapperContainer.getInstance(entity.getClass().getSuperclass().getCanonicalName());
+            }
             mapper.setConnection(conn);
             mapper.delete(entity);
         }

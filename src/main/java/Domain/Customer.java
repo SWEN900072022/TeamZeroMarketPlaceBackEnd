@@ -2,7 +2,6 @@ package Domain;
 
 import Enums.ListingTypes;
 import Enums.UserRoles;
-import Service.Counter;
 import UnitofWork.IUnitofWork;
 import org.javamoney.moneta.Money;
 
@@ -32,7 +31,13 @@ public class Customer extends User {
     public Order checkoutListing(String address, List<OrderItem> oiList) {
         // Create an order object
         // Generate order id
-        int orderId = Counter.increment(Order.class);
+        Order ord = Order.getLastOrderItem(repo);
+        int orderId;
+        if(ord == null) {
+            orderId = 1;
+        } else {
+            orderId = ord.getOrderId();
+        }
         return Order.create(orderId, getUserId(), address, oiList);
     }
 
@@ -79,7 +84,7 @@ public class Customer extends User {
                 if(ord.getOrderId() == orderId) {
                     int initialQuantity = ord.getOrderItem(listingId).getQuantity();
                     OrderItem oi = ord.modifyOrderItem(listingId, quantity, l.getQuantity());
-                    l.setQuantity(l.getQuantity() - (initialQuantity - oi.getQuantity()));
+                    l.setQuantity(l.getQuantity() + (initialQuantity - oi.getQuantity()));
 
                     List<EntityObject> result = new ArrayList<>();
                     result.add(ord);

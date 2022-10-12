@@ -40,20 +40,19 @@ public class CancelOrderServlet extends HttpServlet {
                 int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
                 if(Objects.equals(role, UserRoles.CUSTOMER.toString())) {
                     Customer customer = (Customer) User.create("", "", "", uid, UserRoles.CUSTOMER.toString());
+                    customer.setRepo(repo);
                     for(Order ord : ordersToBeDeletedList) {
                         Order cancOrd = customer.cancelOrder(ord.getOrderId());
 
                         if(cancOrd != null) {
-                            // We want to register the cancellation
-                            for(OrderItem ordItem : cancOrd.getOrderItemList()) {
-                                repo.registerDeleted(ordItem);
-                            }
+//                            // We want to register the cancellation
+//                            for(OrderItem ordItem : cancOrd.getOrderItemList()) {
+//
+//                                repo.registerDeleted(ordItem);
+//                            }
 
                             // Register the order to be cancelled
-                            List<Object>param = new ArrayList<>();
-                            param.add(cancOrd.getOrderId());
-                            cancOrd.setInjector(new DeleteIdInjector("orders"));
-                            cancOrd.setParam(param);
+                            cancOrd.markForDelete();
                             repo.registerDeleted(cancOrd);
                         }
                     }
@@ -61,12 +60,11 @@ public class CancelOrderServlet extends HttpServlet {
 
                 if(Objects.equals(role, UserRoles.SELLER.toString())) {
                     Seller seller = (Seller) User.create("", "", "", uid, UserRoles.SELLER.toString());
+                    int groupId = Integer.parseInt(JWTUtil.getClaim("groupId",jwt));
                     for(Order ord : ordersToBeDeletedList) {
-                        // seller.cancelOrder();
 
-                        // TODO: add seller cancel order
                         // Make sure to register the orderitems and order to be deleted
-                        Order cancOrd = seller.cancelOrder(ord.getOrderId());
+                        Order cancOrd = seller.cancelOrder(ord.getOrderId(), groupId);
                         if(cancOrd != null){
                             for(OrderItem item: cancOrd.getOrderItemList()){
                                 repo.registerDeleted(item);

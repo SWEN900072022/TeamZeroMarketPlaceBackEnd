@@ -41,6 +41,7 @@ public class ModifyServlet extends HttpServlet {
 
                 if (Objects.equals(role, UserRoles.CUSTOMER.toString())) {
                     Customer customer = (Customer) User.create("", "", "", uid, UserRoles.CUSTOMER.toString());
+                    customer.setRepo(repo);
                     for(OrderItem orderItem : ordersToBeModifiedList) {
                         List<EntityObject> modiOrderListing = customer.modifyOrder(
                                 orderItem.getOrderId(),
@@ -62,14 +63,14 @@ public class ModifyServlet extends HttpServlet {
                 }
 
                 if(Objects.equals(role, UserRoles.SELLER.toString())) {
-                    // TODO: add the seller modifying the order
                     int groupId = Integer.parseInt(JWTUtil.getClaim("groupId",jwt));
                     Seller seller = (Seller) User.create("", "", "", uid, UserRoles.SELLER.toString());
-                    seller.setGroupId(groupId);
+                    seller.setRepo(repo);
                     for(OrderItem orderItem : ordersToBeModifiedList) {
-                        List<EntityObject> modiOrder = seller.modifyOrder1(
+                        List<EntityObject> modiOrder = seller.modifyOrder(
                                 orderItem.getOrderId(),
                                 orderItem.getListingId(),
+                                groupId,
                                 orderItem.getQuantity());
 
                         if(modiOrder != null) {

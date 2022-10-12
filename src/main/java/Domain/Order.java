@@ -1,5 +1,7 @@
 package Domain;
 
+import Injector.DeleteConditionInjector.DeleteIdInjector;
+import Injector.FindConditionInjector.FindLastOrderInjector;
 import Injector.FindConditionInjector.FindOrderItemWithOrderId;
 import Injector.FindConditionInjector.FindOrderWithUser;
 import Injector.FindConditionInjector.FindOrderForSellerGroupInjector;
@@ -35,9 +37,9 @@ public class Order extends EntityObject {
         this.repo = repo;
     }
 
-    public static List<OrderItem> getOrdersByGroupId(int userId, IUnitofWork repo){
+    public static List<OrderItem> getOrdersByGroupId(int groupId, IUnitofWork repo){
         List<Object> param = new ArrayList<>();
-        param.add(userId);
+        param.add(groupId);
 
         // Get order details by groupId
         List<OrderItem> ordList = GeneralUtil.castObjectInList(repo.readMulti(
@@ -73,6 +75,14 @@ public class Order extends EntityObject {
         }
 
         return ordList;
+    }
+
+    public static Order getLastOrderItem(IUnitofWork repo) {
+        return (Order) repo.read(
+                new FindLastOrderInjector(),
+                new ArrayList<>(),
+                Order.class
+        );
     }
 
     public static List<OrderItem> getOrderItemList(int orderId, IUnitofWork repo) {
@@ -154,5 +164,12 @@ public class Order extends EntityObject {
 
     public void setOrderItemList(List<OrderItem> orderItemList) {
         this.orderItemList = orderItemList;
+    }
+
+    public void markForDelete() {
+        List<Object>param = new ArrayList<>();
+        param.add(getOrderId());
+        setInjector(new DeleteIdInjector("orders"));
+        setParam(param);
     }
 }
