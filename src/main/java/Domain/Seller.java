@@ -32,7 +32,7 @@ public class Seller extends User{
         super(email, username, password, userId);
     }
 
-    public int getGroupId(){
+    public void getGroupId(){
         List<Object> param = new ArrayList<>();
         param.add(getUserId());
         GroupMembership result = (GroupMembership) repo.read(new FindIdInjector("groupmembership"), param,

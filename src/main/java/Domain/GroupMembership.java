@@ -1,6 +1,12 @@
 package Domain;
 
-public class GroupMembership {
+import Injector.FindConditionInjector.FindIdInjector;
+import UnitofWork.IUnitofWork;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class GroupMembership extends EntityObject{
     private int groupId;
     private int userId;
 
@@ -11,6 +17,17 @@ public class GroupMembership {
 
     public static GroupMembership create(int groupId, int userId) {
         return new GroupMembership(groupId, userId);
+    }
+
+    public static GroupMembership getGroupMembershipByUserId(int userId, IUnitofWork repo) {
+        List<Object> param = new ArrayList<>();
+        param.add(userId);
+
+        return (GroupMembership) repo.read(
+                new FindIdInjector("groupmembership"),
+                param,
+                GroupMembership.class
+        );
     }
 
     public int getGroupId() {

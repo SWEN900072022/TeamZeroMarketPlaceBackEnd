@@ -47,9 +47,9 @@ public class CreateListingServlet extends HttpServlet {
             if(JWTUtil.validateToken(jwt)) {
                 String role = JWTUtil.getClaim("role", jwt);
                 int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
-                String groupId = Integer.parseInt(JWTUtil.getClaim("groupId"));
+                int groupId = Integer.parseInt(JWTUtil.getClaim("groupId", jwt));
                 if(Objects.equals(role, UserRoles.SELLER.toString())) {
-                    Seller seller = (Seller) User.create("", "", "", uid, UserRoles.SELLER);
+                    Seller seller = (Seller) User.create("", "", "", uid, UserRoles.SELLER.toString());
 
                     // TODO: add seller create listing
                     // seller.createListing();

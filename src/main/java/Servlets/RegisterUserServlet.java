@@ -1,5 +1,6 @@
 package Servlets;
 
+import Domain.User;
 import UnitofWork.IUnitofWork;
 import UnitofWork.UnitofWork;
 import com.google.gson.Gson;
@@ -23,30 +24,33 @@ public class RegisterUserServlet extends HttpServlet {
         String password = request.getParameter("password");
         String role = request.getParameter("role");
 
-        // TODO: user registration not implemented
+        IUnitofWork repo = new UnitofWork();
+        boolean isSuccessful = false;
 
-//        User user = new User(email, username, password, role);
-//        IUnitofWork repo = new UnitofWork();
-//        UserModel uModel = new UserModel(repo);
-//        boolean hasRegistered = uModel.register(user);
-//
-//        // Check to see if the operations have been successful, if it is commit
-//        if(hasRegistered) {
-//            try {
-//                repo.commit();
-//            } catch (SQLException e) {
-//                repo.rollback();
-//            }
-//        } else {
-//            repo.rollback();
-//        }
-//
-//        Map<String, Boolean>result = new HashMap<>();
-//        result.put("result", hasRegistered);
-//        Gson gson = new Gson();
-//        String json = gson.toJson(result);
-//
-//        PrintWriter out = response.getWriter();
-//        out.println(json);
+        try {
+            User user = User.register(email, username, password, role, repo);
+
+            if(user != null) {
+                // Register is successful, user is registered to be commited
+                repo.registerNew(user);
+                isSuccessful = true;
+            }
+        } catch (Exception e) {
+            System.out.println("Something went wrong");
+        }
+
+        try {
+            repo.commit();
+        } catch (SQLException e) {
+            repo.rollback();
+        }
+
+        Map<String, Boolean>result = new HashMap<>();
+        result.put("result", isSuccessful);
+        Gson gson = new Gson();
+        String json = gson.toJson(result);
+
+        PrintWriter out = response.getWriter();
+        out.println(json);
     }
 }

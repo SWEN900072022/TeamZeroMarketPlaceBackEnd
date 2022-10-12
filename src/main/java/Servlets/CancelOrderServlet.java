@@ -41,7 +41,7 @@ public class CancelOrderServlet extends HttpServlet {
                 String role = JWTUtil.getClaim("role", jwt);
                 int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
                 if(Objects.equals(role, UserRoles.CUSTOMER.toString())) {
-                    Customer customer = (Customer) User.create("", "", "", uid, UserRoles.CUSTOMER);
+                    Customer customer = (Customer) User.create("", "", "", uid, UserRoles.CUSTOMER.toString());
                     for(Order ord : ordersToBeDeletedList) {
                         Order cancOrd = customer.cancelOrder(ord.getOrderId());
 
@@ -58,7 +58,7 @@ public class CancelOrderServlet extends HttpServlet {
                 }
 
                 if(Objects.equals(role, UserRoles.SELLER.toString())) {
-                    Seller seller = (Seller) User.create("", "", "", uid, UserRoles.SELLER);
+                    Seller seller = (Seller) User.create("", "", "", uid, UserRoles.SELLER.toString());
                     for(Order ord : ordersToBeDeletedList) {
                         // seller.cancelOrder();
 

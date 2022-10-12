@@ -37,7 +37,7 @@ public class DeleteListingServlet extends HttpServlet {
                 // Admin and seller can remove listings
                 if(Objects.equals(role, UserRoles.SELLER.toString())) {
                     // TODO: add seller remove listing function here
-                    Seller seller = (Seller) User.create("", "", "", uid, UserRoles.SELLER);
+                    Seller seller = (Seller) User.create("", "", "", uid, UserRoles.SELLER.toString());
 
                 }
 

@@ -43,7 +43,7 @@ public class ModifyServlet extends HttpServlet {
                 List<Order> modifiedOrder = new ArrayList<>();
 
                 if (Objects.equals(role, UserRoles.CUSTOMER.toString())) {
-                    Customer customer = (Customer) User.create("", "", "", uid, UserRoles.CUSTOMER);
+                    Customer customer = (Customer) User.create("", "", "", uid, UserRoles.CUSTOMER.toString());
                     for(OrderItem orderItem : ordersToBeModifiedList) {
                         Order modiOrder = customer.modifyOrder(
                                 orderItem.getOrderId(),
