@@ -1,7 +1,5 @@
 package Domain;
 
-import Entity.EntityObject;
-import Entity.Filter;
 import Enums.ListingTypes;
 import Injector.FindConditionInjector.FindAllInjector;
 import Injector.FindConditionInjector.FindIdInjector;
@@ -47,14 +45,14 @@ public class Listing extends EntityObject {
         return false;
     }
 
-    public static Listing create(Class<?> clazz, int listingId, int groupId, ListingTypes type, String title, String description, int quantity, Money price, LocalDateTime startTime, LocalDateTime endTime) {
-        if(FixedPriceListing.class.equals(clazz)) {
+    public static Listing create(int listingId, int groupId, ListingTypes type, String title, String description, int quantity, Money price, LocalDateTime startTime, LocalDateTime endTime) {
+        if(type == ListingTypes.FIXED_PRICE) {
             return new FixedPriceListing(listingId, groupId, type, title, description, quantity, price, startTime, endTime);
         }
-        if(AuctionListing.class.equals(clazz)) {
+        if(type == ListingTypes.AUCTION) {
             return new AuctionListing(listingId, groupId, type, title, description, quantity, price, startTime, endTime);
         }
-        throw new IllegalArgumentException(clazz.getName());
+        throw new IllegalArgumentException();
     }
 
     public static Listing getListingById(int listingId, IUnitofWork repo) {

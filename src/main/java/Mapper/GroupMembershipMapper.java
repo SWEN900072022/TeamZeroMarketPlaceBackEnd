@@ -1,6 +1,6 @@
 package Mapper;
 
-import Entity.GroupMembership;
+import Domain.GroupMembership;
 import Injector.ISQLInjector;
 import Util.SQLUtil;
 
@@ -66,12 +66,13 @@ public class GroupMembershipMapper extends GeneralMapper<GroupMembership> {
 
     @Override
     public GroupMembership find(ISQLInjector injector, List<Object> queryParam) {
-        GroupMembership gm = new GroupMembership();
+        GroupMembership gm = GroupMembership.create(0, 0);
         try {
             ResultSet rs = getResultSet(injector, queryParam);
             if(rs.next()) {
-                gm.setGroupId(rs.getInt("groupId"));
-                gm.setUserId(rs.getInt("userId"));
+                gm = GroupMembership.create(
+                        rs.getInt("groupId"),
+                        rs.getInt("userId"));
             }
         } catch (SQLException e) {
             return null;
@@ -85,9 +86,9 @@ public class GroupMembershipMapper extends GeneralMapper<GroupMembership> {
         try {
             ResultSet rs = getResultSet(injector, queryParam);
             while(rs.next()) {
-                GroupMembership gm = new GroupMembership();
-                gm.setGroupId(rs.getInt("groupId"));
-                gm.setUserId(rs.getInt("userId"));
+                GroupMembership gm = GroupMembership.create(
+                        rs.getInt("groupId"),
+                        rs.getInt("userId"));
                 gmList.add(gm);
             }
         } catch (SQLException e) {

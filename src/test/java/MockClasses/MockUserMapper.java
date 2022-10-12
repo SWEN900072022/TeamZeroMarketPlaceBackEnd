@@ -1,6 +1,6 @@
 package MockClasses;
 
-import Entity.User;
+import Domain.User;
 import Enums.UserRoles;
 import Injector.FindConditionInjector.FindEmailAndPasswordInjector;
 import Injector.FindConditionInjector.FindUserOrEmailInjector;
@@ -17,19 +17,21 @@ public class MockUserMapper implements Mapper<User> {
 
     public MockUserMapper() {
         // Populate the users with some dummy data
-        User user1 = new User();
-        user1.setUserId(1);
-        user1.setRole(UserRoles.CUSTOMER);
-        user1.setUsername("a");
-        user1.setPassword("a");
-        user1.setEmail("a");
+        User user1 = User.create(
+                "a",
+                "a",
+                "a",
+                1,
+                UserRoles.CUSTOMER
+        );
 
-        User user2 = new User();
-        user2.setUserId(2);
-        user2.setRole(UserRoles.SELLER);
-        user2.setUsername("b");
-        user2.setPassword("b");
-        user2.setEmail("b");
+        User user2 = User.create(
+                "b",
+                "b",
+                "b",
+                2,
+                UserRoles.SELLER
+        );
 
         users.add(user1);
         users.add(user2);
@@ -74,7 +76,7 @@ public class MockUserMapper implements Mapper<User> {
             }
         }
 
-        return new User();
+        return null;
     }
 
     @Override

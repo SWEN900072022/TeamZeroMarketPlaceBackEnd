@@ -1,9 +1,10 @@
 package Servlets;
 
-import Entity.SellerGroup;
-import Model.SellerGroupModel;
-import UnitofWork.IUnitofWork;
+import Domain.Admin;
+import Domain.User;
+import Enums.UserRoles;
 import UnitofWork.UnitofWork;
+import Util.JWTUtil;
 import com.google.gson.Gson;
 
 import javax.servlet.*;
@@ -14,6 +15,7 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @WebServlet(name = "CreateSellerGroupServlet", value = "/CreateSellerGroupServlet")
 public class CreateSellerGroupServlet extends HttpServlet {
@@ -23,24 +25,37 @@ public class CreateSellerGroupServlet extends HttpServlet {
         String jwt = request.getHeader("jwt");
         String groupName = request.getParameter("groupName");
 
-        SellerGroup sg = new SellerGroup(groupName);
-        IUnitofWork repo = new UnitofWork();
-        SellerGroupModel sgModel = new SellerGroupModel(repo);
-        boolean hasCreated = sgModel.createSellerGroup(sg, jwt);
+        UnitofWork repo = new UnitofWork();
+        boolean isSuccessful = false;
 
-        // Check to see if the operations have been successful, if it is commit
-        if(hasCreated) {
-            try {
-                repo.commit();
-            } catch (SQLException e) {
-                repo.rollback();
+        try {
+            if(JWTUtil.validateToken(jwt)) {
+                String role = JWTUtil.getClaim("role", jwt);
+                int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
+                if (Objects.equals(role, UserRoles.ADMIN.toString())) {
+                    Admin admin = (Admin) User.create("", "", "", uid, UserRoles.ADMIN);
+
+                    // TODO: create seller groups
+//                    SellerGroup newSellerGroup = admin.createSellerGroup();
+
+                    // Once the seller group is created, register it
+//                    repo.registerNew(newSellerGroup);
+                }
+                isSuccessful = true;
             }
-        } else {
+        } catch (Exception e) {
+            System.out.println("Something went wrong");
+        }
+
+        // Check to see if the operations have been successful, if it is committed
+        try {
+            repo.commit();
+        } catch (SQLException e) {
             repo.rollback();
         }
 
         Map<String, Boolean> result = new HashMap<>();
-        result.put("result", hasCreated);
+        result.put("result", isSuccessful);
         Gson gson = new Gson();
         String json = gson.toJson(result);
 

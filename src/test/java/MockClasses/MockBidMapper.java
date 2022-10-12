@@ -1,6 +1,6 @@
 package MockClasses;
 
-import Entity.Bid;
+import Domain.Bid;
 import Injector.ISQLInjector;
 import Mapper.Mapper;
 import org.javamoney.moneta.Money;
@@ -16,15 +16,17 @@ public class MockBidMapper implements Mapper<Bid> {
 
     public MockBidMapper() {
         // Populate the bids with some dummy data
-        Bid bid1 = new Bid();
-        bid1.setBidAmount(Money.of(10, Monetary.getCurrency("AUD")));
-        bid1.setUserId(1);
-        bid1.setListingId(1);
+        Bid bid1 = Bid.create(
+                1,
+                1,
+                Money.of(10, Monetary.getCurrency("AUD"))
+        );
 
-        Bid bid2 = new Bid();
-        bid2.setBidAmount(Money.of(20, Monetary.getCurrency("AUD")));
-        bid2.setUserId(2);
-        bid2.setListingId(2);
+        Bid bid2 = Bid.create(
+                2,
+                2,
+                Money.of(20, Monetary.getCurrency("AUD"))
+        );
 
         bids.add(bid1);
         bids.add(bid2);

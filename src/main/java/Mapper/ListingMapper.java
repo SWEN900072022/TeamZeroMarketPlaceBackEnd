@@ -1,6 +1,6 @@
 package Mapper;
 
-import Entity.Listing;
+import Domain.Listing;
 import Enums.ListingTypes;
 import Injector.ISQLInjector;
 import Util.SQLUtil;
@@ -105,24 +105,25 @@ public class ListingMapper extends GeneralMapper<Listing> {
     }
 
     public Listing find(ISQLInjector injector, List<Object> queryParam) {
-        Listing listing = new Listing();
         try {
             ResultSet rs = getResultSet(injector, queryParam);
             if(rs.next()) {
-                listing.setListingId(rs.getInt("listingId"));
-                listing.setGroupId(rs.getInt("groupId"));
-                listing.setType(ListingTypes.fromString(rs.getString("type")));
-                listing.setTitle(rs.getString("title"));
-                listing.setDescription(rs.getString("description"));
-                listing.setQuantity(rs.getInt("quantity"));
-                listing.setPrice(Money.of(rs.getBigDecimal("price"), Monetary.getCurrency("AUD")));
-                listing.setStartTime(rs.getObject("startTime", LocalDateTime.class));
-                listing.setEndTime(rs.getObject("endTime", LocalDateTime.class));
+                return Listing.create(
+                        rs.getInt("listingId"),
+                        rs.getInt("groupId"),
+                        ListingTypes.fromString(rs.getString("type")),
+                        rs.getString("title"),
+                        rs.getString("description"),
+                        rs.getInt("quantity"),
+                        Money.of(rs.getBigDecimal("price"), Monetary.getCurrency("AUD")),
+                        rs.getObject("startTime", LocalDateTime.class),
+                        rs.getObject("endTime", LocalDateTime.class)
+                );
             }
         } catch (SQLException e) {
             return null;
         }
-        return listing;
+        return null;
     }
 
     @Override
@@ -131,16 +132,17 @@ public class ListingMapper extends GeneralMapper<Listing> {
         try {
             ResultSet rs = getResultSet(injector, queryParam);
             while(rs.next()) {
-                Listing listing = new Listing();
-                listing.setListingId(rs.getInt("listingId"));
-                listing.setGroupId(rs.getInt("groupId"));
-                listing.setType(ListingTypes.fromString(rs.getString("type")));
-                listing.setTitle(rs.getString("title"));
-                listing.setDescription(rs.getString("description"));
-                listing.setQuantity(rs.getInt("quantity"));
-                listing.setPrice(Money.of(rs.getBigDecimal("price"), Monetary.getCurrency("AUD")));
-                listing.setStartTime(rs.getObject("startTime", LocalDateTime.class));
-                listing.setEndTime(rs.getObject("endTime", LocalDateTime.class));
+                Listing listing = Listing.create(
+                        rs.getInt("listingId"),
+                        rs.getInt("groupId"),
+                        ListingTypes.fromString(rs.getString("type")),
+                        rs.getString("title"),
+                        rs.getString("description"),
+                        rs.getInt("quantity"),
+                        Money.of(rs.getBigDecimal("price"), Monetary.getCurrency("AUD")),
+                        rs.getObject("startTime", LocalDateTime.class),
+                        rs.getObject("endTime", LocalDateTime.class)
+                );
                 listingList.add(listing);
             }
         } catch (SQLException e) {

@@ -1,7 +1,6 @@
 package MockClasses;
 
-import Entity.GroupMembership;
-import Entity.SellerGroup;
+import Domain.GroupMembership;
 import Injector.FindConditionInjector.FindIdInjector;
 import Injector.ISQLInjector;
 import Mapper.Mapper;
@@ -16,13 +15,9 @@ public class MockGroupMembershipMapper implements Mapper<GroupMembership> {
 
     public MockGroupMembershipMapper() {
         // Populate the gmList with some dummy data
-        GroupMembership gm1 = new GroupMembership();
-        gm1.setGroupId(1);
-        gm1.setUserId(1);
+        GroupMembership gm1 = GroupMembership.create(1, 1);
 
-        GroupMembership gm2 = new GroupMembership();
-        gm2.setGroupId(2);
-        gm2.setUserId(2);
+        GroupMembership gm2 = GroupMembership.create(2, 2);
 
         gmList.add(gm1);
         gmList.add(gm2);
@@ -59,7 +54,7 @@ public class MockGroupMembershipMapper implements Mapper<GroupMembership> {
                 }
             }
         }
-        return new GroupMembership();
+        return null;
     }
 
     @Override

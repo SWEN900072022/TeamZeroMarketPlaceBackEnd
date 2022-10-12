@@ -1,8 +1,9 @@
 package Servlets;
 
-import Model.ListingModel;
+import Enums.UserRoles;
 import UnitofWork.IUnitofWork;
 import UnitofWork.UnitofWork;
+import Util.JWTUtil;
 import com.google.gson.Gson;
 
 import javax.servlet.*;
@@ -13,6 +14,7 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @WebServlet(name = "DeleteListingServlet", value = "/DeleteListingServlet")
 public class DeleteListingServlet extends HttpServlet {
@@ -24,17 +26,31 @@ public class DeleteListingServlet extends HttpServlet {
 
         // We have the listingId to identify the listing in question, now we will delete the listing
         IUnitofWork repo = new UnitofWork();
-        ListingModel listingModel = new ListingModel(repo);
-        boolean isSuccessful = listingModel.delete(listingId, jwt);
+        boolean isSuccessful = false;
+
+        try {
+            if(JWTUtil.validateToken(jwt)) {
+                String role = JWTUtil.getClaim("role", jwt);
+                int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
+                // Admin and seller can remove listings
+                if(Objects.equals(role, UserRoles.SELLER.toString())) {
+                    // TODO: add seller remove listing function here
+                }
+
+                if(Objects.equals(role, UserRoles.ADMIN.toString())) {
+                    // TODO: add admin remove listing function here
+                }
+
+                isSuccessful = true;
+            }
+        } catch (Exception e) {
+            System.out.println("Something went wrong");
+        }
 
         // Check to see if the operations have been successful, if it is commit
-        if(isSuccessful) {
-            try {
-                repo.commit();
-            } catch (SQLException e) {
-                repo.rollback();
-            }
-        } else {
+        try {
+            repo.commit();
+        } catch (SQLException e) {
             repo.rollback();
         }
 

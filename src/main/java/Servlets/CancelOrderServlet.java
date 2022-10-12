@@ -1,9 +1,10 @@
 package Servlets;
 
-import Entity.Order;
-import Model.OrderModel;
+import Domain.*;
+import Enums.UserRoles;
 import UnitofWork.IUnitofWork;
 import UnitofWork.UnitofWork;
+import Util.JWTUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -17,6 +18,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @WebServlet(name = "CancelOrderServlet", value = "/CancelOrderServlet")
 public class CancelOrderServlet extends HttpServlet {
@@ -30,21 +32,51 @@ public class CancelOrderServlet extends HttpServlet {
         Gson gson = new Gson();
         List<Order>ordersToBeDeletedList = gson.fromJson(ordersToBeDeleted, typeOfOrder);
 
-        // Now that we have the list we will proceed with deleting the order
         IUnitofWork repo = new UnitofWork();
-        OrderModel om = new OrderModel(repo);
-        boolean isSuccessful = om.cancelOrders(ordersToBeDeletedList, jwt);
+        boolean isSuccessful = false;
 
-        // Check to see if the operations have been successful, if it is commit
-        if(isSuccessful) {
-            try {
-                repo.commit();
-            } catch (SQLException e) {
-                repo.rollback();
+        // Get roles from the jwt
+        try {
+            if(JWTUtil.validateToken(jwt)) {
+                String role = JWTUtil.getClaim("role", jwt);
+                int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
+                if(Objects.equals(role, UserRoles.CUSTOMER.toString())) {
+                    Customer customer = (Customer) User.create("", "", "", uid, UserRoles.CUSTOMER);
+                    for(Order ord : ordersToBeDeletedList) {
+                        Order cancOrd = customer.cancelOrder(ord.getOrderId());
+
+                        if(cancOrd != null) {
+                            // We want to register the cancellation
+                            for(OrderItem ordItem : cancOrd.getOrderItemList()) {
+                                repo.registerDeleted(ordItem);
+                            }
+
+                            // Register the order to be cancelled
+                            repo.registerDeleted(cancOrd);
+                        }
+                    }
+                }
+
+                if(Objects.equals(role, UserRoles.SELLER.toString())) {
+                    Seller seller = (Seller) User.create("", "", "", uid, UserRoles.SELLER);
+                    for(Order ord : ordersToBeDeletedList) {
+                        // seller.cancelOrder();
+                        // TODO: add seller cancel order
+                        // Make sure to register the orderitems and order to be deleted
+                    }
+                }
+                isSuccessful = true;
             }
-        } else {
+        } catch (Exception e) {
+
+        }
+
+        try {
+            repo.commit();
+        } catch (SQLException e) {
             repo.rollback();
         }
+
 
         Map<String, Boolean> result = new HashMap<>();
         result.put("result", isSuccessful);

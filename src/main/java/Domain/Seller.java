@@ -6,9 +6,13 @@ public class Seller extends User{
     private UserRoles userRoles = UserRoles.SELLER;
     private SellerGroup sg;
 
-    public Seller(String email, String username, String password, int userId, UserRoles userRoles) {
+    public Seller(String email, String username, String password, int userId) {
         super(email, username, password, userId);
-        this.userRoles = userRoles;
+    }
+
+    @Override
+    public String getRole() {
+        return UserRoles.SELLER.toString();
     }
 
     public void createListing(Listing l) {

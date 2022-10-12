@@ -1,6 +1,6 @@
 package MockClasses;
 
-import Entity.Order;
+import Domain.Order;
 import Injector.ISQLInjector;
 import Mapper.Mapper;
 
@@ -14,15 +14,17 @@ public class MockOrderMapper implements Mapper<Order> {
 
     public MockOrderMapper() {
         // Populate the bids with some dummy data
-        Order order = new Order();
-        order.setOrderId(1);
-        order.setUserId(1);
-        order.setAddress("a");
+        Order order = Order.create(
+                1,
+                1,
+                "a"
+        );
 
-        Order order1 = new Order();
-        order1.setOrderId(2);
-        order1.setUserId(2);
-        order1.setAddress("b");
+        Order order1 = Order.create(
+                2,
+                2,
+                "b"
+        );
 
         orders.add(order);
         orders.add(order1);

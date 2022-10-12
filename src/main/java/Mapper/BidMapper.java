@@ -1,6 +1,6 @@
 package Mapper;
 
-import Entity.Bid;
+import Domain.Bid;
 import Injector.ISQLInjector;
 import Util.SQLUtil;
 import org.javamoney.moneta.Money;
@@ -70,13 +70,14 @@ public class BidMapper extends GeneralMapper<Bid>{
 
     @Override
     public Bid find(ISQLInjector injector, List<Object> queryParam) {
-        Bid bid = new Bid();
+        Bid bid = Bid.create(0, 0, Money.of(0, Monetary.getCurrency("AUD")));
         try {
             ResultSet rs = getResultSet(injector, queryParam);
             if(rs.next()) {
-                bid.setListingId(rs.getInt("listingId"));
-                bid.setUserId(rs.getInt("userId"));
-                bid.setBidAmount(Money.of(rs.getBigDecimal("bidAmount"), Monetary.getCurrency("AUD")));
+                bid = Bid.create(
+                        rs.getInt("listingId"),
+                        rs.getInt("userId"),
+                        Money.of(rs.getBigDecimal("bidAmount"), Monetary.getCurrency("AUD")));
             }
         } catch (SQLException e) {
             return null;
@@ -90,10 +91,10 @@ public class BidMapper extends GeneralMapper<Bid>{
         try {
             ResultSet rs = getResultSet(injector, queryParam);
             while(rs.next()) {
-                Bid bid = new Bid();
-                bid.setListingId(rs.getInt("listingId"));
-                bid.setUserId(rs.getInt("userId"));
-                bid.setBidAmount(Money.of(rs.getBigDecimal("bidAmount"), Monetary.getCurrency("AUD")));
+                Bid bid = Bid.create(
+                        rs.getInt("listingId"),
+                        rs.getInt("userId"),
+                        Money.of(rs.getBigDecimal("bidAmount"), Monetary.getCurrency("AUD")));
                 bidList.add(bid);
             }
         } catch (SQLException e) {

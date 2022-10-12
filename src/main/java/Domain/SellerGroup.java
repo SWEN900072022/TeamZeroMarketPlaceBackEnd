@@ -17,6 +17,10 @@ public class SellerGroup {
         this.ordersList = ordersList;
     }
 
+    public static SellerGroup create(int groupId, String groupName) {
+        return new SellerGroup(groupId, groupName, null, null, null);
+    }
+
     public static SellerGroup create(int groupId, String groupName, List<Seller>sellerList, List<Listing> listingList, List<OrderItem> ordersList) {
         return new SellerGroup(groupId, groupName, sellerList, listingList, ordersList);
     }

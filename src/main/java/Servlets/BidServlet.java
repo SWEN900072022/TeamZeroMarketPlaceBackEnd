@@ -1,10 +1,13 @@
 package Servlets;
 
-import Entity.Bid;
+import Domain.Bid;
+import Domain.Customer;
+import Domain.User;
+import Enums.UserRoles;
 import JsonDeserializer.BidDeserializer;
-import Model.BidModel;
 import UnitofWork.IUnitofWork;
 import UnitofWork.UnitofWork;
+import Util.JWTUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -16,6 +19,7 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @WebServlet(name = "BidServlet", value = "/BidServlet")
 public class BidServlet extends HttpServlet {
@@ -32,20 +36,31 @@ public class BidServlet extends HttpServlet {
         Gson gson = gsonBuilder.create();
         Bid bidObj = gson.fromJson(bid, Bid.class);
 
-        // Business logic initialisation
-        // Initialise unit of work and insert them on model initialisation
         IUnitofWork repo = new UnitofWork();
-        BidModel bm = new BidModel(repo);
-        boolean isSuccessful = bm.createBid(bidObj, jwt);
+        Bid resultBid;
+        Boolean isSuccessful = false;
+
+        // Get roles from the jwt
+        try {
+            if(JWTUtil.validateToken(jwt)) {
+                if(Objects.equals(JWTUtil.getClaim("role", jwt), UserRoles.CUSTOMER.toString())) {
+                    int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
+                    Customer customer = (Customer) User.create("", "", "", uid, UserRoles.CUSTOMER);
+                    resultBid = customer.bid(bidObj.getListingId(), bidObj.getBidAmount());
+                    if(resultBid != null) {
+                        repo.registerNew(resultBid);
+                        isSuccessful = true;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Something went wrong");
+        }
 
         // Check to see if the operations have been successful, if it is commit
-        if(isSuccessful) {
-            try {
-                repo.commit();
-            } catch (SQLException e) {
-                repo.rollback();
-            }
-        } else {
+        try {
+            repo.commit();
+        } catch (SQLException e) {
             repo.rollback();
         }
 

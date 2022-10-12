@@ -2,7 +2,7 @@ package Domain;
 
 import Enums.UserRoles;
 
-public class User {
+public abstract class User {
     private String email;
     private String username;
     private String password;
@@ -17,18 +17,20 @@ public class User {
 
     public static User create(String email, String username, String password, int userId, UserRoles roles) {
         if(roles.equals(UserRoles.CUSTOMER.toString())) {
-            // Return customer user
+            return new Customer(email, username, password, userId);
         }
 
         if(roles.equals(UserRoles.SELLER.toString())) {
-            // Return seller user
+            return new Seller(email, username, password, userId);
         }
 
         if(roles.equals(UserRoles.ADMIN.toString())) {
-            // Return admin user
+            return new Admin(email, username, password, userId);
         }
         throw new IllegalArgumentException();
     }
+
+    public abstract String getRole();
 
     public String getEmail() {
         return email;

@@ -1,6 +1,6 @@
 package Mapper;
 
-import Entity.SellerGroup;
+import Domain.SellerGroup;
 import Injector.ISQLInjector;
 import Util.SQLUtil;
 
@@ -85,17 +85,18 @@ public class SellerGroupMapper extends GeneralMapper<SellerGroup> {
 
     @Override
     public SellerGroup find(ISQLInjector injector, List<Object> queryParam) {
-        SellerGroup sg = new SellerGroup();
         try {
             ResultSet rs = getResultSet(injector, queryParam);
             if(rs.next()) {
-                sg.setGroupId(rs.getInt("groupId"));
-                sg.setGroupName(rs.getString("groupName"));
+                return SellerGroup.create(
+                        rs.getInt("groupId"),
+                        rs.getString("groupName")
+                );
             }
         } catch (SQLException e) {
             return null;
         }
-        return sg;
+        return null;
     }
 
     @Override
@@ -104,9 +105,10 @@ public class SellerGroupMapper extends GeneralMapper<SellerGroup> {
         try {
             ResultSet rs = getResultSet(injector, queryParam);
             while(rs.next()) {
-                SellerGroup sg = new SellerGroup();
-                sg.setGroupId(rs.getInt("groupId"));
-                sg.setGroupName(rs.getString("groupName"));
+                SellerGroup sg = SellerGroup.create(
+                        rs.getInt("groupId"),
+                        rs.getString("groupName")
+                );
                 sgList.add(sg);
             }
         } catch (SQLException e) {

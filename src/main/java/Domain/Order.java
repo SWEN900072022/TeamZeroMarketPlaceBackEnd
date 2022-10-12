@@ -1,8 +1,5 @@
 package Domain;
 
-import Entity.EntityObject;
-import Injector.FindConditionInjector.FindIdInjector;
-import Injector.FindConditionInjector.FindOrderFromUserInjector;
 import Injector.FindConditionInjector.FindOrderItemWithOrderId;
 import Injector.FindConditionInjector.FindOrderWithUser;
 import UnitofWork.IUnitofWork;
@@ -23,6 +20,10 @@ public class Order extends EntityObject {
         this.userId = userId;
         this.address = address;
         this.orderItemList = orderItemList;
+    }
+
+    public static Order create(int orderId, int userId, String address) {
+        return new Order(orderId, userId, address, null);
     }
 
     public static Order create(int orderId, int userId, String address, List<OrderItem> orderItemList) {
