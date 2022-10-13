@@ -51,11 +51,4 @@ public class CustomerTest {
 
         assertNull(l);
     }
-
-    @Test
-    public void getOrdersCorrectly() {
-        List<Order> orderList = customer.viewAllOrders();
-
-        assertNull(orderList);
-    }
 }
