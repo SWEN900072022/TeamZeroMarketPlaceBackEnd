@@ -11,14 +11,9 @@ public class Admin extends User{
     private UserRoles userRoles = UserRoles.ADMIN;
     private List<SellerGroup> sellerGroupList;
     private List<User> userGroupList;
-    private IUnitofWork repo;
 
     public Admin(String email, String username, String password, int userId) {
         super(email, username, password, userId);
-    }
-
-    public void setRepo(IUnitofWork repo) {
-        this.repo = repo;
     }
 
     @Override
@@ -28,14 +23,17 @@ public class Admin extends User{
 
     public List<OrderItem> getAllPurchases() {
         // To view all purchases, we want to retrieve it from the orders
-        List<Order> orders = Order.getAllOrders(repo);
+        List<Order> orders = Order.getAllOrders(getRepo());
 
         List<OrderItem> result = new ArrayList<>();
 
         // For all orders get the order items and return the list of order items
         for(Order ord : orders) {
+            ord.setRepository(getRepo());
             List<OrderItem> orderItemList = ord.getOrderItemList();
-            result.addAll(orderItemList);
+            if(orderItemList != null) {
+                result.addAll(orderItemList);
+            }
         }
         return result;
     }
@@ -48,14 +46,14 @@ public class Admin extends User{
 
     public List<User> getAllUsers() {
         // Get all users
-        List<User> users = User.getAllUser(repo);
+        List<User> users = User.getAllUser(getRepo());
         userGroupList = users;
         return users;
     }
 
     public SellerGroup createSellerGroup(String groupName) {
         if(sellerGroupList == null) {
-            sellerGroupList = getAllSellerGroup(repo);
+            sellerGroupList = getAllSellerGroup(getRepo());
         }
 
         // Check to see if the seller group already exist
@@ -71,10 +69,11 @@ public class Admin extends User{
 
     public GroupMembership addSellerToGroup(String groupName, int userId) {
         // With userid and groupid, we can create a seller group with the user
-        SellerGroup sg = SellerGroup.getSellerGroupByGroupName(groupName, repo);
+        SellerGroup sg = SellerGroup.getSellerGroupByGroupName(groupName, getRepo());
 
         if(sg != null) {
             // group exists add user to group
+            sg.setRepo(getRepo());
             GroupMembership gm = sg.addSeller(userId, sg.getGroupId());
             return gm;
         }
@@ -82,7 +81,7 @@ public class Admin extends User{
     }
 
     public GroupMembership removeSellerFromGroup(String groupName, int userId) {
-        SellerGroup sg = SellerGroup.getSellerGroupByGroupName(groupName, repo);
+        SellerGroup sg = SellerGroup.getSellerGroupByGroupName(groupName, getRepo());
 
         if(sg != null) {
             // Group exists, remove user
@@ -95,7 +94,7 @@ public class Admin extends User{
     public Listing removeListing(int listingId) {
         // Given the listing id, remove the listing from teh database
         // FInd the listing and delete it
-        Listing l = Listing.getListingById(listingId, repo);
+        Listing l = Listing.getListingById(listingId, getRepo());
         return l;
     }
 }

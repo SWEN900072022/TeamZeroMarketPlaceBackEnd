@@ -13,7 +13,6 @@ public class Customer extends User {
     private UserRoles userRoles = UserRoles.CUSTOMER;
     private List<Order> orderList;
     private List<Listing> listingList;
-    private IUnitofWork repo;
 
     public Customer(String email, String username, String password, int userId) {
         super(email, username, password, userId);
@@ -24,14 +23,10 @@ public class Customer extends User {
         return UserRoles.CUSTOMER.toString();
     }
 
-    public void setRepo(IUnitofWork repo) {
-        this.repo = repo;
-    }
-
     public Order checkoutListing(String address, List<OrderItem> oiList) {
         // Create an order object
         // Generate order id
-        Order ord = Order.getLastOrderItem(repo);
+        Order ord = Order.getLastOrderItem(getRepo());
         int orderId;
         if(ord == null) {
             orderId = 1;
@@ -42,7 +37,7 @@ public class Customer extends User {
     }
 
     public Bid bid(int listingId, Money bidAmount) {
-        Listing l = Listing.getListingById(listingId, repo);
+        Listing l = Listing.getListingById(listingId, getRepo());
 
         if(l == null) {
             return null;
@@ -61,7 +56,7 @@ public class Customer extends User {
         // Check to see if the order list is empty
         // Lazy load if yes
         if(orderList == null) {
-            orderList = Order.getOrdersByUserId(getUserId(), repo);
+            orderList = Order.getOrdersByUserId(getUserId(), getRepo());
         }
 
         return orderList;
@@ -73,10 +68,10 @@ public class Customer extends User {
         // Check to see if the order is in the orderList,if not load from
         // db
         if(orderList == null) {
-            orderList = Order.getOrdersByUserId(getUserId(), repo);
+            orderList = Order.getOrdersByUserId(getUserId(), getRepo());
         }
 
-        Listing l = Listing.getListingById(listingId, repo);
+        Listing l = Listing.getListingById(listingId, getRepo());
 
         if(l != null && orderList != null) {
             for(Order ord : orderList) {
@@ -100,7 +95,7 @@ public class Customer extends User {
 
     public Order cancelOrder(int orderId) {
         if(orderList == null) {
-            orderList = Order.getOrdersByUserId(getUserId(), repo);
+            orderList = Order.getOrdersByUserId(getUserId(), getRepo());
         }
 
         for(int i = 0; i < orderList.size(); i++) {

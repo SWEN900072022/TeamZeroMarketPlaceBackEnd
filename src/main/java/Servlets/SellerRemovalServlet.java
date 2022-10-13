@@ -2,6 +2,7 @@ package Servlets;
 
 import Domain.Admin;
 import Domain.GroupMembership;
+import Domain.Seller;
 import Domain.User;
 import Enums.UserRoles;
 import UnitofWork.IUnitofWork;
@@ -29,7 +30,7 @@ public class SellerRemovalServlet extends HttpServlet {
         String groupName = request.getParameter("groupName");
         String jwt = request.getHeader("jwt"); // This is used to authenticate the admin, we will skip this for now
 
-        Type typeOfUser = TypeToken.getParameterized(User.class).getType();
+        Type typeOfUser = TypeToken.getParameterized(Seller.class).getType();
 
         Gson gson = new Gson();
         User user = gson.fromJson(userStr, typeOfUser);
@@ -43,7 +44,7 @@ public class SellerRemovalServlet extends HttpServlet {
                 int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
                 if(Objects.equals(role, UserRoles.ADMIN.toString())) {
                     Admin admin = (Admin) User.create("", "", "", uid, UserRoles.ADMIN.toString());
-
+                    admin.setRepo(repo);
                     GroupMembership gm = admin.removeSellerFromGroup(groupName, user.getUserId());
                     gm.markForDelete();
                     repo.registerDeleted(gm);

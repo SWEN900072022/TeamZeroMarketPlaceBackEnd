@@ -126,7 +126,7 @@ public class Order extends EntityObject {
     public OrderItem getOrderItem(int listingId) {
         // Lazy load if orderItemList is empty
         if(orderItemList == null) {
-            getOrderItemList(orderId, repo);
+            orderItemList = getOrderItemList(orderId, repo);
         }
 
         for(OrderItem ord : orderItemList) {
@@ -168,6 +168,9 @@ public class Order extends EntityObject {
     }
 
     public List<OrderItem> getOrderItemList() {
+        if(orderItemList == null) {
+            orderItemList = getOrderItemList(orderId, repo);
+        }
         return orderItemList;
     }
 

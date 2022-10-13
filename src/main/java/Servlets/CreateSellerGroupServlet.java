@@ -35,13 +35,15 @@ public class CreateSellerGroupServlet extends HttpServlet {
                 int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
                 if (Objects.equals(role, UserRoles.ADMIN.toString())) {
                     Admin admin = (Admin) User.create("", "", "", uid, UserRoles.ADMIN.toString());
-
+                    admin.setRepo(repo);
                     SellerGroup newSellerGroup = admin.createSellerGroup(groupName);
 
                     // Once the seller group is created, register it
-//                    repo.registerNew(newSellerGroup);
+                    if(newSellerGroup != null) {
+                        repo.registerNew(newSellerGroup);
+                        isSuccessful = true;
+                    }
                 }
-                isSuccessful = true;
             }
         } catch (Exception e) {
             System.out.println("Something went wrong");

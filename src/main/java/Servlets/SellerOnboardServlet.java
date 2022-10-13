@@ -1,9 +1,6 @@
 package Servlets;
 
-import Domain.Admin;
-import Domain.Customer;
-import Domain.GroupMembership;
-import Domain.User;
+import Domain.*;
 import Enums.UserRoles;
 import UnitofWork.IUnitofWork;
 import UnitofWork.UnitofWork;
@@ -30,7 +27,7 @@ public class SellerOnboardServlet extends HttpServlet {
         String groupName = request.getParameter("groupName");
         String jwt = request.getHeader("jwt");
 
-        Type typeOfUser = TypeToken.getParameterized(User.class).getType();
+        Type typeOfUser = TypeToken.getParameterized(Seller.class).getType();
 
         Gson gson = new Gson();
         User user = gson.fromJson(userStr, typeOfUser);
@@ -44,7 +41,7 @@ public class SellerOnboardServlet extends HttpServlet {
                 int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
                 if(Objects.equals(role, UserRoles.ADMIN.toString())) {
                     Admin admin = (Admin) User.create("", "", "", uid, UserRoles.ADMIN.toString());
-
+                    admin.setRepo(repo);
                     GroupMembership gm = admin.addSellerToGroup(groupName, user.getUserId());
                     repo.registerNew(gm);
 

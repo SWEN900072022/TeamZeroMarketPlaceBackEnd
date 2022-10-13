@@ -1,7 +1,6 @@
 package Servlets;
 
 import Domain.User;
-import Enums.UserRoles;
 import UnitofWork.IUnitofWork;
 import UnitofWork.UnitofWork;
 import com.google.gson.Gson;
@@ -33,7 +32,7 @@ public class LoginServlet extends HttpServlet {
                     0,
                     role
             );
-            user.setRepository(repo);
+            user.setRepo(repo);
             jwt = user.login();
         } catch (Exception e) {
             System.out.println("Something went wrong");

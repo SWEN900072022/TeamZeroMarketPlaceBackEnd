@@ -50,8 +50,12 @@ public abstract class User extends EntityObject{
         return ordList;
     }
 
-    public void setRepository(IUnitofWork repo) {
+    public void setRepo(IUnitofWork repo) {
         this.repo = repo;
+    }
+
+    public IUnitofWork getRepo() {
+        return this.repo;
     }
 
     public static User getUserByUsernamePassword(String email, String password, IUnitofWork repo) {

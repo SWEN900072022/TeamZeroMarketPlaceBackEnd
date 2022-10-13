@@ -77,7 +77,7 @@ public class GroupMembershipMapper extends GeneralMapper<GroupMembership> {
         } catch (SQLException e) {
             return null;
         }
-        return gm;
+        return null;
     }
 
     @Override

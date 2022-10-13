@@ -44,14 +44,14 @@ public class SellerGroup extends EntityObject{
 
         if(gm == null) {
             // The user does not belong to any groups, add them
-            gm = GroupMembership.create(userId, groupId);
+            gm = GroupMembership.create(groupId, userId);
             return gm;
         }
         return null;
     }
 
     public GroupMembership removeSeller(int userId, int groupId) {
-        return GroupMembership.create(userId, groupId);
+        return GroupMembership.create(groupId, userId);
     }
 
     public static SellerGroup create(int groupId, String groupName) {

@@ -14,14 +14,10 @@ import java.util.Set;
 public class Seller extends User{
     private UserRoles userRoles = UserRoles.SELLER;
     private SellerGroup sg;
-    private IUnitofWork repo;
     private List<Listing> listingList;
     private List<OrderItem> ordersList;
     private List<Order> fullOrderList;
 
-    public void setRepo(IUnitofWork repo){
-        this.repo = repo;
-    }
 
     public Seller(String email, String username, String password, int userId) {
         super(email, username, password, userId);
@@ -67,7 +63,7 @@ public class Seller extends User{
         List<Filter> filterCondition = new ArrayList<>();
         filterCondition.add(filter);
         if(listingList == null) {
-            listingList = Listing.getListingByFilterCondition(filterCondition, repo);
+            listingList = Listing.getListingByFilterCondition(filterCondition, getRepo());
         }
         return listingList;
     }
@@ -76,7 +72,7 @@ public class Seller extends User{
         // Check to see if the order list is empty
         // Lazy load if yes
         if(ordersList == null) {
-            ordersList = Order.getOrdersByGroupId(getUserId(), repo);
+            ordersList = Order.getOrdersByGroupId(getUserId(), getRepo());
         }
 
         return ordersList;
@@ -88,7 +84,7 @@ public class Seller extends User{
         List<Integer> tempList = new ArrayList<Integer>();
         List<Order> fullOrderList = new ArrayList<Order>();
         if(ordersList == null) {
-            ordersList = Order.getOrdersByGroupId(groupId, repo);
+            ordersList = Order.getOrdersByGroupId(groupId, getRepo());
         }
         for(OrderItem item: ordersList){
             tempList.add(item.getOrderId());
@@ -111,7 +107,7 @@ public class Seller extends User{
            fullOrderList = viewFullOrder(groupId);
         }
 
-        Listing l = Listing.getListingById(listingId, repo);
+        Listing l = Listing.getListingById(listingId, getRepo());
 
         if(l != null && fullOrderList != null) {
             for(Order ord : fullOrderList) {

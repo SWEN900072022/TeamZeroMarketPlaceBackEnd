@@ -43,19 +43,25 @@ public class DeleteListingServlet extends HttpServlet {
                     Seller seller = (Seller) User.create("", "", "", uid, UserRoles.SELLER.toString());
                     seller.setRepo(repo);
                     Listing listing = seller.deleteListing(listingId, groupId);
-                    listing.markForDelete();
-                    repo.registerDeleted(listing);
+                    if(listing != null) {
+                        listing.markForDelete();
+                        repo.registerDeleted(listing);
+                        isSuccessful = true;
+
+                    }
                 }
 
                 if(Objects.equals(role, UserRoles.ADMIN.toString())) {
                     Admin admin = (Admin) User.create("", "", "", uid, UserRoles.ADMIN.toString());
                     admin.setRepo(repo);
                     Listing l = admin.removeListing(listingId);
-                    l.markForDelete();
-                    repo.registerDeleted(l);
+                    if(l != null) {
+                        l.markForDelete();
+                        repo.registerDeleted(l);
+                        isSuccessful = true;
+                    }
                 }
 
-                isSuccessful = true;
             }
         } catch (Exception e) {
             System.out.println("Something went wrong");

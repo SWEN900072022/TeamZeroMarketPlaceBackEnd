@@ -36,11 +36,13 @@ public class ViewOrderServlet extends HttpServlet {
                 int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
                 if(Objects.equals(role, UserRoles.ADMIN.toString())) {
                     Admin admin = (Admin) User.create("", "", "", uid, UserRoles.ADMIN.toString());
-                    // TODO: get all orders from admin
+                    admin.setRepo(repo);
+                    list = admin.getAllPurchases();
                 }
 
                 if(Objects.equals(role, UserRoles.CUSTOMER.toString())) {
                     Customer customer = (Customer) User.create("", "", "", uid, UserRoles.CUSTOMER.toString());
+                    customer.setRepo(repo);
                     List<Order> orderList = customer.viewAllOrders();
                     for(Order ord : orderList) {
                         list.addAll(ord.getOrderItemList());
@@ -49,11 +51,9 @@ public class ViewOrderServlet extends HttpServlet {
 
                 if(Objects.equals(role, UserRoles.SELLER.toString())) {
                     Seller seller = (Seller) User.create("", "", "", uid, UserRoles.SELLER.toString());
-                    // TODO: get all orders from seller
+                    seller.setRepo(repo);
                     List<OrderItem> itemList = seller.viewOrders();
-                    for(OrderItem ord : itemList) {
-                        list.add(ord);
-                    }
+                    list = itemList;
                 }
 
             }
