@@ -2,6 +2,7 @@ package Servlets;
 
 import Domain.*;
 import Enums.UserRoles;
+import PessimisticLock.LockManager;
 import UnitofWork.IUnitofWork;
 import UnitofWork.UnitofWork;
 import Util.JWTUtil;
@@ -32,6 +33,7 @@ public class ModifyServlet extends HttpServlet {
         // Perform the modification on the orders
         IUnitofWork repo = new UnitofWork();
         boolean isSuccessful = false;
+        String identifier = jwt;
 
         try {
             if(JWTUtil.validateToken(jwt)) {
@@ -43,6 +45,11 @@ public class ModifyServlet extends HttpServlet {
                     Customer customer = (Customer) User.create("", "", "", uid, UserRoles.CUSTOMER.toString());
                     customer.setRepo(repo);
                     for(OrderItem orderItem : ordersToBeModifiedList) {
+                        // Lock entries that will be changed
+                        LockManager.getInstance().acquireLock(Integer.toString(orderItem.getOrderId()), "orders", identifier);
+                        LockManager.getInstance().acquireLock(Integer.toString(orderItem.getListingId()), "listing", identifier);
+                        LockManager.getInstance().acquireLock(Integer.toString(orderItem.getOrderId()) + Integer.toString(orderItem.getListingId()), "orderitems", identifier);
+
                         List<EntityObject> modiOrderListing = customer.modifyOrder(
                                 orderItem.getOrderId(),
                                 orderItem.getListingId(),
@@ -64,9 +71,15 @@ public class ModifyServlet extends HttpServlet {
 
                 if(Objects.equals(role, UserRoles.SELLER.toString())) {
                     int groupId = Integer.parseInt(JWTUtil.getClaim("groupId",jwt));
+
                     Seller seller = (Seller) User.create("", "", "", uid, UserRoles.SELLER.toString());
                     seller.setRepo(repo);
                     for(OrderItem orderItem : ordersToBeModifiedList) {
+                        // Lock entries that will be changed
+                        LockManager.getInstance().acquireLock(Integer.toString(orderItem.getOrderId()), "orders", identifier);
+                        LockManager.getInstance().acquireLock(Integer.toString(orderItem.getListingId()), "listing", identifier);
+                        LockManager.getInstance().acquireLock(Integer.toString(orderItem.getOrderId()) + Integer.toString(orderItem.getListingId()), "orderitems", identifier);
+
                         List<EntityObject> modiOrder = seller.modifyOrder(
                                 orderItem.getOrderId(),
                                 orderItem.getListingId(),
@@ -99,6 +112,9 @@ public class ModifyServlet extends HttpServlet {
         } catch (SQLException e) {
             repo.rollback();
         }
+
+        // Release all the locks owned by identifier
+        LockManager.getInstance().releaseOwner(identifier);
 
         Map<String, Boolean> result = new HashMap<>();
         result.put("result", isSuccessful);

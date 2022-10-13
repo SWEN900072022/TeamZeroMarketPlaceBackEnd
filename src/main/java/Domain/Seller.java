@@ -2,6 +2,7 @@ package Domain;
 
 import Enums.ListingTypes;
 import Enums.UserRoles;
+import PessimisticLock.LockManager;
 import UnitofWork.IUnitofWork;
 import org.javamoney.moneta.Money;
 
@@ -104,6 +105,7 @@ public class Seller extends User{
         // Check to see if the order is in the orderList,if not load from
         // db
         if(fullOrderList == null) {
+            // The list of orders owned by the seller
            fullOrderList = viewFullOrder(groupId);
         }
 

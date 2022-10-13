@@ -2,6 +2,7 @@ package Servlets;
 
 import Domain.*;
 import Enums.UserRoles;
+import PessimisticLock.LockManager;
 import UnitofWork.IUnitofWork;
 import UnitofWork.UnitofWork;
 import Util.JWTUtil;
@@ -42,6 +43,9 @@ public class SellerOnboardServlet extends HttpServlet {
                 if(Objects.equals(role, UserRoles.ADMIN.toString())) {
                     Admin admin = (Admin) User.create("", "", "", uid, UserRoles.ADMIN.toString());
                     admin.setRepo(repo);
+
+                    // Lock groupmembership table
+                    LockManager.getInstance().acquireLock(groupName + Integer.toString(user.getUserId()), "groupmembership", jwt);
                     GroupMembership gm = admin.addSellerToGroup(groupName, user.getUserId());
                     repo.registerNew(gm);
 
@@ -58,6 +62,9 @@ public class SellerOnboardServlet extends HttpServlet {
         } catch (SQLException e) {
             repo.rollback();
         }
+
+        // Release lock here
+        LockManager.getInstance().releaseOwner(jwt);
 
         Map<String, Boolean> result = new HashMap<>();
         result.put("result", isSuccessful);

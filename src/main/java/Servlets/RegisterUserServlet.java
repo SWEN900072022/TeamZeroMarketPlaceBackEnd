@@ -1,6 +1,7 @@
 package Servlets;
 
 import Domain.User;
+import PessimisticLock.LockManager;
 import UnitofWork.IUnitofWork;
 import UnitofWork.UnitofWork;
 import com.google.gson.Gson;
@@ -28,6 +29,7 @@ public class RegisterUserServlet extends HttpServlet {
         boolean isSuccessful = false;
 
         try {
+            LockManager.getInstance().acquireLock(email, "users", email);
             User user = User.register(email, username, password, role, repo);
 
             if(user != null) {
@@ -44,6 +46,8 @@ public class RegisterUserServlet extends HttpServlet {
         } catch (SQLException e) {
             repo.rollback();
         }
+
+        LockManager.getInstance().releaseOwner(email);
 
         Map<String, Boolean>result = new HashMap<>();
         result.put("result", isSuccessful);
