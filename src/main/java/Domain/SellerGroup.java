@@ -1,6 +1,9 @@
 package Domain;
 
+import Injector.FindConditionInjector.FindAllInjector;
+import Injector.FindConditionInjector.FindEmailAndPasswordInjector;
 import Injector.FindConditionInjector.FindGroupIdByNameInjector;
+import Injector.FindConditionInjector.FindIdInjector;
 import UnitofWork.IUnitofWork;
 
 import java.time.LocalDateTime;
@@ -9,13 +12,15 @@ import java.util.List;
 
 import Enums.ListingTypes;
 import java.time.LocalDateTime;
+
+import Util.GeneralUtil;
 import org.javamoney.moneta.Money;
 
 
-public class SellerGroup {
+public class SellerGroup extends EntityObject{
     private int groupId;
     private String groupName;
-    private List<Seller> sellerList;
+    private List<GroupMembership> sellerList;
     private List<Listing> listingList;
     private List<OrderItem> ordersList;
     private IUnitofWork repo;
@@ -25,7 +30,7 @@ public class SellerGroup {
     }
 
 
-    protected SellerGroup(int groupId, String groupName, List<Seller> sellerList, List<Listing> listingList, List<OrderItem> ordersList) {
+    protected SellerGroup(int groupId, String groupName, List<GroupMembership> sellerList, List<Listing> listingList, List<OrderItem> ordersList) {
         this.groupId = groupId;
         this.groupName = groupName;
         this.sellerList = sellerList;
@@ -33,30 +38,51 @@ public class SellerGroup {
         this.ordersList = ordersList;
     }
 
-    public boolean addSeller(Seller seller) {
-        // Check to see if the object is valid
-        if(seller == null) {
-            return false;
+    public GroupMembership addSeller(int userId, int groupId) {
+        // Check if the seller is already added
+        GroupMembership gm = GroupMembership.getGroupMembershipByUserId(userId, repo);
+
+        if(gm == null) {
+            // The user does not belong to any groups, add them
+            gm = GroupMembership.create(userId, groupId);
+            return gm;
         }
-        List<Object> param = new ArrayList<>();
-        param.add(seller.getUserId());
-        GroupMembership membership = new GroupMembership(this.groupId,seller.getUserId());
-        sellerList.add(seller);
-        return false;
+        return null;
+    }
+
+    public GroupMembership removeSeller(int userId, int groupId) {
+        return GroupMembership.create(userId, groupId);
     }
 
     public static SellerGroup create(int groupId, String groupName) {
         return new SellerGroup(groupId, groupName, null, null, null);
     }
 
-    public static SellerGroup create(int groupId, String groupName, List<Seller>sellerList, List<Listing> listingList, List<OrderItem> ordersList) {
+    public static SellerGroup create(int groupId, String groupName, List<GroupMembership>sellerList, List<Listing> listingList, List<OrderItem> ordersList) {
         return new SellerGroup(groupId, groupName, sellerList, listingList, ordersList);
     }
 
-    public void removeSeller(Seller seller) {
-        sellerList.removeIf(t -> (
-                seller.getUserId() == t.getUserId()
-                ));
+    public static SellerGroup getSellerGroupByGroupName(String groupName, IUnitofWork repo) {
+        List<Object> param = new ArrayList<>();
+        param.add(groupName);
+
+        return (SellerGroup) repo.read(
+                new FindGroupIdByNameInjector(),
+                param,
+                SellerGroup.class
+        );
+    }
+
+    public static List<SellerGroup> getAllSellerGroup(IUnitofWork repo) {
+        List<Object> param = new ArrayList<>();
+
+        // Get order details
+        List<SellerGroup> ordList = GeneralUtil.castObjectInList(repo.readMulti(
+                new FindAllInjector("sellergroups"),
+                param,
+                SellerGroup.class), SellerGroup.class);
+
+        return ordList;
     }
 
     public int getGroupId() {
@@ -75,11 +101,11 @@ public class SellerGroup {
         this.groupName = groupName;
     }
 
-    public List<Seller> getSellerList() {
+    public List<GroupMembership> getSellerList() {
         return sellerList;
     }
 
-    public void setSellerList(List<Seller> sellerList) {
+    public void setSellerList(List<GroupMembership> sellerList) {
         this.sellerList = sellerList;
     }
 

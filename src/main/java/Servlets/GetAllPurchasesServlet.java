@@ -1,6 +1,8 @@
 package Servlets;
 
+import Domain.Admin;
 import Domain.Customer;
+import Domain.OrderItem;
 import Domain.User;
 import Enums.UserRoles;
 import JsonSerializer.MoneySerializer;
@@ -22,24 +24,22 @@ public class GetAllPurchasesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         IUnitofWork repo = new UnitofWork();
-        // TODO: pass jwt for all purchases
 
-        // TODO: admin add all purchases function here
+        Admin admin = (Admin) User.create("", "", "", 0, UserRoles.ADMIN.toString());
+        admin.setRepo(repo);
+        List<OrderItem> list = admin.getAllPurchases();
 
-//        OrderModel om = new OrderModel(repo);
-//        List<OrderItem> list = om.getAllOrderItem();
+        GsonBuilder gb = new GsonBuilder();
+        gb.registerTypeAdapter(Money.class, new MoneySerializer());
+        Gson gson = gb.create();
+        String json = gson.toJson(list);
 
-//        GsonBuilder gb = new GsonBuilder();
-//        gb.registerTypeAdapter(Money.class, new MoneySerializer());
-//        Gson gson = gb.create();
-//        String json = gson.toJson(list);
-//
-//        PrintWriter out = response.getWriter();
-//        response.setContentType("application/json");
-//        response.setCharacterEncoding("UTF-8");
-//        System.out.println(json);
-//        out.print(json);
-//        out.flush();
+        PrintWriter out = response.getWriter();
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        System.out.println(json);
+        out.print(json);
+        out.flush();
 
     }
 }

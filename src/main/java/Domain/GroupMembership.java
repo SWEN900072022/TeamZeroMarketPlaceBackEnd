@@ -1,5 +1,7 @@
 package Domain;
 
+import Injector.DeleteConditionInjector.DeleteGroupMemberByUserIdInjector;
+import Injector.DeleteConditionInjector.DeleteIdInjector;
 import Injector.FindConditionInjector.FindIdInjector;
 import UnitofWork.IUnitofWork;
 
@@ -28,6 +30,13 @@ public class GroupMembership extends EntityObject{
                 param,
                 GroupMembership.class
         );
+    }
+
+    public void markForDelete() {
+        List<Object>param = new ArrayList<>();
+        param.add(userId);
+        setInjector(new DeleteGroupMemberByUserIdInjector());
+        setParam(param);
     }
 
     public int getGroupId() {

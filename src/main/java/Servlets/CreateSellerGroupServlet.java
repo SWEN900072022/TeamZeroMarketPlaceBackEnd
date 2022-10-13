@@ -1,6 +1,7 @@
 package Servlets;
 
 import Domain.Admin;
+import Domain.SellerGroup;
 import Domain.User;
 import Enums.UserRoles;
 import UnitofWork.UnitofWork;
@@ -35,8 +36,7 @@ public class CreateSellerGroupServlet extends HttpServlet {
                 if (Objects.equals(role, UserRoles.ADMIN.toString())) {
                     Admin admin = (Admin) User.create("", "", "", uid, UserRoles.ADMIN.toString());
 
-                    // TODO: create seller groups
-//                    SellerGroup newSellerGroup = admin.createSellerGroup();
+                    SellerGroup newSellerGroup = admin.createSellerGroup(groupName);
 
                     // Once the seller group is created, register it
 //                    repo.registerNew(newSellerGroup);

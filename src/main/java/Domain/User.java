@@ -1,8 +1,10 @@
 package Domain;
 
 import Enums.UserRoles;
+import Injector.FindConditionInjector.FindAllInjector;
 import Injector.FindConditionInjector.FindEmailAndPasswordInjector;
 import UnitofWork.IUnitofWork;
+import Util.GeneralUtil;
 import Util.JWTUtil;
 
 import java.util.*;
@@ -34,6 +36,18 @@ public abstract class User extends EntityObject{
             return new Admin(email, username, password, userId);
         }
         throw new IllegalArgumentException();
+    }
+
+    public static List<User> getAllUser(IUnitofWork repo) {
+        List<Object> param = new ArrayList<>();
+
+        // Get order details
+        List<User> ordList = GeneralUtil.castObjectInList(repo.readMulti(
+                new FindAllInjector("users"),
+                param,
+                User.class), User.class);
+
+        return ordList;
     }
 
     public void setRepository(IUnitofWork repo) {

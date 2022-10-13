@@ -1,5 +1,6 @@
 package Servlets;
 
+import Domain.Admin;
 import Domain.Listing;
 import Domain.Seller;
 import Domain.User;
@@ -47,7 +48,11 @@ public class DeleteListingServlet extends HttpServlet {
                 }
 
                 if(Objects.equals(role, UserRoles.ADMIN.toString())) {
-                    // TODO: add admin remove listing function here
+                    Admin admin = (Admin) User.create("", "", "", uid, UserRoles.ADMIN.toString());
+                    admin.setRepo(repo);
+                    Listing l = admin.removeListing(listingId);
+                    l.markForDelete();
+                    repo.registerDeleted(l);
                 }
 
                 isSuccessful = true;

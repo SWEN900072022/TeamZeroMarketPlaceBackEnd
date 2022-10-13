@@ -2,6 +2,7 @@ package Servlets;
 
 import Domain.Admin;
 import Domain.Customer;
+import Domain.GroupMembership;
 import Domain.User;
 import Enums.UserRoles;
 import UnitofWork.IUnitofWork;
@@ -44,10 +45,9 @@ public class SellerOnboardServlet extends HttpServlet {
                 if(Objects.equals(role, UserRoles.ADMIN.toString())) {
                     Admin admin = (Admin) User.create("", "", "", uid, UserRoles.ADMIN.toString());
 
-                    // TODO: add behaviour to add seller to group
-                    admin.addSellerToGroup();
+                    GroupMembership gm = admin.addSellerToGroup(groupName, user.getUserId());
+                    repo.registerNew(gm);
 
-                    // TODO: register the changes to unit of work
                     isSuccessful = true;
                 }
             }

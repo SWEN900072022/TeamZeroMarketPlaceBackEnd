@@ -1,6 +1,7 @@
 package Servlets;
 
 import Domain.Admin;
+import Domain.GroupMembership;
 import Domain.User;
 import Enums.UserRoles;
 import UnitofWork.IUnitofWork;
@@ -43,10 +44,10 @@ public class SellerRemovalServlet extends HttpServlet {
                 if(Objects.equals(role, UserRoles.ADMIN.toString())) {
                     Admin admin = (Admin) User.create("", "", "", uid, UserRoles.ADMIN.toString());
 
-                    // TODO: add behaviour to add seller to group
-                    admin.removeSellerFromGroup();
+                    GroupMembership gm = admin.removeSellerFromGroup(groupName, user.getUserId());
+                    gm.markForDelete();
+                    repo.registerDeleted(gm);
 
-                    // TODO: register the changes to unit of work
                     isSuccessful = true;
                 }
             }
