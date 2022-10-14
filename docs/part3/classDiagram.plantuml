@@ -35,7 +35,20 @@ class Customer <? extends User> {
     {method} + modifyOrder(orderId : int, listingId : int, quantity : int) : List<EntityObject>
     {method} + cancelOrder(orderId : int) : Order
 }
+'EntityObject
+class EntityObject{
+    - injector : ISQLInjector
+    - param : List<Object>
+}
 'Filter Class
+class Filter{
+    - filterKey : String
+    - filterVal : Object
+
+}
 'FixedPriceListing Class
+class FixedPriceListing <? extends User>{
+
+}
 '
 @enduml
