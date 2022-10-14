@@ -15,9 +15,16 @@ class Admin<? extends User> {
 }
 'AuctionListing class
 class AuctionListing<? extends Listing> {
-    {method} bid(bid : Money, bidTime : localDateTime, userId : int): Bid
+    {method} + bid(bid : Money, bidTime : localDateTime, userId : int): Bid
 }
 'Bid Class
+class Bid<? extends EntityObject> {
+    - listingId : int
+    - userId : int
+    - bidAmount : Money
+    {method} {static} + create(listingId : int, userId : int, bidAmount : Money) : Bid
+
+}
 'Customer Class
 'Filter Class
 'FixedPriceListing Class
