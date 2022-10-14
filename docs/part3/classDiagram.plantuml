@@ -26,6 +26,15 @@ class Bid<? extends EntityObject> {
 
 }
 'Customer Class
+class Customer <? extends User> {
+    - userRoles: UserRoles
+    - listingList : List<Listing>
+    {method} + checkoutListing(address : String,  oiList : List<OrderItem>) : Order
+    {method} + bid(listingId : int, bidAmount : Money) : Bid
+    {method} + viewAllOrders() : List<Order>
+    {method} + modifyOrder(orderId : int, listingId : int, quantity : int) : List<EntityObject>
+    {method} + cancelOrder(orderId : int) : Order
+}
 'Filter Class
 'FixedPriceListing Class
 '
