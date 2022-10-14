@@ -1,0 +1,22 @@
+@startuml
+
+'Admin class
+class Admin<? extends HttpServlet> {
+    - userRoles
+    - sellerGroupList
+    - userGroupList
+    {method} + getAllPurchases() : List<OrderItem>
+    {method} + getAllSellerGroup(repo : IUnitofWork ) : List<SellerGroup>
+    {method} + getAllUsers() : List<User>
+    {method} + createSellerGroup(groupName : String) : List<SellerGroup>
+    {method} + addSellerToGroup(groupName : String, userId : int) : GroupMembership
+    {method} + removeSellerFromGroup(groupName : String, userId : int) : GroupMembership
+    {method} + removeListing(listingId : int) : Listing
+}
+'AuctionListing class
+'Bid Class
+'Customer Class
+'Filter Class
+'FixedPriceListing Class
+'
+@enduml
