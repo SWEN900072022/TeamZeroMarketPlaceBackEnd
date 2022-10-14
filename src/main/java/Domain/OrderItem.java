@@ -1,5 +1,6 @@
-package Entity;
+package Domain;
 
+import UnitofWork.IUnitofWork;
 import org.javamoney.moneta.Money;
 
 import javax.money.Monetary;
@@ -11,26 +12,15 @@ public class OrderItem extends EntityObject{
     private Money unitPrice;
     private int priceInCents;
 
-    public OrderItem() {
-    }
-
-    public OrderItem(int orderId, int listingId, int quantity, Money unitPrice) {
+    protected OrderItem(int orderId, int listingId, int quantity, Money unitPrice) {
         this.orderId = orderId;
         this.listingId = listingId;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
     }
 
-    public boolean isEmpty() {
-        if(this.orderId == 0 ||
-            this.listingId == 0 ||
-            this.quantity == 0 ||
-            (this.priceInCents == 0 && unitPrice == null)
-        ) {
-            return true;
-        } else {
-            return false;
-        }
+    public static OrderItem create(int orderId, int listingId, int quantity, Money unitPrice) {
+        return new OrderItem(orderId, listingId, quantity, unitPrice);
     }
 
     public int getOrderId() {
@@ -59,11 +49,7 @@ public class OrderItem extends EntityObject{
 
     public Money getUnitPrice() {
         if(unitPrice == null && priceInCents != 0) {
-            // Somewhat lazy loading
-            Money unitPriceInCents = Money.of(getPriceInCents(), Monetary.getCurrency("AUD"));
-            setUnitPrice(unitPriceInCents.divide(100));
-        } else if(unitPrice == null) {
-            // Retrieve it from the database with the load function
+            unitPrice = Money.of(getPriceInCents(), Monetary.getCurrency("AUD")).divide(100);
         }
         return unitPrice;
     }

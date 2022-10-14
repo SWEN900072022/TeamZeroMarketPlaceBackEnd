@@ -1,6 +1,8 @@
 package MockClasses;
 
-import Entity.Listing;
+import Domain.AuctionListing;
+import Domain.FixedPriceListing;
+import Domain.Listing;
 import Enums.ListingTypes;
 import Injector.FindConditionInjector.FindIdInjector;
 import Injector.FindConditionInjector.FindListingWithGroupIdInjector;
@@ -22,27 +24,27 @@ public class MockListingMapper implements Mapper<Listing> {
 
     public MockListingMapper() {
         // Populate the listings with some dummy data
-        Listing listing1 = new Listing();
-        listing1.setListingId(1);
-        listing1.setGroupId(1);
-        listing1.setTitle("a");
-        listing1.setQuantity(5);
-        listing1.setPrice(Money.of(1, Monetary.getCurrency("AUD")));
-        listing1.setDescription("a");
-        listing1.setType(ListingTypes.FIXED_PRICE);
-        listing1.setStartTime(LocalDateTime.now());
-        listing1.setEndTime(LocalDateTime.now());
+        Listing listing1 = Listing.create(
+                1,
+                1,
+                ListingTypes.FIXED_PRICE,
+                "a",
+                "a",
+                5,
+                Money.of(1, Monetary.getCurrency("AUD")),
+                LocalDateTime.now(),
+                LocalDateTime.now());
 
-        Listing listing2 = new Listing();
-        listing2.setListingId(2);
-        listing2.setGroupId(2);
-        listing2.setTitle("b");
-        listing2.setQuantity(2);
-        listing2.setPrice(Money.of(2, Monetary.getCurrency("AUD")));
-        listing2.setDescription("b");
-        listing2.setType(ListingTypes.AUCTION);
-        listing2.setStartTime(LocalDateTime.now());
-        listing2.setEndTime(LocalDateTime.now().plusHours(2));
+        Listing listing2 = Listing.create(
+                2,
+                2,
+                ListingTypes.AUCTION,
+                "b",
+                "b",
+                2,
+                Money.of(2, Monetary.getCurrency("AUD")),
+                LocalDateTime.now(),
+                LocalDateTime.now().plusHours(2));
 
         listings.add(listing1);
         listings.add(listing2);

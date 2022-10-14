@@ -1,11 +1,10 @@
 package Servlets;
 
-import Entity.Order;
-import Entity.OrderItem;
-import Model.ListingModel;
-import Model.OrderModel;
+import Domain.*;
+import Enums.UserRoles;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
+import Util.JWTUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -16,9 +15,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @WebServlet(name = "ModifyServlet", value = "/ModifyServlet")
 public class ModifyServlet extends HttpServlet {
@@ -33,26 +30,73 @@ public class ModifyServlet extends HttpServlet {
         List<OrderItem>ordersToBeModifiedList = gson.fromJson(orderItemsToBeRefactored, typeOfOrderItem);
 
         // Perform the modification on the orders
-        IUnitofWork repo = new Repository();
-        OrderModel om = new OrderModel(repo);
-        boolean isSuccessful = om.modifyOrders(ordersToBeModifiedList, jwt);
+        IUnitofWork repo = new UnitofWork();
+        boolean isSuccessful = false;
 
-        if(isSuccessful) {
-            for (OrderItem oi : ordersToBeModifiedList) {
-                // Perform the modification on the lsiting to update the stock level
-                ListingModel lm = new ListingModel(repo);
-                isSuccessful = isSuccessful && (lm.modifyListing(oi.getListingId(), oi.getQuantity(), jwt));
+        try {
+            if(JWTUtil.validateToken(jwt)) {
+                String role = JWTUtil.getClaim("role", jwt);
+                int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
+                List<Order> modifiedOrder = new ArrayList<>();
+
+                if (Objects.equals(role, UserRoles.CUSTOMER.toString())) {
+                    Customer customer = (Customer) User.create("", "", "", uid, UserRoles.CUSTOMER.toString());
+                    customer.setRepo(repo);
+                    for(OrderItem orderItem : ordersToBeModifiedList) {
+                        List<EntityObject> modiOrderListing = customer.modifyOrder(
+                                orderItem.getOrderId(),
+                                orderItem.getListingId(),
+                                orderItem.getQuantity());
+
+                        if(modiOrderListing != null) {
+                            modifiedOrder.add((Order)modiOrderListing.get(0));
+                            repo.registerModified(modiOrderListing.get(1));
+                        }
+                    }
+
+                    for(Order order : modifiedOrder) {
+                        for(OrderItem ordItem : order.getOrderItemList()) {
+                            repo.registerModified(ordItem);
+                        }
+                    }
+                    isSuccessful = true;
+                }
+
+                if(Objects.equals(role, UserRoles.SELLER.toString())) {
+                    int groupId = Integer.parseInt(JWTUtil.getClaim("groupId",jwt));
+                    Seller seller = (Seller) User.create("", "", "", uid, UserRoles.SELLER.toString());
+                    seller.setRepo(repo);
+                    for(OrderItem orderItem : ordersToBeModifiedList) {
+                        List<EntityObject> modiOrder = seller.modifyOrder(
+                                orderItem.getOrderId(),
+                                orderItem.getListingId(),
+                                groupId,
+                                orderItem.getQuantity());
+
+                        if(modiOrder != null) {
+                            modifiedOrder.add((Order) modiOrder.get(0));
+                            repo.registerModified(modiOrder.get(1));
+                        }
+                    }
+
+                    for(Order order : modifiedOrder) {
+                        for(OrderItem ordItem : order.getOrderItemList()) {
+                            repo.registerModified(ordItem);
+                        }
+                    }
+                    isSuccessful = true;
+
+                }
+
             }
+        } catch (Exception e) {
+            System.out.print("Something went wrong");
         }
 
         // Check to see if the operations have been successful, if it is commit
-        if(isSuccessful) {
-            try {
-                repo.commit();
-            } catch (SQLException e) {
-                repo.rollback();
-            }
-        } else {
+        try {
+            repo.commit();
+        } catch (SQLException e) {
             repo.rollback();
         }
 

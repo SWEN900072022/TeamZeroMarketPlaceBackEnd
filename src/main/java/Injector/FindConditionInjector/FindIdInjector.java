@@ -19,6 +19,8 @@ public class FindIdInjector implements ISQLInjector {
                 return getListingSQLQuery();
             case "groupmembership":
                 return getGroupMembershipQuery();
+            case "sellergroups":
+                return getSellerGroupQuery();
         }
         return "";
     }
@@ -37,5 +39,9 @@ public class FindIdInjector implements ISQLInjector {
 
     private String getListingSQLQuery() {
         return "SELECT * FROM listings where listingId=?;";
+    }
+
+    private String getSellerGroupQuery() {
+        return "SELECT * FROM sellergroups where groupId=?;";
     }
 }

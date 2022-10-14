@@ -1,6 +1,6 @@
 package Mapper;
 
-import Entity.EntityObject;
+import Domain.EntityObject;
 import Injector.ISQLInjector;
 import Util.SQLUtil;
 

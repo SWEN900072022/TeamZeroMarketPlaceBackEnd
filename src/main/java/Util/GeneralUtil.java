@@ -1,6 +1,6 @@
 package Util;
 
-import Entity.EntityObject;
+import Domain.EntityObject;
 
 import java.util.List;
 import java.util.stream.Collectors;

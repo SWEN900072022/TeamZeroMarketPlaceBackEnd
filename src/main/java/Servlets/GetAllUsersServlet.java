@@ -1,10 +1,11 @@
 package Servlets;
 
-import Entity.User;
-import Mapper.UserMapper;
-import Model.UserModel;
+import Domain.Admin;
+import Domain.SellerGroup;
+import Domain.User;
+import Enums.UserRoles;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
 import com.google.gson.Gson;
 
 import javax.servlet.*;
@@ -18,10 +19,11 @@ import java.util.List;
 public class GetAllUsersServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        IUnitofWork repo = new Repository();
-        UserModel uModel = new UserModel(repo);
-        List<User> list;
-        list = uModel.getAllUsers();
+        IUnitofWork repo = new UnitofWork();
+
+        Admin admin = (Admin) User.create("","","", 0, UserRoles.ADMIN.toString());
+        admin.setRepo(repo);
+        List<User> list = admin.getAllUsers();
 
         Gson gson = new Gson();
         String json = gson.toJson(list);

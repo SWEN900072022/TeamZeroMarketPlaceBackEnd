@@ -1,10 +1,13 @@
 package Servlets;
 
-import Entity.OrderItem;
+import Domain.Admin;
+import Domain.Customer;
+import Domain.OrderItem;
+import Domain.User;
+import Enums.UserRoles;
 import JsonSerializer.MoneySerializer;
-import Model.OrderModel;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.javamoney.moneta.Money;
@@ -20,9 +23,11 @@ import java.util.List;
 public class GetAllPurchasesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        IUnitofWork repo = new Repository();
-        OrderModel om = new OrderModel(repo);
-        List<OrderItem> list = om.getAllOrderItem();
+        IUnitofWork repo = new UnitofWork();
+
+        Admin admin = (Admin) User.create("", "", "", 0, UserRoles.ADMIN.toString());
+        admin.setRepo(repo);
+        List<OrderItem> list = admin.getAllPurchases();
 
         GsonBuilder gb = new GsonBuilder();
         gb.registerTypeAdapter(Money.class, new MoneySerializer());

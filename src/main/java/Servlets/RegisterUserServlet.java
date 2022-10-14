@@ -1,15 +1,13 @@
 package Servlets;
 
-import Entity.User;
-import Model.UserModel;
+import Domain.User;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
 import com.google.gson.Gson;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -26,24 +24,29 @@ public class RegisterUserServlet extends HttpServlet {
         String password = request.getParameter("password");
         String role = request.getParameter("role");
 
-        User user = new User(email, username, password, role);
-        IUnitofWork repo = new Repository();
-        UserModel uModel = new UserModel(repo);
-        boolean hasRegistered = uModel.register(user);
+        IUnitofWork repo = new UnitofWork();
+        boolean isSuccessful = false;
 
-        // Check to see if the operations have been successful, if it is commit
-        if(hasRegistered) {
-            try {
-                repo.commit();
-            } catch (SQLException e) {
-                repo.rollback();
+        try {
+            User user = User.register(email, username, password, role, repo);
+
+            if(user != null) {
+                // Register is successful, user is registered to be commited
+                repo.registerNew(user);
+                isSuccessful = true;
             }
-        } else {
+        } catch (Exception e) {
+            System.out.println("Something went wrong");
+        }
+
+        try {
+            repo.commit();
+        } catch (SQLException e) {
             repo.rollback();
         }
 
         Map<String, Boolean>result = new HashMap<>();
-        result.put("result", hasRegistered);
+        result.put("result", isSuccessful);
         Gson gson = new Gson();
         String json = gson.toJson(result);
 

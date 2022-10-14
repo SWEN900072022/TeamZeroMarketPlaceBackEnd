@@ -1,11 +1,12 @@
 package Servlets;
 
-import Entity.Listing;
+import Domain.Filter;
+import Domain.Listing;
 import JsonSerializer.LocalDateTimeSerializer;
 import JsonSerializer.MoneySerializer;
-import Model.ListingModel;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
+import Util.JWTUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet(name = "SearchServlet", value = "/search")
@@ -27,14 +29,23 @@ public class SearchServlet extends HttpServlet {
         String filterList = request.getParameter("filter");
         String jwt = request.getHeader("jwt");
 
-        Type typeOfFilter = TypeToken.getParameterized(List.class, Entity.Filter.class).getType();
+        Type typeOfFilter = TypeToken.getParameterized(List.class, Filter.class).getType();
 
         Gson gson = new Gson();
-        List<Entity.Filter> filterConditions = gson.fromJson(filterList, typeOfFilter);
+        List<Filter> filterConditions = gson.fromJson(filterList, typeOfFilter);
 
-        IUnitofWork repo = new Repository();
-        ListingModel lModel = new ListingModel(repo);
-        List<Listing> list = lModel.search(filterConditions, jwt);
+        IUnitofWork repo = new UnitofWork();
+        boolean isSuccessful = false;
+        List<Listing> list = new ArrayList<>();
+
+        // Search listing
+        try {
+            if(JWTUtil.validateToken(jwt)) {
+                list = Listing.getListingByFilterCondition(new ArrayList<>(), repo);
+            }
+        } catch (Exception e) {
+            System.out.println("Something went wrong.");
+        }
 
         GsonBuilder gb = new GsonBuilder();
         gb.registerTypeAdapter(Money.class, new MoneySerializer());

@@ -1,7 +1,7 @@
 package UnitofWork;
 
 import Container.DIContainer;
-import Entity.*;
+import Domain.*;
 import Enums.UnitActions;
 import Injector.ISQLInjector;
 import Mapper.*;
@@ -11,14 +11,14 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
 
-public class Repository implements IUnitofWork{
+public class UnitofWork implements IUnitofWork{
     private final Map<String, List<EntityObject>> context;
     private Map<String, EntityObject> oneToOneIdentityMap;
     private Map<String, List<EntityObject>> oneToManyIdentityMap;
     private DIContainer<Mapper<EntityObject>> mapperContainer;
     private Connection conn;
 
-    public Repository() {
+    public UnitofWork() {
         conn = SQLUtil.getConnection();
         context = new HashMap<>();
         oneToOneIdentityMap = new HashMap<>();
@@ -41,7 +41,6 @@ public class Repository implements IUnitofWork{
         mapperClasses.put(Order.class, OrderMapper.class);
         mapperClasses.put(SellerGroup.class, SellerGroupMapper.class);
         mapperClasses.put(User.class, UserMapper.class);
-        mapperClasses.put(ShoppingCartItem.class, ShoppingCartItemsMapper.class);
 
         return new DIContainer(mapperClasses);
     }
@@ -161,6 +160,10 @@ public class Repository implements IUnitofWork{
             // Get the object key to determine the mapper to be used
             // Once we have the mapper, we can start inserting it into the db
             Mapper<EntityObject> mapper = mapperContainer.getInstance(entity.getClass().getCanonicalName());
+            if(mapper == null) {
+                // Get super class name instead
+                mapper = mapperContainer.getInstance(entity.getClass().getSuperclass().getCanonicalName());
+            }
             mapper.setConnection(conn);
             mapper.insert(entity);
         }
@@ -170,6 +173,10 @@ public class Repository implements IUnitofWork{
         List<EntityObject> entityList = context.get(UnitActions.MODIFY.toString());
         for(EntityObject entity : entityList) {
             Mapper<EntityObject> mapper = mapperContainer.getInstance(entity.getClass().getCanonicalName());
+            if(mapper == null) {
+                // Get super class name instead
+                mapper = mapperContainer.getInstance(entity.getClass().getSuperclass().getCanonicalName());
+            }
             mapper.setConnection(conn);
             mapper.modify(entity);
         }
@@ -179,6 +186,10 @@ public class Repository implements IUnitofWork{
         List<EntityObject> entityList = context.get(UnitActions.DELETE.toString());
         for(EntityObject entity : entityList) {
             Mapper<EntityObject> mapper = mapperContainer.getInstance(entity.getClass().getCanonicalName());
+            if(mapper == null) {
+                // Get super class name instead
+                mapper = mapperContainer.getInstance(entity.getClass().getSuperclass().getCanonicalName());
+            }
             mapper.setConnection(conn);
             mapper.delete(entity);
         }

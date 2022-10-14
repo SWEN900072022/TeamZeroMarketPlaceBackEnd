@@ -1,9 +1,10 @@
 package Servlets;
 
-import Entity.User;
-import Model.SellerGroupModel;
+import Domain.*;
+import Enums.UserRoles;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
+import Util.JWTUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -16,6 +17,7 @@ import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @WebServlet(name = "SellerOnboardServlet", value = "/SellerOnboardServlet")
 public class SellerOnboardServlet extends HttpServlet {
@@ -25,23 +27,35 @@ public class SellerOnboardServlet extends HttpServlet {
         String groupName = request.getParameter("groupName");
         String jwt = request.getHeader("jwt");
 
-        Type typeOfUser = TypeToken.getParameterized(User.class).getType();
+        Type typeOfUser = TypeToken.getParameterized(Seller.class).getType();
 
         Gson gson = new Gson();
         User user = gson.fromJson(userStr, typeOfUser);
 
-        IUnitofWork repo = new Repository();
-        SellerGroupModel sgModel = new SellerGroupModel(repo);
-        boolean isSuccessful = sgModel.addSellerToSellerGroup(user, groupName);
+        IUnitofWork repo = new UnitofWork();
+        boolean isSuccessful = false;
+
+        try {
+            if(JWTUtil.validateToken(jwt)) {
+                String role = JWTUtil.getClaim("role", jwt);
+                int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
+                if(Objects.equals(role, UserRoles.ADMIN.toString())) {
+                    Admin admin = (Admin) User.create("", "", "", uid, UserRoles.ADMIN.toString());
+                    admin.setRepo(repo);
+                    GroupMembership gm = admin.addSellerToGroup(groupName, user.getUserId());
+                    repo.registerNew(gm);
+
+                    isSuccessful = true;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Something went wrong");
+        }
 
         // Check to see if the operations have been successful, if it is commit
-        if(isSuccessful) {
-            try {
-                repo.commit();
-            } catch (SQLException e) {
-                repo.rollback();
-            }
-        } else {
+        try {
+            repo.commit();
+        } catch (SQLException e) {
             repo.rollback();
         }
 

@@ -1,6 +1,6 @@
 package MockClasses;
 
-import Entity.OrderItem;
+import Domain.OrderItem;
 import Injector.ISQLInjector;
 import Mapper.Mapper;
 import org.javamoney.moneta.Money;
@@ -16,17 +16,19 @@ public class MockOrderItemMapper implements Mapper<OrderItem> {
 
     public MockOrderItemMapper() {
         // Populate the order items with some dummy data
-        OrderItem oi = new OrderItem();
-        oi.setOrderId(1);
-        oi.setListingId(1);
-        oi.setQuantity(1);
-        oi.setUnitPrice(Money.of(1, Monetary.getCurrency("AUD")));
+        OrderItem oi = OrderItem.create(
+                1,
+                1,
+                1,
+                Money.of(1, Monetary.getCurrency("AUD"))
+        );
 
-        OrderItem oi2 = new OrderItem();
-        oi2.setOrderId(2);
-        oi2.setListingId(2);
-        oi2.setQuantity(2);
-        oi2.setUnitPrice(Money.of(2, Monetary.getCurrency("AUD")));
+        OrderItem oi2 = OrderItem.create(
+                2,
+                2,
+                2,
+                Money.of(2, Monetary.getCurrency("AUD"))
+        );
 
         orderItems.add(oi);
         orderItems.add(oi2);

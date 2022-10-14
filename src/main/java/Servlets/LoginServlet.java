@@ -1,9 +1,8 @@
 package Servlets;
 
-import Entity.User;
-import Model.UserModel;
+import Domain.User;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
 import com.google.gson.Gson;
 
 import javax.servlet.*;
@@ -22,10 +21,22 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
         String role = request.getParameter("role");
 
-        User user = new User(email, null, password, role);
-        IUnitofWork repo = new Repository();
-        UserModel uModel = new UserModel(repo);
-        String jwt = uModel.login(user);
+        IUnitofWork repo = new UnitofWork();
+        String jwt = "";
+
+        try {
+            User user = User.create(
+                    email,
+                    "",
+                    password,
+                    0,
+                    role
+            );
+            user.setRepo(repo);
+            jwt = user.login();
+        } catch (Exception e) {
+            System.out.println("Something went wrong");
+        }
 
         Map<String, String> result = new HashMap<>();
         result.put("jwt", jwt);

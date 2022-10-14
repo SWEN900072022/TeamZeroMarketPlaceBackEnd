@@ -1,10 +1,10 @@
-package Entity;
+package Domain;
 
 import Injector.ISQLInjector;
 
 import java.util.List;
 
-public abstract class EntityObject implements IEntityObject {
+public abstract class EntityObject {
     private ISQLInjector injector;
     private List<Object> param;
 

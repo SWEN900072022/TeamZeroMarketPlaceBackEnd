@@ -1,9 +1,11 @@
 package Servlets;
 
-import Entity.SellerGroup;
-import Model.SellerGroupModel;
+import Domain.Admin;
+import Domain.SellerGroup;
+import Domain.User;
+import Enums.UserRoles;
 import UnitofWork.IUnitofWork;
-import UnitofWork.Repository;
+import UnitofWork.UnitofWork;
 import com.google.gson.Gson;
 
 import javax.servlet.*;
@@ -17,10 +19,11 @@ import java.util.List;
 public class GetAllSellerGroupServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        IUnitofWork repo = new Repository();
-        SellerGroupModel sgModel = new SellerGroupModel(repo);
-        List<SellerGroup> list;
-        list = sgModel.getAllSellerGroup();
+        IUnitofWork repo = new UnitofWork();
+
+        Admin admin = (Admin) User.create("","","", 0, UserRoles.ADMIN.toString());
+        admin.setRepo(repo);
+        List<SellerGroup> list = admin.getAllSellerGroup(repo);
 
         Gson gson = new Gson();
         String json = gson.toJson(list);
