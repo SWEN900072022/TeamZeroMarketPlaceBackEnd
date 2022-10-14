@@ -92,4 +92,51 @@ class Order<? extends EntityObject>{
     + modifyOrderItem(listingId : int, quantity : int, stockLevel : int) : OrderItem
     + getOrderItem (listingId : int) : OrderItem
 }
+
+'OrderItem Class
+class OrderItem<extends EntityObject>{
+    - orderId : int
+    - listingId : int
+    - quantity : int
+    - unitPrice : Money
+    - priceInCents : int
+
+    {static} + create(orderId : int, listingId : int, quantity : int, unitPrice : Money) : OrderItem
+}
+
+class Seller <extends User>{
+    - userRoles : UserRoles
+    - sg : SellerGroup
+    - listingList : List<Listing>
+    - ordersList : List<OrderItem>
+    - fullOrderList : List<Order>
+
+    + createListing(groupId : int, type : ListingTypes, title : String, description : String, quantity : int, price : Money, startTime : LocalDateTime, endTime : LocalDateTime)
+    + deleteListing(listingId : int, groupId : int) : Listing
+    + viewSellerListings(groupId : int) : List<Listing>
+    + viewOrders() : List<OrderItem>
+    + viewFullOrder(groupId : int) : List<Order>
+    + modifyOrder(orderId : int, listingId : int, groupId : int, quantity : int) : List<EntityObject>
+    + cancelOrder(orderId : int, groupId : int) : Order
+
+}
+
+'SellerGroup Class
+class SellerGroup{
+    - groupId : int
+    - groupName : String
+    - sellerList : List<GroupMembership>
+    - listingList : List<Listing>
+    - ordersList : List<OrderItem>
+    - repo : IUnitofWork
+
+    + addSeller(userId : int, groupId : int) : GroupMembership
+    + removeSeller(userId : int, groupId : int) : GroupMembership
+    {static} + create(groupId : int, groupName : String) : SellerGroup
+    {static} + create(groupId : int, groupName : String, sellerList : List<GroupMembership>, listingList : List<Listing>, ordersList : List<OrderItem>) : SellerGroup
+    {static} + getSellerGroupByGroupName(groupName : String, repo : IUnitofWork) : SellerGroup
+    {static} + getAllSellerGroup(repo : IUnitofWork) : List<SellerGroup>
+
+}
+
 @enduml
