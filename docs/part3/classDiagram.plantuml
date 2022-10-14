@@ -50,5 +50,46 @@ class Filter{
 class FixedPriceListing <? extends User>{
 
 }
-'
+'GroupMembership Class
+class GroupMembership <? extends EntityObject>{
+    - groupId : int
+    - userId : int
+    {static} + create(groupId : int, userId : int) : GroupMembership
+    {static} + getGroupMembershipByUserId(userId : int, repo : IUnitofWork) : GroupMembership
+    + markForDelete() : void
+}
+'Listing Class
+class Listing<? extends EntityObject>{
+    - listingId : int
+    - groupId : int
+    - type : ListingTypes
+    - title : String
+    - description : String
+    - quantity : int
+    - price : Money
+    - startTime : LocalDateTime
+    - endTime : LocalDateTime
+    {method} {static}  + create(listingId : int, groupId : int, type : ListingTypes, title : String, description : String, quantity : int, price : Money, startTime : LocalDateTime, endTime : LocalDateTime) : Listing
+    {method} {static} + getListingById(listingId : int, repo : IUnitofWork) : Listing
+    {method} {static} + getListingByFilterCondition(filterCondition : List<Filter>, repo : IUnitofWork) : List<Listing>
+    {method} {static} + getInjector(key : String) : ISQLInjector
+}
+'Order Class
+class Order<? extends EntityObject>{
+    - orderId : int
+    - userId : int
+    - address : String
+    - orderItemList : List<OrderItem>
+    - repo : IUnitofWork
+
+    {method} {static}  + create(orderId : int, userId : int, address : String) : Order
+    {method} {static}  + create(orderId : int, userId : int, address : String, orderItemList : List<OrderItem>) : Order
+    {method} {static} + getOrdersByGroupId(groupId : int, repo : IUnitofWork) : List<OrderItem>
+    {method} {static} + getOrdersByUserId(userId : int, repo : IUnitofWork) : List<Order>
+    {method} {static} + getLastOrderItem(repo : IUnitofWork) : Order
+    {method} {static} + getAllOrders(repo : IUnitofWork) : List<Order>
+    {method} {static} + getOrderItemList(orderId : int, repo : IUnitofWork) : List<OrderItem>
+    + modifyOrderItem(listingId : int, quantity : int, stockLevel : int) : OrderItem
+    + getOrderItem (listingId : int) : OrderItem
+}
 @enduml
