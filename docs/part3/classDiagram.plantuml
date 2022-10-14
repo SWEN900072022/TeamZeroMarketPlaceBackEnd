@@ -1,10 +1,10 @@
 @startuml
 
 'Admin class
-class Admin<? extends HttpServlet> {
-    - userRoles
-    - sellerGroupList
-    - userGroupList
+class Admin<? extends User> {
+    - userRoles : UserRoles
+    - sellerGroupList : List<SellerGroup>
+    - userGroupList : List<User>
     {method} + getAllPurchases() : List<OrderItem>
     {method} + getAllSellerGroup(repo : IUnitofWork ) : List<SellerGroup>
     {method} + getAllUsers() : List<User>
@@ -14,6 +14,9 @@ class Admin<? extends HttpServlet> {
     {method} + removeListing(listingId : int) : Listing
 }
 'AuctionListing class
+class AuctionListing<? extends Listing> {
+    {method} bid(bid : Money, bidTime : localDateTime, userId : int): Bid
+}
 'Bid Class
 'Customer Class
 'Filter Class
