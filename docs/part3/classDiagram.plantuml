@@ -122,7 +122,7 @@ class Seller <extends User>{
 }
 
 'SellerGroup Class
-class SellerGroup{
+class SellerGroup <extends Entity Object>{
     - groupId : int
     - groupName : String
     - sellerList : List<GroupMembership>
@@ -138,5 +138,19 @@ class SellerGroup{
     {static} + getAllSellerGroup(repo : IUnitofWork) : List<SellerGroup>
 
 }
+'User Class
+abstract class User <extends EntityObject>{
+    - email : String
+    - username : String
+    - password : String
+    - userId : int
+    - repo : IUnitofWork
 
+    {static} + create(email : String, username : String, password : String, userId : int, roles : String) : User
+    {static} + getAllUser(repo : IUnitofWork) : List<User>
+    {static} + getUserByUsernamePassword(email : String, password : String, repo : IUnitofWork) : User
+    + login() : String
+    {static} + register(email : String, username : String, password : String, roles : String, repo : IUnitofWork) : User
+    
+}
 @enduml
