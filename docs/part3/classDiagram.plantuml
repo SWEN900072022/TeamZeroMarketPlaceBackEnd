@@ -13,10 +13,16 @@ class Admin<? extends User> {
     {method} + removeSellerFromGroup(groupName : String, userId : int) : GroupMembership
     {method} + removeListing(listingId : int) : Listing
 }
+'Admin extends user.
+User<|--Admin : extends
+
 'AuctionListing class
 class AuctionListing<? extends Listing> {
     {method} + bid(bid : Money, bidTime : localDateTime, userId : int): Bid
 }
+'AuctionListing extends Listing
+Listing <|-- AuctionListing
+
 'Bid Class
 class Bid<? extends EntityObject> {
     - listingId : int
@@ -25,6 +31,9 @@ class Bid<? extends EntityObject> {
     {method} {static} + create(listingId : int, userId : int, bidAmount : Money) : Bid
 
 }
+'Bid extends Entity Object
+EntityObject <|-- Bid
+
 'Customer Class
 class Customer <? extends User> {
     - userRoles: UserRoles
@@ -35,11 +44,15 @@ class Customer <? extends User> {
     {method} + modifyOrder(orderId : int, listingId : int, quantity : int) : List<EntityObject>
     {method} + cancelOrder(orderId : int) : Order
 }
+'Customer extends user class.
+User <|-- Customer : extends
+
 'EntityObject
 class EntityObject{
     - injector : ISQLInjector
     - param : List<Object>
 }
+
 'Filter Class
 class Filter{
     - filterKey : String
@@ -47,9 +60,12 @@ class Filter{
 
 }
 'FixedPriceListing Class
-class FixedPriceListing <? extends User>{
+class FixedPriceListing <? extends Listing>{
 
 }
+'FixedPriceListing extends Listing
+Listing <|-- FixedPriceListing
+
 'GroupMembership Class
 class GroupMembership <? extends EntityObject>{
     - groupId : int
@@ -58,6 +74,9 @@ class GroupMembership <? extends EntityObject>{
     {static} + getGroupMembershipByUserId(userId : int, repo : IUnitofWork) : GroupMembership
     + markForDelete() : void
 }
+'GroupMembership extends EntityObject
+EntityObject <|-- GroupMembership
+
 'Listing Class
 class Listing<? extends EntityObject>{
     - listingId : int
@@ -74,6 +93,9 @@ class Listing<? extends EntityObject>{
     {method} {static} + getListingByFilterCondition(filterCondition : List<Filter>, repo : IUnitofWork) : List<Listing>
     {method} {static} + getInjector(key : String) : ISQLInjector
 }
+'Listing extends EntityObject
+EntityObject <|-- Listing
+
 'Order Class
 class Order<? extends EntityObject>{
     - orderId : int
@@ -92,6 +114,8 @@ class Order<? extends EntityObject>{
     + modifyOrderItem(listingId : int, quantity : int, stockLevel : int) : OrderItem
     + getOrderItem (listingId : int) : OrderItem
 }
+'Order extends EntityObject
+EntityObject <|-- Order
 
 'OrderItem Class
 class OrderItem<extends EntityObject>{
@@ -103,6 +127,8 @@ class OrderItem<extends EntityObject>{
 
     {static} + create(orderId : int, listingId : int, quantity : int, unitPrice : Money) : OrderItem
 }
+'OrderItem extends EntityObject
+EntityObject <|-- OrderItem
 
 class Seller <extends User>{
     - userRoles : UserRoles
@@ -120,6 +146,8 @@ class Seller <extends User>{
     + cancelOrder(orderId : int, groupId : int) : Order
 
 }
+'Seller extends User
+User <|-- Seller
 
 'SellerGroup Class
 class SellerGroup <extends Entity Object>{
@@ -138,6 +166,9 @@ class SellerGroup <extends Entity Object>{
     {static} + getAllSellerGroup(repo : IUnitofWork) : List<SellerGroup>
 
 }
+'SellerGroup extends EntityObject
+EntityObject <|-- SellerGroup
+
 'User Class
 abstract class User <extends EntityObject>{
     - email : String
@@ -151,6 +182,17 @@ abstract class User <extends EntityObject>{
     {static} + getUserByUsernamePassword(email : String, password : String, repo : IUnitofWork) : User
     + login() : String
     {static} + register(email : String, username : String, password : String, roles : String, repo : IUnitofWork) : User
-    
+
 }
+
+/' Servlet Classes
+
+/' Bid Servlet
+class <extends HttpServlet> {
+    /' Bid Servlet creates new bids.
+    /' Bid Servlet makes use of UnitofWork.
+
+
+}
+
 @enduml
