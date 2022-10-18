@@ -1,15 +1,12 @@
-import Domain.Bid;
-import Domain.Customer;
-import Domain.Listing;
-import Domain.Order;
+import Domain.*;
 import Enums.ListingTypes;
 import MockClasses.MockRepository;
 import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.Test;
-
 import javax.money.Monetary;
-
+import java.util.ArrayList;
 import java.util.List;
+import org.junit.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -51,4 +48,103 @@ public class CustomerTest {
 
         assertNull(l);
     }
+
+    @Test
+    public void  viewAllOrdersCorrectly() {
+
+        List<Order> orderList = customer.viewAllOrders();
+        Order.getOrdersByUserId(1,repo);
+        assertNotNull(orderList);
+    }
+
+    @Test
+    public void  viewAllOrdersItemsNull() {
+        // view all orders when item is null
+        Order order= Order.create(1,1,"Melbourne");
+        assertEquals(order.getOrderId(),1);
+        assertEquals(order.getUserId(),1);
+        assertEquals(order.getAddress(),"Melbourne");
+    }
+
+    @Test
+    public void  viewAllOrdersGetByUserId() {
+        // test get orders by user id in view all orders
+        List<Order> orderList= Order.getOrdersByUserId(1,repo);
+        assertNotNull(orderList);
+    }
+
+    @Test
+    public void  viewAllOrdersItems() {
+        //Test for view all orders
+        OrderItem orderItemList=OrderItem.create(1,1,2,Money.of(3, Monetary.getCurrency("AUD")));
+        List<OrderItem> oiList = new ArrayList<>();
+        oiList.add(orderItemList);
+        Order order= Order.create(1,1,"Melbourne",oiList);
+
+        assertNotNull(order);
+        assertEquals(order.getOrderItemList(),oiList);
+        assertEquals(order.getOrderId(),1);
+        assertEquals(order.getUserId(),1);
+        assertEquals(order.getAddress(),"Melbourne");
+    }
+
+    @Test
+    public void cancelOrderCorrectly(){
+        Order orderList = customer.cancelOrder(1);
+
+        assertEquals(orderList.getOrderId(),1);
+        assertNotNull(orderList);
+    }
+
+    @Test
+    public void cancelNullOrder(){
+        Order orderList = customer.cancelOrder(999);
+
+        assertNull(orderList);
+    }
+
+
+    @Test
+    public void modifyOrdersCorrectly(){
+        List<EntityObject> orderList = customer.modifyOrder(1,1,3);
+
+        assertNotNull(orderList);
+
+    }
+//
+//    @Test
+//    public void modifyOrdersError(){
+//        List<EntityObject> orderList = customer.modifyOrder(999,1,2);
+//
+//        assertNull(orderList);
+//        assertThrows(IllegalArgumentException.class,);
+//
+//    }
+
+
+    @Test
+    public void checkoutListingItem(){
+        // test when one item in the listing
+        OrderItem item = OrderItem.create(1,1,2,Money.of(3, Monetary.getCurrency("AUD")));
+        List<OrderItem> oiList = new ArrayList<>();
+        oiList.add(item);
+        Order orderList = customer.checkoutListing("Melbourne", oiList);
+        assertEquals(orderList.getAddress(),"Melbourne");
+        assertNotNull(oiList);
+}
+
+    @Test
+    public void checkoutListingItems(){
+        // test when more than one item in the listing
+        OrderItem item1 = OrderItem.create(1,1,2,Money.of(3, Monetary.getCurrency("AUD")));
+        OrderItem item2 = OrderItem.create(1,2,3,Money.of(4, Monetary.getCurrency("AUD")));
+        List<OrderItem> oiList = new ArrayList<>();
+        oiList.add(item1);
+        oiList.add(item2);
+        Order orderList = customer.checkoutListing("Melbourne", oiList);
+        assertEquals(orderList.getAddress(),"Melbourne");
+        assertNotNull(oiList);
+    }
+
+
 }
