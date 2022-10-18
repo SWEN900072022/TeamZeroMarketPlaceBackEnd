@@ -1,0 +1,11 @@
+@startuml
+actor Seller
+Seller -> Servlet : view a \nseller's listing
+Servlet -> SellerDomainObject : viewSellerListing
+alt listingList is null
+    SellerDomainObject -> UnitOfWork : find list of listing
+    UnitOfWork -> SellerDomainObject : returns results
+end
+SellerDomainObject -> Servlet : returns list of listings
+Servlet -> Seller : list of listings in JSON
+@enduml
