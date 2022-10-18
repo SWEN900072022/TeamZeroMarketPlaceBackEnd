@@ -2,8 +2,6 @@
 
 'Admin class
 class Admin<? extends User> {
-    - userRoles : UserRoles
-    - sellerGroupList : List<SellerGroup>
     - userGroupList : List<User>
     {method} + getAllPurchases() : List<OrderItem>
     {method} + getAllSellerGroup(repo : IUnitofWork ) : List<SellerGroup>
@@ -15,6 +13,14 @@ class Admin<? extends User> {
 }
 'Admin extends user.
 User<|--Admin : extends
+'Admin has user Roles as an attribute (association)
+Admin -> UserRoles
+'Admin has multiple SellerGroups (association)
+Admin -> SellerGroup
+'getAllUsers depends on user class (dependency) (implied by association)
+'Admin .> User
+'createSellerGroup creates sellers (dependency) (implied by association)
+'Admin .> SellerGroup
 
 'AuctionListing class
 class AuctionListing<? extends Listing> {
@@ -22,6 +28,8 @@ class AuctionListing<? extends Listing> {
 }
 'AuctionListing extends Listing
 Listing <|-- AuctionListing
+'Bid method creates bids using Bid factory (dependency)
+Bid <. AuctionListing
 
 'Bid Class
 class Bid<? extends EntityObject> {
@@ -36,7 +44,6 @@ EntityObject <|-- Bid
 
 'Customer Class
 class Customer <? extends User> {
-    - userRoles: UserRoles
     - listingList : List<Listing>
     {method} + checkoutListing(address : String,  oiList : List<OrderItem>) : Order
     {method} + bid(listingId : int, bidAmount : Money) : Bid
@@ -46,6 +53,12 @@ class Customer <? extends User> {
 }
 'Customer extends user class.
 User <|-- Customer : extends
+'Customer has user role enum.
+Customer -> UserRoles
+'Customer has list of orders. (association)
+Customer -> Order : has/view/modify/cancel
+'Customer bids on listings. (dependency)
+Customer .> AuctionListing : bids on
 
 'EntityObject
 class EntityObject{
@@ -76,6 +89,8 @@ class GroupMembership <? extends EntityObject>{
 }
 'GroupMembership extends EntityObject
 EntityObject <|-- GroupMembership
+'GroupMemberShip creates
+
 
 'Listing Class
 class Listing<? extends EntityObject>{
@@ -184,15 +199,54 @@ abstract class User <extends EntityObject>{
     {static} + register(email : String, username : String, password : String, roles : String, repo : IUnitofWork) : User
 
 }
+'User extends EntityObject
+EntityObject <|-- User
+
+'Enum Classes
+'ListingTypes
+enum ListingTypes{
+    FIXED_PRICE
+    AUCTION
+}
+
+enum UnitActions{
+    INSERT
+    MODIFY
+    DELETE
+}
+
+enum UserRoles{
+    CUSTOMER
+    SELLER
+    ADMIN
+}
+
 
 /' Servlet Classes
 
 /' Bid Servlet
-class <extends HttpServlet> {
+class BidServlet <extends HttpServlet> {
     /' Bid Servlet creates new bids.
     /' Bid Servlet makes use of UnitofWork.
 
 
 }
+/' CancelOrderServlet
+
+/' CheckoutServlet
+/' CreateListingServlet
+/' CreateSellerGroupServlet
+/' DeleteListingServlet
+/' GetAllPurchasesServlet
+/' GetAllSellerGroupServlet
+/' GetAllUsersServlet
+/' LoginServlet
+/' ModifyServlet
+/' RegisterUserServlet
+/' SearchServlet
+/' SellerOnboardServlet
+/' SellerRemovalServlet
+/' ViewOrderServlet
+
 
 @enduml
