@@ -4,6 +4,7 @@ import Domain.Admin;
 import Domain.SellerGroup;
 import Domain.User;
 import Enums.UserRoles;
+import PessimisticLock.LockManager;
 import UnitofWork.UnitofWork;
 import Util.JWTUtil;
 import com.google.gson.Gson;
@@ -33,9 +34,13 @@ public class CreateSellerGroupServlet extends HttpServlet {
             if(JWTUtil.validateToken(jwt)) {
                 String role = JWTUtil.getClaim("role", jwt);
                 int uid = Integer.parseInt(JWTUtil.getSubject(jwt));
+
                 if (Objects.equals(role, UserRoles.ADMIN.toString())) {
                     Admin admin = (Admin) User.create("", "", "", uid, UserRoles.ADMIN.toString());
                     admin.setRepo(repo);
+
+                    // Lock group name
+                    LockManager.getInstance().acquireLock(groupName, "sellergroup", jwt);
                     SellerGroup newSellerGroup = admin.createSellerGroup(groupName);
 
                     // Once the seller group is created, register it
@@ -55,6 +60,9 @@ public class CreateSellerGroupServlet extends HttpServlet {
         } catch (SQLException e) {
             repo.rollback();
         }
+
+        // Release locks here
+        LockManager.getInstance().releaseOwner(jwt);
 
         Map<String, Boolean> result = new HashMap<>();
         result.put("result", isSuccessful);

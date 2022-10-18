@@ -2,6 +2,7 @@ package Servlets;
 
 import Domain.*;
 import Enums.UserRoles;
+import PessimisticLock.LockManager;
 import UnitofWork.IUnitofWork;
 import UnitofWork.UnitofWork;
 import Util.JWTUtil;
@@ -54,6 +55,9 @@ public class CheckoutServlet extends HttpServlet {
                     if(newOrder != null) {
                         // We want to register the order items
                         for(OrderItem orderItem : newOrder.getOrderItemList()) {
+                            // Lock manager
+                            LockManager.getInstance().acquireLock(Integer.toString(orderItem.getListingId()), "listing", jwt);
+
                             Listing l = Listing.getListingById(orderItem.getListingId(), repo);
                             if(l.getQuantity() > orderItem.getQuantity()) {
                                 orderItem.setOrderId(newOrder.getOrderId());
@@ -75,6 +79,9 @@ public class CheckoutServlet extends HttpServlet {
         } catch (SQLException e) {
             repo.rollback();
         }
+
+        // Release locks
+        LockManager.getInstance().releaseOwner(jwt);
 
         Map<String, Boolean>result = new HashMap<>();
         result.put("result", isSuccessful);
