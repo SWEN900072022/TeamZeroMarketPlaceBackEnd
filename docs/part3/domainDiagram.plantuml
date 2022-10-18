@@ -13,16 +13,15 @@ class Admin{
 }
 'Admin extends user.
 User<|--Admin : extends
-'Admin has user Roles as an attribute enum (association)
-UserRoles <-- Admin
+
 'Admin creates SellerGroups (association)
-Admin --> SellerGroup : creates
+Admin "1" --> "0..*" SellerGroup : creates
 'getAllUsers depends on user class (dependency) (implied by association)
 'Admin .> User
 'createSellerGroup creates sellers (dependency) (implied by association)
 'Admin .> SellerGroup
 'Admin adds members to groups
-Admin ..> GroupMembership : adds
+Admin "1" ..> "0..*" GroupMembership : adds
 
 'AuctionListing class
 class AuctionListing {
@@ -31,7 +30,7 @@ class AuctionListing {
 'AuctionListing extends Listing
 Listing <|-- AuctionListing : extends
 'Bid method creates bids using Bid factory (dependency)
-AuctionListing ..> Bid : has
+AuctionListing "1"..> "0..*" Bid : has
 
 'Bid Class
 class Bid {
@@ -53,12 +52,11 @@ class Customer{
 }
 'Customer extends user class.
 User <|-- Customer : extends
-'Customer has user role enum.
-UserRoles <-- Customer
+
 'Customer has list of orders. (association)
-Customer --> Order : has/view/modify/cancel
+Customer "1..*" --> "0..*" Order : has/view/modify/cancel
 'Customer bids on listings. (dependency)
-Customer .> AuctionListing : bids on
+Customer "1..*" .> "0..*" AuctionListing : bids on
 
 'FixedPriceListing Class
 class FixedPriceListing{
@@ -113,7 +111,7 @@ class Order{
     + getOrderItem (listingId : int) : OrderItem
 }
 'An order has a list of items.
-Order --> OrderItem : has
+Order "1" --> "1..*" OrderItem : has
 
 'OrderItem Class
 class OrderItem{
@@ -127,11 +125,6 @@ class OrderItem{
 }
 
 class Seller{
-    - userRoles : UserRoles
-    - sg : SellerGroup
-    - listingList : List<Listing>
-    - ordersList : List<OrderItem>
-    - fullOrderList : List<Order>
 
     + createListing(groupId : int, type : ListingTypes, title : String, description : String,
     quantity : int, price : Money, startTime : LocalDateTime, endTime : LocalDateTime)
@@ -145,14 +138,20 @@ class Seller{
 }
 'Seller extends User
 User <|-- Seller : extends
-'Seller has user roles enum
-UserRoles <-- Seller
+
+'Seller has a list of orders.
+Seller "1" --> "0..*" Order : creates/modify/deletes
+'Seller has listings.
+Seller "1" --> "0..*" Listing : creates/modify/cancel
+'Seller belongs to sellerGroup.
+Seller "0..*" --> "1..*" SellerGroup : belongs to
+
 'SellerGroup Class
-class SellerGroup <extends Entity Object>{
+class SellerGroup {
     - groupId : int
     - groupName : String
-    - listingList : List<Listing>
-    - ordersList : List<OrderItem>
+'    - listingList : List<Listing>
+'    - ordersList : List<OrderItem>
     - repo : IUnitofWork
 
     + addSeller(userId : int, groupId : int) : GroupMembership
@@ -163,8 +162,8 @@ class SellerGroup <extends Entity Object>{
     {static} + getAllSellerGroup(repo : IUnitofWork) : List<SellerGroup>
 
 }
-'Has seller group has group members
-GroupMembership <- SellerGroup : has
+'Each seller group has group members
+GroupMembership"0..*" <- "1" SellerGroup : has
 'User Class
 abstract class User{
     - email : String
@@ -179,26 +178,6 @@ abstract class User{
     + login() : String
     {static} + register(email : String, username : String, password : String, roles : String, repo : IUnitofWork) : User
 
-}
-
-
-'Enum Classes
-'ListingTypes
-enum ListingTypes{
-    FIXED_PRICE
-    AUCTION
-}
-
-enum UnitActions{
-    INSERT
-    MODIFY
-    DELETE
-}
-
-enum UserRoles{
-    CUSTOMER
-    SELLER
-    ADMIN
 }
 
 @enduml
