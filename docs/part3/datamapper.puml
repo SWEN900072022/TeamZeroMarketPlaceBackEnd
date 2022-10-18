@@ -1,0 +1,14 @@
+@startuml
+DomainObject -> UnitOfWork : registerNew,\nregisterModify,\nregisterDelete
+DomainObject -> UnitOfWork : registerNew,\nregisterModify,\nregisterDelete
+DomainObject -> UnitOfWork : registerNew,\nregisterModify,\nregisterDelete
+UnitOfWork -> Mapper : commit
+Mapper -> Database : inserts,\nmodifies,\ndeletes
+alt writing to database failed
+    Database -> Mapper : SQLException
+    Mapper -> UnitOfWork: SQLException
+    UnitOfWork -> Database : rollback
+    UnitOfWork -> DomainObject : failure
+end
+
+@enduml

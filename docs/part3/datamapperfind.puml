@@ -1,0 +1,16 @@
+@startuml
+DomainObject -> UnitOfWork : Find(ISQLInjector, param)
+UnitOfWork -> Mapper : Find(ISQLInjector, param)
+Mapper -> Database : find the database entries
+alt hasEntry
+    Database -> Mapper : results
+    Mapper -> UnitOfWork : results
+    UnitOfWork -> UnitOfWork : updates identity map
+    UnitOfWork -> DomainObject : results
+else reading from database failed
+    Database -> Mapper : SQLException
+    Mapper -> UnitOfWork: SQLException
+    UnitOfWork -> DomainObject : null
+end
+
+@enduml

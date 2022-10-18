@@ -1,0 +1,11 @@
+@startuml
+Server -> Server : Has 2 objects
+A -> Server : Checks stock level \n to initiate business\n transaction
+Server -> A : Returns true
+B -> Server : Checks stock level \n to initiate business\n transaction
+Server -> B : Returns true
+A -> Server : Buys 2 objects
+B -> Server : Buys 2  objects
+Server -> Server : Has -2 objects
+
+@enduml

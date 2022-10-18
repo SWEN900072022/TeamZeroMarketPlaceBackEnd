@@ -1,0 +1,18 @@
+@startuml
+Servlet -> UnitOfWork : new UnitOfWork()
+== Initialisation ==
+UnitOfWork -> SQLUtil : get SQL connection
+activate UnitOfWork
+SQLUtil -> UnitOfWork : SQL connection
+
+UnitOfWork -> UnitOfWork : Initialise Identity Map
+activate UnitOfWork
+deactivate UnitOfWork
+UnitOfWork -> UnitOfWork : Register data mappers
+activate UnitOfWork
+deactivate UnitOfWork
+deactivate UnitOfWork
+
+== End of Initialisation ==
+
+@enduml
