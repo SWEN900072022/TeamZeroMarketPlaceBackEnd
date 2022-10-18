@@ -1,7 +1,7 @@
 @startuml
 
 'Admin class
-class Admin<? extends User> {
+class Admin{
     - userGroupList : List<User>
     {method} + getAllPurchases() : List<OrderItem>
     {method} + getAllSellerGroup(repo : IUnitofWork ) : List<SellerGroup>
@@ -15,12 +15,14 @@ class Admin<? extends User> {
 User<|--Admin : extends
 'Admin has user Roles as an attribute enum (association)
 UserRoles <-- Admin
-'Admin has multiple SellerGroups (association)
-Admin --> SellerGroup
+'Admin creates SellerGroups (association)
+Admin --> SellerGroup : creates
 'getAllUsers depends on user class (dependency) (implied by association)
 'Admin .> User
 'createSellerGroup creates sellers (dependency) (implied by association)
 'Admin .> SellerGroup
+'Admin adds members to groups
+Admin ..> GroupMembership : adds
 
 'AuctionListing class
 class AuctionListing {
@@ -41,7 +43,7 @@ class Bid {
 }
 
 'Customer Class
-class Customer <? extends User> {
+class Customer{
     - listingList : List<Listing>
     {method} + checkoutListing(address : String,  oiList : List<OrderItem>) : Order
     {method} + bid(listingId : int, bidAmount : Money) : Bid
@@ -58,12 +60,6 @@ Customer --> Order : has/view/modify/cancel
 'Customer bids on listings. (dependency)
 Customer .> AuctionListing : bids on
 
-'Filter Class
-class Filter{
-    - filterKey : String
-    - filterVal : Object
-
-}
 'FixedPriceListing Class
 class FixedPriceListing{
 
@@ -79,9 +75,6 @@ class GroupMembership {
     {static} + getGroupMembershipByUserId(userId : int, repo : IUnitofWork) : GroupMembership
     + markForDelete() : void
 }
-
-'GroupMemberShip creates
-
 
 'Listing Class
 class Listing{
@@ -107,7 +100,6 @@ class Order{
     - orderId : int
     - userId : int
     - address : String
-    - orderItemList : List<OrderItem>
     - repo : IUnitofWork
 
     {method} {static}  + create(orderId : int, userId : int, address : String) : Order
@@ -120,6 +112,8 @@ class Order{
     + modifyOrderItem(listingId : int, quantity : int, stockLevel : int) : OrderItem
     + getOrderItem (listingId : int) : OrderItem
 }
+'An order has a list of items.
+Order --> OrderItem : has
 
 'OrderItem Class
 class OrderItem{
@@ -157,7 +151,6 @@ UserRoles <-- Seller
 class SellerGroup <extends Entity Object>{
     - groupId : int
     - groupName : String
-    - sellerList : List<GroupMembership>
     - listingList : List<Listing>
     - ordersList : List<OrderItem>
     - repo : IUnitofWork
@@ -170,8 +163,8 @@ class SellerGroup <extends Entity Object>{
     {static} + getAllSellerGroup(repo : IUnitofWork) : List<SellerGroup>
 
 }
-
-
+'Has seller group has group members
+GroupMembership <- SellerGroup : has
 'User Class
 abstract class User{
     - email : String
