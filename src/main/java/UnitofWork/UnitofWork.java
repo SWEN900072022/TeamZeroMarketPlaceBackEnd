@@ -16,10 +16,8 @@ public class UnitofWork implements IUnitofWork{
     private Map<String, EntityObject> oneToOneIdentityMap;
     private Map<String, List<EntityObject>> oneToManyIdentityMap;
     private DIContainer<Mapper<EntityObject>> mapperContainer;
-    private Connection conn;
 
     public UnitofWork() {
-        conn = SQLUtil.getConnection();
         context = new HashMap<>();
         oneToOneIdentityMap = new HashMap<>();
         oneToManyIdentityMap = new HashMap<>();
@@ -52,6 +50,7 @@ public class UnitofWork implements IUnitofWork{
             // Return the object in the identity map
             return oneToOneIdentityMap.get(key);
         } else {
+            Connection conn = SQLUtil.getInstance().getConnection();
             // look up the database and return the object
             // First, we need to lookup for the correct mapper
             Mapper<EntityObject> mapper = mapperContainer.getInstance(objClass.getCanonicalName());
@@ -59,6 +58,7 @@ public class UnitofWork implements IUnitofWork{
 
             EntityObject entity = (EntityObject) mapper.find(injector, param);
             oneToOneIdentityMap.put(key, entity);
+            SQLUtil.getInstance().close(conn);
             return entity;
         }
     }
@@ -70,6 +70,7 @@ public class UnitofWork implements IUnitofWork{
             // Return the object in the identity map
             return oneToManyIdentityMap.get(key);
         } else {
+            Connection conn = SQLUtil.getInstance().getConnection();
             // look up the database and return the relevant mapper
             // First, we need to lookup the correct mapper
             Mapper<EntityObject> mapper = mapperContainer.getInstance(objClass.getCanonicalName());
@@ -77,6 +78,7 @@ public class UnitofWork implements IUnitofWork{
 
             List<EntityObject> entity = mapper.findMulti(injector, param);
             oneToManyIdentityMap.put(key, entity);
+            SQLUtil.getInstance().close(conn);
             return entity;
         }
     }
@@ -84,19 +86,25 @@ public class UnitofWork implements IUnitofWork{
     @Override
     public EntityObject read(ISQLInjector injector, List<Object> param, Class<?>objClass) {
         // Look up the database and return the relevant mapper
+        Connection conn = SQLUtil.getInstance().getConnection();
         Mapper<EntityObject> mapper = mapperContainer.getInstance(objClass.getCanonicalName());
         mapper.setConnection(conn);
 
-        return mapper.find(injector, param);
+        EntityObject obj = mapper.find(injector, param);
+        SQLUtil.getInstance().close(conn);
+        return obj;
     }
 
     @Override
     public List<EntityObject> readMulti(ISQLInjector injector, List<Object> param, Class<?>objClass) {
         // Look up the database and return the relevant mappers
+        Connection conn = SQLUtil.getInstance().getConnection();
         Mapper<EntityObject> mapper = mapperContainer.getInstance(objClass.getCanonicalName());
         mapper.setConnection(conn);
 
-        return mapper.findMulti(injector, param);
+        List<EntityObject> objList = mapper.findMulti(injector, param);
+        SQLUtil.getInstance().close(conn);
+        return objList;
     }
 
     @Override
@@ -126,22 +134,24 @@ public class UnitofWork implements IUnitofWork{
     }
 
     @Override
-    public void commit() throws SQLException{
+    public void commit() throws SQLException, InterruptedException{
+        Connection conn = SQLUtil.getInstance().getConnection();
         // Check to see if there are anything to commit
         if(context.size() == 0) {
+            SQLUtil.getInstance().close(conn);
             return;
         }
 
         if(context.containsKey(UnitActions.INSERT.toString())) {
-            commitNew();
+            commitNew(conn);
         }
 
         if(context.containsKey(UnitActions.MODIFY.toString())) {
-            commitModify();
+            commitModify(conn);
         }
 
         if(context.containsKey(UnitActions.DELETE.toString())) {
-            commitDelete();
+            commitDelete(conn);
         }
 
         // Everything that needs to be commited should be commited at this point
@@ -150,11 +160,11 @@ public class UnitofWork implements IUnitofWork{
         } catch (SQLException e) {
             conn.rollback();
         } finally {
-            conn.close();
+            SQLUtil.getInstance().close(conn);
         }
     }
 
-    private void commitNew() {
+    private void commitNew(Connection conn) {
         List<EntityObject> entityList = context.get(UnitActions.INSERT.toString());
         for(EntityObject entity : entityList) {
             // Get the object key to determine the mapper to be used
@@ -169,7 +179,7 @@ public class UnitofWork implements IUnitofWork{
         }
     }
 
-    private void commitModify() {
+    private void commitModify(Connection conn) {
         List<EntityObject> entityList = context.get(UnitActions.MODIFY.toString());
         for(EntityObject entity : entityList) {
             Mapper<EntityObject> mapper = mapperContainer.getInstance(entity.getClass().getCanonicalName());
@@ -182,7 +192,7 @@ public class UnitofWork implements IUnitofWork{
         }
     }
 
-    private void commitDelete() {
+    private void commitDelete(Connection conn) {
         List<EntityObject> entityList = context.get(UnitActions.DELETE.toString());
         for(EntityObject entity : entityList) {
             Mapper<EntityObject> mapper = mapperContainer.getInstance(entity.getClass().getCanonicalName());
@@ -192,15 +202,6 @@ public class UnitofWork implements IUnitofWork{
             }
             mapper.setConnection(conn);
             mapper.delete(entity);
-        }
-    }
-
-    public void rollback() {
-        try {
-            conn.rollback();
-            conn.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
     }
 }

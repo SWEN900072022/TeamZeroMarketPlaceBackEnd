@@ -82,8 +82,7 @@ public class CancelOrderServlet extends HttpServlet {
 
         try {
             repo.commit();
-        } catch (SQLException e) {
-            repo.rollback();
+        } catch (Exception e) {
         }
 
 

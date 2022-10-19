@@ -37,10 +37,6 @@ public class ListingMapper extends GeneralMapper<Listing> {
     private Listing insertOperation(Listing listing, boolean shouldReturn) throws SQLException {
         PreparedStatement statement;
 
-        if(conn == null) {
-            conn = SQLUtil.getConnection();
-        }
-
         statement = conn.prepareStatement(
                 "INSERT INTO listings (groupId, type, title, description, quantity, price, startTime, endTime) " +
                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
@@ -69,9 +65,6 @@ public class ListingMapper extends GeneralMapper<Listing> {
 
     public boolean modify(Listing listing) {
         try {
-            if(conn == null) {
-                conn = SQLUtil.getConnection();
-            }
 
             PreparedStatement statement = conn.prepareStatement(
                     "UPDATE listings as l set " +

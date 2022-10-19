@@ -25,9 +25,6 @@ public class GroupMembershipMapper extends GeneralMapper<GroupMembership> {
     private void insertOperation(GroupMembership gm, boolean shouldReturn) throws SQLException {
         PreparedStatement statement;
 
-        if(conn == null) {
-            conn = SQLUtil.getConnection();
-        }
 
         statement = conn.prepareStatement(
                 "INSERT INTO groupmembership(groupId, userId) " +
@@ -42,9 +39,6 @@ public class GroupMembershipMapper extends GeneralMapper<GroupMembership> {
     @Override
     public boolean modify(GroupMembership TEntity) {
         try {
-            if(conn == null) {
-                conn = SQLUtil.getConnection();
-            }
 
             PreparedStatement statement = conn.prepareStatement(
                     "UPDATE groupmembership as gm set " +
@@ -77,7 +71,7 @@ public class GroupMembershipMapper extends GeneralMapper<GroupMembership> {
         } catch (SQLException e) {
             return null;
         }
-        return null;
+        return gm;
     }
 
     @Override

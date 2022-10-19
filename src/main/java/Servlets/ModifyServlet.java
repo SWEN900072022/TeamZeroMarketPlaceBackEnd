@@ -109,8 +109,7 @@ public class ModifyServlet extends HttpServlet {
         // Check to see if the operations have been successful, if it is commit
         try {
             repo.commit();
-        } catch (SQLException e) {
-            repo.rollback();
+        } catch (Exception e) {
         }
 
         // Release all the locks owned by identifier

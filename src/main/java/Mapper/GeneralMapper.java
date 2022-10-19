@@ -17,10 +17,6 @@ public abstract class GeneralMapper<T> implements Mapper<T> {
     public ResultSet getResultSet(ISQLInjector injector, List<Object> queryParam) throws SQLException {
         PreparedStatement statement;
 
-        if(conn == null) {
-            conn = SQLUtil.getConnection();
-        }
-
         statement = conn.prepareStatement(injector.getSQLQuery());
         for(int i = 1; i <= queryParam.size(); i++) {
             Object param = queryParam.get(i-1);

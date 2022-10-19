@@ -27,9 +27,6 @@ public class OrderItemMapper extends GeneralMapper<OrderItem> {
     private void insertOperation(OrderItem oi, boolean shouldReturn) throws SQLException {
         PreparedStatement statement;
 
-        if(conn == null) {
-            conn = SQLUtil.getConnection();
-        }
 
         statement = conn.prepareStatement(
                 "INSERT INTO orderitems (orderid, listingid, quantity, unitprice) " +
@@ -47,9 +44,6 @@ public class OrderItemMapper extends GeneralMapper<OrderItem> {
     @Override
     public boolean modify(OrderItem TEntity) {
         try {
-            if(conn == null) {
-                conn = SQLUtil.getConnection();
-            }
 
             PreparedStatement statement = conn.prepareStatement(
                     "UPDATE orderitems as oi set " +
