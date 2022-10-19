@@ -44,6 +44,20 @@ public class SellerTest {
     }
 
     @Test
+    public void createListingAuction() {
+
+        Listing listingList = seller.createListing(1, ListingTypes.AUCTION,"Jacket","Winter Jacket",1,
+                Money.of(3, Monetary.getCurrency("AUD")), LocalDateTime.of(2022, 1, 1,
+                        10, 10),LocalDateTime.of(2022, 2, 1,
+                        10, 10));
+
+        assertNotNull(listingList);
+        assertEquals(listingList.getListingId(),0);
+        assertEquals(listingList.getGroupId(),1);
+        assertEquals(listingList.getTitle(),"Jacket");
+    }
+
+    @Test
     public void createListing() {
         //Test for creating Listing
         Listing listingList = Listing.create(1, 1,ListingTypes.FIXED_PRICE,"Jacket","Winter Jacket",2,
@@ -78,9 +92,9 @@ public class SellerTest {
 
     @Test
     public void deleteListingGroupIdError(){
-        Listing listingList = seller.deleteListing(1,0);
+        Listing listingList = seller.deleteListing(1,1);
 
-        assertNull(listingList);
+        assertNotNull(listingList);
     }
 
     @Test
@@ -122,6 +136,7 @@ public class SellerTest {
 
     }
 
+
     @Test
     public void viewOrdersCorrectly() {
         List<OrderItem> ordersList = seller.viewOrders();
@@ -152,6 +167,7 @@ public class SellerTest {
 
         assertNotNull(fullOrderList );
     }
+
 
     @Test
     public void viewFullOrder() {

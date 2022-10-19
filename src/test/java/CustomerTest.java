@@ -58,8 +58,8 @@ public class CustomerTest {
     }
 
     @Test
-    public void  viewAllOrdersItemsNull() {
-        // view all orders when item is null
+    public void  viewAllOrders() {
+        // Test for orders in the view all orders
         Order order= Order.create(1,1,"Melbourne");
         assertEquals(order.getOrderId(),1);
         assertEquals(order.getUserId(),1);
@@ -111,15 +111,6 @@ public class CustomerTest {
         assertNotNull(orderList);
 
     }
-//
-//    @Test
-//    public void modifyOrdersError(){
-//        List<EntityObject> orderList = customer.modifyOrder(999,1,2);
-//
-//        assertNull(orderList);
-//        assertThrows(IllegalArgumentException.class,);
-//
-//    }
 
 
     @Test
