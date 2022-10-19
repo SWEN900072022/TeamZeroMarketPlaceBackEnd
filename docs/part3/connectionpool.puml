@@ -1,0 +1,20 @@
+@startuml
+UnitOfWork -> SQLUtil : get connection
+alt has SQLUtil instance and queue size > 0
+    SQLUtil -> UnitOfWork : pops first connection
+else queue size == 0
+SQLUtil -> SQLUtil : busy waits until queue size > 0
+else no SQLUtil instance
+== initialisation ==
+    SQLUtil -> Database : establish 10 connections
+    Database -> SQLUtil : returns
+    SQLUtil -> SQLUtil : register connections in a queue
+==  end of  initialisation ==
+    SQLUtil -> UnitOfWork : pops first connection
+end
+UnitOfWork -> Mapper : sets connection to run database queries
+Mapper -> UnitOfWork : returns data from database
+
+UnitOfWork -> SQLUtil : close(connection)
+SQLUtil -> SQLUtil : insert connection to queue
+@enduml

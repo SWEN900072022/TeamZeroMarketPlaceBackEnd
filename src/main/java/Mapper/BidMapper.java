@@ -27,10 +27,6 @@ public class BidMapper extends GeneralMapper<Bid>{
     private void insertOperation(Bid bid, boolean shouldReturn) throws SQLException {
         PreparedStatement statement;
 
-        if(conn == null) {
-            conn = SQLUtil.getConnection();
-        }
-
         statement = conn.prepareStatement(
                 "INSERT INTO bids (listingid, userid, bidamount) " +
                         "VALUES (?, ?, ?);",
@@ -45,9 +41,6 @@ public class BidMapper extends GeneralMapper<Bid>{
     @Override
     public boolean modify(Bid TEntity) {
         try {
-            if(conn == null) {
-                conn = SQLUtil.getConnection();
-            }
 
             PreparedStatement statement = conn.prepareStatement(
                     "UPDATE bids as b set " +

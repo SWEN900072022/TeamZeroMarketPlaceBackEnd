@@ -34,10 +34,6 @@ public class SellerGroupMapper extends GeneralMapper<SellerGroup> {
     private SellerGroup insertOperation(SellerGroup TEntity, boolean shouldReturn) throws SQLException {
         PreparedStatement statement;
 
-        if(conn == null) {
-            conn = SQLUtil.getConnection();
-        }
-
         statement = conn.prepareStatement(
                 "INSERT INTO sellergroups (groupname) " +
                         "VALUES (?);",
@@ -61,9 +57,6 @@ public class SellerGroupMapper extends GeneralMapper<SellerGroup> {
     @Override
     public boolean modify(SellerGroup TEntity) {
         try {
-            if(conn == null) {
-                conn = SQLUtil.getConnection();
-            }
 
             PreparedStatement statement = conn.prepareStatement(
                     "UPDATE sellergroups as sg set " +

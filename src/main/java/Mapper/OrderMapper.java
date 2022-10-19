@@ -18,10 +18,6 @@ public class OrderMapper extends GeneralMapper<Order> {
         try {
             PreparedStatement statement;
 
-            if (conn == null) {
-                conn = SQLUtil.getConnection();
-            }
-
             statement = conn.prepareStatement(
                     "INSERT INTO orders (userId, address) " +
                             "VALUES (?, ?);", Statement.RETURN_GENERATED_KEYS);
@@ -41,9 +37,6 @@ public class OrderMapper extends GeneralMapper<Order> {
 
     @Override
     public boolean modify(Order order) {
-        if (conn == null) {
-            conn = SQLUtil.getConnection();
-        }
         try {
             PreparedStatement statement = conn.prepareStatement(
                     "UPDATE orders as o set " +

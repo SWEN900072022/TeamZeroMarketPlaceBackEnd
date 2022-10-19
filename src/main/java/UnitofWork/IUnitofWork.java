@@ -14,6 +14,5 @@ public interface IUnitofWork{
     void registerNew(EntityObject entity);
     void registerModified(EntityObject entity);
     void registerDeleted(EntityObject entity);
-    void commit() throws SQLException;
-    void rollback();
+    void commit() throws SQLException, InterruptedException;
 }

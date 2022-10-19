@@ -59,7 +59,7 @@ public class CheckoutServlet extends HttpServlet {
                             LockManager.getInstance().acquireLock(Integer.toString(orderItem.getListingId()), "listing", jwt);
 
                             Listing l = Listing.getListingById(orderItem.getListingId(), repo);
-                            if(l.getQuantity() > orderItem.getQuantity()) {
+                            if(l.getQuantity() >= orderItem.getQuantity()) {
                                 orderItem.setOrderId(newOrder.getOrderId());
                                 l.setQuantity(l.getQuantity() - orderItem.getQuantity());
                                 repo.registerNew(orderItem);
@@ -68,16 +68,16 @@ public class CheckoutServlet extends HttpServlet {
                         }
                     }
                 }
+                isSuccessful = true;
             }
         } catch (Exception e) {
-            System.out.print("Something went wrong");
+            e.printStackTrace();
         }
 
         // Check to see if the operations have been successful, if it is commit
         try {
             repo.commit();
-        } catch (SQLException e) {
-            repo.rollback();
+        } catch (Exception e) {
         }
 
         // Release locks

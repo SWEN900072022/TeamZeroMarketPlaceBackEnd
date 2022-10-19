@@ -70,8 +70,7 @@ public class DeleteListingServlet extends HttpServlet {
         // Check to see if the operations have been successful, if it is commit
         try {
             repo.commit();
-        } catch (SQLException e) {
-            repo.rollback();
+        } catch (Exception e) {
         }
 
         Map<String, Boolean> result = new HashMap<>();

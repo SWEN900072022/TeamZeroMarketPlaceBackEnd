@@ -43,8 +43,7 @@ public class RegisterUserServlet extends HttpServlet {
 
         try {
             repo.commit();
-        } catch (SQLException e) {
-            repo.rollback();
+        } catch (Exception e) {
         }
 
         LockManager.getInstance().releaseOwner(email);

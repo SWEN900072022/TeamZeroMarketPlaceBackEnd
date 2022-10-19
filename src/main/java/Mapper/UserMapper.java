@@ -22,9 +22,6 @@ public class UserMapper extends GeneralMapper<User> {
     private User insertOperation(User user, boolean shouldReturn) throws SQLException {
         PreparedStatement statement;
 
-        if(conn == null) {
-            conn = SQLUtil.getConnection();
-        }
 
         statement = conn.prepareStatement(
                 "INSERT INTO users (username, password, email, role)" +
@@ -51,9 +48,6 @@ public class UserMapper extends GeneralMapper<User> {
         try {
             PreparedStatement statement;
 
-            if(conn == null) {
-                conn = SQLUtil.getConnection();
-            }
 
             statement = conn.prepareStatement(
                     "UPDATE users as u set " +
