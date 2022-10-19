@@ -158,21 +158,20 @@ public class AdminTest {
         assertNotNull(sellergroup);
     }
 
-//    @Test
-//    public void createSellerGroupError(){
-//        SellerGroup sg= admin.createSellerGroup("Team0");
-//        SellerGroup sellergroup= admin.createSellerGroup("Team0");
-//
-//        assertNull(sellergroup);
-//    }
+    @Test
+    public void createSellerGroupError(){
+        SellerGroup sellergroup= admin.createSellerGroup("a");
+
+        assertNull(sellergroup);
+    }
 
 
     @Test
     public void addSellerToGroupCorrectly(){
 
-        GroupMembership groupmembership= admin.addSellerToGroup("Team0",1);
+        GroupMembership groupmembership= admin.addSellerToGroup("a",3);
 
-        assertNull(groupmembership);
+        assertNotNull(groupmembership);
     }
 
     @Test
@@ -188,6 +187,13 @@ public class AdminTest {
 //
 //        assertNull(groupmembership);
 //    }
+
+    @Test
+    public void removeSellerFromGroupCorrectly(){
+        GroupMembership groupmembership= admin.removeSellerFromGroup("a",1);
+
+        assertNotNull(groupmembership);
+    }
 
     @Test
     public void removeSellerFromGroup(){
