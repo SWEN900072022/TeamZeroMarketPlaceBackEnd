@@ -5,12 +5,12 @@ actor User
 participant Servlet
 User -> Servlet : logout(token)
 activate Servlet
-Servlet -> Servlet : check token validity
+Servlet -> Servlet : Check token validity
 alt invalid token
-    Servlet --> User : invalid request
+    Servlet --> User : Invalid request
 else valid token
-    Servlet -> Servlet : store blacklisted token
-    Servlet --> User : logout successful
+    Servlet -> Servlet : Store blacklisted token
+    Servlet --> User : Logout successful
 end
 deactivate Servlet
 Servlet-[hidden]->Servlet
