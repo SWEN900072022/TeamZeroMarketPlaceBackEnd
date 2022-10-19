@@ -1,0 +1,20 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor User
+participant LoginServlet
+participant Database
+User -> LoginServlet : login
+activate LoginServlet
+
+LoginServlet -> Database : getUserByUsernamePassword(username, password)
+Database --> LoginServlet
+LoginServlet -> LoginServlet: Check returned user
+alt correct credentials
+    LoginServlet -> LoginServlet : Generate JWT Token
+    LoginServlet --> User : Send JWT token
+else invalid credentials
+    LoginServlet --> User : Invalid credentials
+deactivate LoginServlet
+end
+@enduml

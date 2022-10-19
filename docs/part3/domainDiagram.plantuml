@@ -1,0 +1,183 @@
+@startuml
+
+'Admin class
+class Admin{
+    - userGroupList : List<User>
+    {method} + getAllPurchases() : List<OrderItem>
+    {method} + getAllSellerGroup(repo : IUnitofWork ) : List<SellerGroup>
+    {method} + getAllUsers() : List<User>
+    {method} + createSellerGroup(groupName : String) : List<SellerGroup>
+    {method} + addSellerToGroup(groupName : String, userId : int) : GroupMembership
+    {method} + removeSellerFromGroup(groupName : String, userId : int) : GroupMembership
+    {method} + removeListing(listingId : int) : Listing
+}
+'Admin extends user.
+User<|--Admin : extends
+
+'Admin creates SellerGroups (association)
+Admin "1" --> "0..*" SellerGroup : creates
+'getAllUsers depends on user class (dependency) (implied by association)
+'Admin .> User
+'createSellerGroup creates sellers (dependency) (implied by association)
+'Admin .> SellerGroup
+'Admin adds members to groups
+Admin "1" ..> "0..*" GroupMembership : adds
+
+'AuctionListing class
+class AuctionListing {
+    {method} + bid(bid : Money, bidTime : localDateTime, userId : int): Bid
+}
+'AuctionListing extends Listing
+Listing <|-- AuctionListing : extends
+'Bid method creates bids using Bid factory (dependency)
+AuctionListing "1"..> "0..*" Bid : has
+
+'Bid Class
+class Bid {
+    - listingId : int
+    - userId : int
+    - bidAmount : Money
+    {method} {static} + create(listingId : int, userId : int, bidAmount : Money) : Bid
+
+}
+
+'Customer Class
+class Customer{
+    - listingList : List<Listing>
+    {method} + checkoutListing(address : String,  oiList : List<OrderItem>) : Order
+    {method} + bid(listingId : int, bidAmount : Money) : Bid
+    {method} + viewAllOrders() : List<Order>
+    {method} + modifyOrder(orderId : int, listingId : int, quantity : int) : List<EntityObject>
+    {method} + cancelOrder(orderId : int) : Order
+}
+'Customer extends user class.
+User <|-- Customer : extends
+
+'Customer has list of orders. (association)
+Customer "1..*" --> "0..*" Order : has/view/modify/cancel
+'Customer bids on listings. (dependency)
+Customer "1..*" .> "0..*" AuctionListing : bids on
+
+'FixedPriceListing Class
+class FixedPriceListing{
+
+}
+'FixedPriceListing extends Listing
+Listing <|-- FixedPriceListing : extends
+
+'GroupMembership Class
+class GroupMembership {
+    - groupId : int
+    - userId : int
+    {static} + create(groupId : int, userId : int) : GroupMembership
+    {static} + getGroupMembershipByUserId(userId : int, repo : IUnitofWork) : GroupMembership
+    + markForDelete() : void
+}
+
+'Listing Class
+class Listing{
+    - listingId : int
+    - groupId : int
+    - type : ListingTypes
+    - title : String
+    - description : String
+    - quantity : int
+    - price : Money
+    - startTime : LocalDateTime
+    - endTime : LocalDateTime
+    {method} {static}  + create(listingId : int, groupId : int, type : ListingTypes,
+    {static}title : String, description : String, quantity : int, price : Money, startTime : LocalDateTime, endTime : LocalDateTime) : Listing
+    {method} {static} + getListingById(listingId : int, repo : IUnitofWork) : Listing
+    {method} {static} + getListingByFilterCondition(filterCondition : List<Filter>, repo : IUnitofWork) : List<Listing>
+    {method} {static} + getInjector(key : String) : ISQLInjector
+}
+
+
+'Order Class
+class Order{
+    - orderId : int
+    - userId : int
+    - address : String
+    - repo : IUnitofWork
+
+    {method} {static}  + create(orderId : int, userId : int, address : String) : Order
+    {method} {static}  + create(orderId : int, userId : int, address : String, orderItemList : List<OrderItem>) : Order
+    {method} {static} + getOrdersByGroupId(groupId : int, repo : IUnitofWork) : List<OrderItem>
+    {method} {static} + getOrdersByUserId(userId : int, repo : IUnitofWork) : List<Order>
+    {method} {static} + getLastOrderItem(repo : IUnitofWork) : Order
+    {method} {static} + getAllOrders(repo : IUnitofWork) : List<Order>
+    {method} {static} + getOrderItemList(orderId : int, repo : IUnitofWork) : List<OrderItem>
+    + modifyOrderItem(listingId : int, quantity : int, stockLevel : int) : OrderItem
+    + getOrderItem (listingId : int) : OrderItem
+}
+'An order has a list of items.
+Order "1" --> "1..*" OrderItem : has
+
+'OrderItem Class
+class OrderItem{
+    - orderId : int
+    - listingId : int
+    - quantity : int
+    - unitPrice : Money
+    - priceInCents : int
+
+    {static} + create(orderId : int, listingId : int, quantity : int, unitPrice : Money) : OrderItem
+}
+
+class Seller{
+
+    + createListing(groupId : int, type : ListingTypes, title : String, description : String,
+    quantity : int, price : Money, startTime : LocalDateTime, endTime : LocalDateTime)
+    + deleteListing(listingId : int, groupId : int) : Listing
+    + viewSellerListings(groupId : int) : List<Listing>
+    + viewOrders() : List<OrderItem>
+    + viewFullOrder(groupId : int) : List<Order>
+    + modifyOrder(orderId : int, listingId : int, groupId : int, quantity : int) : List<EntityObject>
+    + cancelOrder(orderId : int, groupId : int) : Order
+
+}
+'Seller extends User
+User <|-- Seller : extends
+
+'Seller has a list of orders.
+Seller "1" --> "0..*" Order : creates/modify/deletes
+'Seller has listings.
+Seller "1" --> "0..*" Listing : creates/modify/cancel
+'Seller belongs to sellerGroup.
+Seller "0..*" --> "1..*" SellerGroup : belongs to
+
+'SellerGroup Class
+class SellerGroup {
+    - groupId : int
+    - groupName : String
+'    - listingList : List<Listing>
+'    - ordersList : List<OrderItem>
+    - repo : IUnitofWork
+
+    + addSeller(userId : int, groupId : int) : GroupMembership
+    + removeSeller(userId : int, groupId : int) : GroupMembership
+    {static} + create(groupId : int, groupName : String) : SellerGroup
+    {static} + create(groupId : int, groupName : String, sellerList : List<GroupMembership>, listingList : List<Listing>, ordersList : List<OrderItem>) : SellerGroup
+    {static} + getSellerGroupByGroupName(groupName : String, repo : IUnitofWork) : SellerGroup
+    {static} + getAllSellerGroup(repo : IUnitofWork) : List<SellerGroup>
+
+}
+'Each seller group has group members
+GroupMembership"0..*" <- "1" SellerGroup : has
+'User Class
+abstract class User{
+    - email : String
+    - username : String
+    - password : String
+    - userId : int
+    - repo : IUnitofWork
+
+    {static} + create(email : String, username : String, password : String, userId : int, roles : String) : User
+    {static} + getAllUser(repo : IUnitofWork) : List<User>
+    {static} + getUserByUsernamePassword(email : String, password : String, repo : IUnitofWork) : User
+    + login() : String
+    {static} + register(email : String, username : String, password : String, roles : String, repo : IUnitofWork) : User
+
+}
+
+@enduml
