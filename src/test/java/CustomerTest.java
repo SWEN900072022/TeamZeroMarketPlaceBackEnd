@@ -1,201 +1,141 @@
 import Domain.*;
 import Enums.ListingTypes;
-import Enums.UserRoles;
 import MockClasses.MockRepository;
 import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.Test;
-
 import javax.money.Monetary;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SellerTest {
+public class CustomerTest {
     private MockRepository repo;
-    private Seller seller;
+    private Customer customer;
 
-    public SellerTest() {
+    public CustomerTest() {
         this.repo = new MockRepository();
-        this.seller = (Seller) User.create(
-                "b",
-                "b",
-                "b",
-                2,
-                UserRoles.SELLER.toString()
-        );
-        seller.setRepo(repo);
+        this.customer = new Customer("a", "a", "a", 1);
+        customer.setRepo(repo);
     }
 
     @Test
-    public void createListingCorrectly() {
+    public void BidCorrectly() {
+        Bid l = customer.bid(2, Money.of(3, Monetary.getCurrency("AUD")));
 
-       Listing listingList = seller.createListing(1, ListingTypes.FIXED_PRICE,"Jacket","Winter Jacket",1,
-               Money.of(3, Monetary.getCurrency("AUD")), LocalDateTime.of(2022, 1, 1,
-                       10, 10),LocalDateTime.of(2022, 2, 1,
-                       10, 10));
-
-        assertNotNull(listingList);
-        assertEquals(listingList.getListingId(),0);
-        assertEquals(listingList.getGroupId(),1);
-        assertEquals(listingList.getTitle(),"Jacket");
+        // check the elements of l
+        assertEquals(l.getListingId(), 2);
     }
 
     @Test
-    public void createListingAuction() {
+    public void BidOnFixedPrice() {
+        Bid l = customer.bid(1, Money.of(3, Monetary.getCurrency("AUD")));
 
-        Listing listingList = seller.createListing(1, ListingTypes.AUCTION,"Jacket","Winter Jacket",1,
-                Money.of(3, Monetary.getCurrency("AUD")), LocalDateTime.of(2022, 1, 1,
-                        10, 10),LocalDateTime.of(2022, 2, 1,
-                        10, 10));
-
-        assertNotNull(listingList);
-        assertEquals(listingList.getListingId(),0);
-        assertEquals(listingList.getGroupId(),1);
-        assertEquals(listingList.getTitle(),"Jacket");
+        assertNull(l);
     }
 
     @Test
-    public void createListing() {
-        //Test for creating Listing
-        Listing listingList = Listing.create(1, 1,ListingTypes.FIXED_PRICE,"Jacket","Winter Jacket",2,
-                Money.of(3, Monetary.getCurrency("AUD")), LocalDateTime.of(2022, 1, 1,
-                        10, 10),LocalDateTime.of(2022, 2, 1,
-                        10, 10));
+    public void OutOfIdBid() {
+        Bid l = customer.bid(300, Money.of(3, Monetary.getCurrency("AUD")));
 
-        assertNotNull(listingList);
-        assertEquals(listingList.getListingId(),1);
-        assertEquals(listingList.getGroupId(),1);
-        assertEquals(listingList.getTitle(),"Jacket");
-    }
-
-//    @Test
-//    public void deleteListingCorrectly(){
-//        Listing listingList = seller.deleteListing(1,1);
-//
-//        assertEquals(listingList.getListingId(),1);
-//        assertEquals(listingList.getGroupId(),1);
-//        assertNotNull(listingList);
-//    }
-
-
-    @Test
-    public void deleteListingCorrectly(){
-        Listing listingList = seller.deleteListing(1,1);
-
-        assertEquals(listingList.getListingId(),1);
-        assertEquals(listingList.getGroupId(),1);
-        assertNotNull(listingList);
+        assertNull(l);
     }
 
     @Test
-    public void deleteListingGroupIdError(){
-        Listing listingList = seller.deleteListing(1,1);
+    public void bidTooSmall() {
+        Bid l = customer.bid(2, Money.of(1, Monetary.getCurrency("AUD")));
 
-        assertNotNull(listingList);
+        assertNull(l);
     }
 
     @Test
-    public void deleteListingListingIdError(){
-        Listing listingList = seller.deleteListing(999,1);
+    public void  viewAllOrdersCorrectly() {
 
-        assertNull(listingList);
-    }
-
-
-    @Test
-    public void viewSellerListingsCorrectly(){
-        List<Listing> listingList = seller.viewSellerListings(1);
-
-        assertNotNull(listingList);
-    }
-
-//    @Test
-//    public void viewSellerListingsError(){
-//        List<Listing> listingList = seller.viewSellerListings(0);
-//
-//        //assertNull(listingList);
-//        assertNotEquals(listingList.,);
-//    }
-
-    @Test
-    public void viewSellerListings(){
-        List<Listing> listingList = seller.viewSellerListings(1);
-
-        assertNotNull(listingList);
-    }
-
-    @Test
-    public void modifyOrderCorrectly(){
-        List<EntityObject> listingList = seller.modifyOrder(1,1,1,2);
-
-
-        assertNotNull(listingList);
-
-    }
-
-
-    @Test
-    public void viewOrdersCorrectly() {
-        List<OrderItem> ordersList = seller.viewOrders();
-
-        assertNotNull(ordersList);
-    }
-
-    @Test
-    public void  viewOrdersGetByUserId() {
-        List<Order> orderList= Order.getOrdersByUserId(1,repo);
-
+        List<Order> orderList = customer.viewAllOrders();
+        Order.getOrdersByUserId(1,repo);
         assertNotNull(orderList);
     }
 
     @Test
-    public void viewOrders() {
-        //Test for OrderItem
-        OrderItem orderItemList=OrderItem.create(1,1,2,Money.of(3, Monetary.getCurrency("AUD")));
-        List<OrderItem> oiList = new ArrayList<>();
-        oiList.add(orderItemList);
-
-        assertNotNull(oiList);
-    }
-
-    @Test
-    public void viewFullOrderCorrectly() {
-        List<Order> fullOrderList = seller.viewFullOrder(1);
-
-        assertNotNull(fullOrderList );
-    }
-
-
-    @Test
-    public void viewFullOrder() {
-        //Test fo ，，，，r Order
-        List<Order> fullOrderList = new ArrayList<Order>();
-        Order order = Order.create(1,1,"Melbourne");
-        fullOrderList.add(order);
-        assertNotNull(fullOrderList );
+    public void  viewAllOrders() {
+        // Test for orders in the view all orders
+        Order order= Order.create(1,1,"Melbourne");
         assertEquals(order.getOrderId(),1);
         assertEquals(order.getUserId(),1);
         assertEquals(order.getAddress(),"Melbourne");
+    }
 
+    @Test
+    public void  viewAllOrdersGetByUserId() {
+        // test get orders by user id in view all orders
+        List<Order> orderList= Order.getOrdersByUserId(1,repo);
+        assertNotNull(orderList);
+    }
+
+    @Test
+    public void  viewAllOrdersItems() {
+        //Test for view all orders
+        OrderItem orderItemList=OrderItem.create(1,1,2,Money.of(3, Monetary.getCurrency("AUD")));
+        List<OrderItem> oiList = new ArrayList<>();
+        oiList.add(orderItemList);
+        Order order= Order.create(1,1,"Melbourne",oiList);
+
+        assertNotNull(order);
+        assertEquals(order.getOrderItemList(),oiList);
+        assertEquals(order.getOrderId(),1);
+        assertEquals(order.getUserId(),1);
+        assertEquals(order.getAddress(),"Melbourne");
     }
 
     @Test
     public void cancelOrderCorrectly(){
+        Order orderList = customer.cancelOrder(1);
 
-        Order ordersList = seller.cancelOrder(1,1);
-        assertEquals(ordersList.getOrderId(),1);
-        assertNotNull(ordersList);
+        assertEquals(orderList.getOrderId(),1);
+        assertNotNull(orderList);
     }
 
     @Test
-    public void cancelOrderOrderIdError(){
-
-        Order orderList = seller.cancelOrder(999,1);
+    public void cancelNullOrder(){
+        Order orderList = customer.cancelOrder(999);
 
         assertNull(orderList);
     }
+
+
+    @Test
+    public void modifyOrdersCorrectly(){
+        List<EntityObject> orderList = customer.modifyOrder(1,1,3);
+
+        assertNotNull(orderList);
+
+    }
+
+
+    @Test
+    public void checkoutListingItem(){
+        // test when one item in the listing
+        OrderItem item = OrderItem.create(1,1,2,Money.of(3, Monetary.getCurrency("AUD")));
+        List<OrderItem> oiList = new ArrayList<>();
+        oiList.add(item);
+        Order orderList = customer.checkoutListing("Melbourne", oiList);
+        assertEquals(orderList.getAddress(),"Melbourne");
+        assertNotNull(oiList);
+}
+
+    @Test
+    public void checkoutListingItems(){
+        // test when more than one item in the listing
+        OrderItem item1 = OrderItem.create(1,1,2,Money.of(3, Monetary.getCurrency("AUD")));
+        OrderItem item2 = OrderItem.create(1,2,3,Money.of(4, Monetary.getCurrency("AUD")));
+        List<OrderItem> oiList = new ArrayList<>();
+        oiList.add(item1);
+        oiList.add(item2);
+        Order orderList = customer.checkoutListing("Melbourne", oiList);
+        assertEquals(orderList.getAddress(),"Melbourne");
+        assertNotNull(oiList);
+    }
+
 
 }
