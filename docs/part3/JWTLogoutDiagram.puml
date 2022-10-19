@@ -1,0 +1,22 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor User
+participant Servlet
+User -> Servlet : logout(token)
+activate Servlet
+Servlet -> Servlet : check token validity
+alt invalid token
+    Servlet --> User : invalid request
+else valid token
+    Servlet -> Servlet : store blacklisted token
+    Servlet --> User : logout successful
+end
+deactivate Servlet
+Servlet-[hidden]->Servlet
+activate Servlet
+loop
+    Servlet -> Servlet : Delete expired blacklisted tokens
+end
+deactivate Servlet
+@enduml
