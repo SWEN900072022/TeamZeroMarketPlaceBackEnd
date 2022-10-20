@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Customer extends User {
-    private UserRoles userRoles = UserRoles.CUSTOMER;
+    private UserRoles role = UserRoles.CUSTOMER;
     private List<Order> orderList;
     private List<Listing> listingList;
 

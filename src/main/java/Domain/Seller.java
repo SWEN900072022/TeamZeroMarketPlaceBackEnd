@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 public class Seller extends User{
-    private UserRoles userRoles = UserRoles.SELLER;
+    private UserRoles role = UserRoles.SELLER;
     private SellerGroup sg;
     private List<Listing> listingList;
     private List<OrderItem> ordersList;

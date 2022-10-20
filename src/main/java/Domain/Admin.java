@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class Admin extends User{
-    private UserRoles userRoles = UserRoles.ADMIN;
+    private UserRoles role = UserRoles.ADMIN;
     private List<SellerGroup> sellerGroupList;
     private List<User> userGroupList;
 
