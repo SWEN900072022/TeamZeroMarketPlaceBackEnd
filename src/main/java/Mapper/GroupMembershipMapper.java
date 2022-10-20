@@ -67,11 +67,12 @@ public class GroupMembershipMapper extends GeneralMapper<GroupMembership> {
                 gm = GroupMembership.create(
                         rs.getInt("groupId"),
                         rs.getInt("userId"));
+                return gm;
             }
         } catch (SQLException e) {
             return null;
         }
-        return gm;
+        return null;
     }
 
     @Override

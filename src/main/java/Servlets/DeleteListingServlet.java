@@ -71,6 +71,7 @@ public class DeleteListingServlet extends HttpServlet {
         try {
             repo.commit();
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
         Map<String, Boolean> result = new HashMap<>();
