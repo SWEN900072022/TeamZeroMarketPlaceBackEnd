@@ -3,6 +3,7 @@ package Domain;
 import Enums.UserRoles;
 import Injector.FindConditionInjector.FindAllInjector;
 import Injector.FindConditionInjector.FindEmailAndPasswordInjector;
+import Injector.FindConditionInjector.FindEmailInjector;
 import UnitofWork.IUnitofWork;
 import Util.GeneralUtil;
 import Util.JWTUtil;
@@ -70,6 +71,17 @@ public abstract class User extends EntityObject{
         );
     }
 
+    public static User getUserByEmail(String email, IUnitofWork repo) {
+        List<Object> param = new ArrayList<>();
+        param.add(email);
+
+        return (User) repo.read(
+                new FindEmailInjector(),
+                param,
+                User.class
+        );
+    }
+
     public String login() {
         // Check to see if the user is present
         User user = getUserByUsernamePassword(email, password, repo);
@@ -94,7 +106,7 @@ public abstract class User extends EntityObject{
 
     public static User register(String email, String username, String password, String roles, IUnitofWork repo) {
         // Check to see if the user is already present
-        User user = getUserByUsernamePassword(email, password, repo);
+        User user = getUserByEmail(email, repo);
 
         if(user == null) {
             // user does not exist
