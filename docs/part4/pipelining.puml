@@ -1,0 +1,18 @@
+@startuml
+Frontend -> Backend: /loadAdminDashboard?request=getAllUsers \n Connection: keep alive
+Backend -> Backend: Adds getAllUsers to buffer
+Frontend -> Backend: /loadAdminDashboard?request=getAllPurchases \n Connection: keep alive
+Backend -> Backend: Adds getAllPurchases to buffer
+group parallel [thread 1]
+    Backend -> Backend : pops request from buffer
+    Backend -> Database : Retrieves list of users
+    Database -> Backend : Returns data
+    Backend -> Frontend : Returns data
+else thread 2
+    Backend -> Backend : pops request from buffer
+    Backend -> Database : Retrieves list of purchases
+    Database -> Backend : Returns data
+    Backend -> Frontend : Returns data
+end
+Frontend -> Backend: /loadAdminDashboard \n Connection: close
+@enduml

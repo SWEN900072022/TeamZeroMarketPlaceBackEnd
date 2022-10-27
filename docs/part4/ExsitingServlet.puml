@@ -1,0 +1,13 @@
+@startuml
+    Frontend -> Servlet : /adminDashboard
+    Servlet -> AdminDashboardFacade : load admin dashboard
+    AdminDashboardFacade -> SellerGroup : get all purchases
+    SellerGroup -> AdminDashboardFacade : returns all order objects
+    AdminDashboardFacade -> User : get all users
+    User -> AdminDashboardFacade : returns all users objects
+    AdminDashboardFacade -> AdminDashboardDTO : create new DTO with the user and purchase data
+    AdminDashboardDTO -> AdminDashboardFacade : returns an instance of the new DTO
+    AdminDashboardFacade -> Servlet : returns Admin Dashboard DTO
+    Servlet -> Servlet : Serialises Admin Dashboard DTO
+    Servlet -> Frontend : return relevant data
+@endum

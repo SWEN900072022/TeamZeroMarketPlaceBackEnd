@@ -1,0 +1,18 @@
+@startuml
+DomainObject -> UnitOfWork : Get object
+alt Has entry in identity map
+    UnitOfWork -> IdentityMap : Check identity map for object
+    IdentityMap -> UnitOfWork : Return object
+else Has entry in cache
+    UnitOfWork -> Cache : Check cache for object data
+    Cache -> UnitOfWork : Return data
+else No entry in cache or identity map
+    UnitOfWork -> Mapper : Find(ISQLInjector, param)
+    Mapper -> Database : find the database entries
+    Database -> Mapper : results
+    Mapper -> UnitOfWork : results
+    Mapper -> Cache : updates cache
+    UnitOfWork -> IdentityMap : updates identity map
+end
+UnitOfWork -> DomainObject : Instantiates object
+@enduml

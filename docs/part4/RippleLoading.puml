@@ -1,0 +1,18 @@
+@startuml
+== Without Ripple Loading ==
+Order -> UnitOfWork : getAllOrderItems
+UnitOfWork -> Order : returns data
+==End of Without Ripple Loading ==
+==Ripple Loading ==
+Order -> OrderItem1 : getOrderItem1
+OrderItem1 -> OrderItem1 : check is null
+OrderItem1 -> UnitOfWork : getOrderItem1
+UnitOfWork -> OrderItem1 : return OrderItem1
+
+Order -> OrderItem2 : getOrderItem2
+OrderItem2 -> OrderItem2 : check is null
+OrderItem2 -> UnitOfWork : getOrderItem1
+UnitOfWork -> OrderItem2 : return OrderItem2
+== End of Ripple Loading ==
+
+@enduml
